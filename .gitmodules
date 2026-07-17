@@ -1,0 +1,3 @@
+[submodule "directed/sHoTT"]
+	path = directed/sHoTT
+	url = https://github.com/rzk-lang/sHoTT.git

@@ -1,0 +1,5 @@
+include:
+  - sHoTT/src/hott/**/*.rzk.md
+  - sHoTT/src/simplicial-hott/**/*.rzk.md
+  - causal-directed.rzk.md
+  - gwb-probe.rzk.md

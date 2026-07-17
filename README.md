@@ -35,3 +35,17 @@ The eight root modules in `src/` (`FDist-Convex`, `RuleDoCalc`, `Rule2`, and the
 `WeightQ` modules) are reused unchanged from the companion artifact
 [cubical-pearls](https://github.com/karsar/cubical-pearls) (arXiv:2606.20351), so
 the artifact checks on its own.
+
+## Directed companion (rzk)
+
+The `directed/` folder holds a separate, exploratory development in a *directed*
+type theory: causal influence as a non-invertible `hom` in a Segal type, in the
+[rzk](https://github.com/rzk-lang/rzk) proof assistant on the
+[sHoTT](https://github.com/rzk-lang/sHoTT) library (pinned as a submodule). It
+proves the structural laws of directed causal reasoning — composition,
+covariant propagation, Rezk/Yoneda identifiability — under **rzk 0.8**.
+
+It sits on a different footing from the Agda development above: unlike the
+`--safe`, postulate-free Agda part, the directed companion **assumes one axiom**
+(extension extensionality), and directed univalence — hence the do-operator — is
+stated but not yet inhabited. See `directed/README.md`.
