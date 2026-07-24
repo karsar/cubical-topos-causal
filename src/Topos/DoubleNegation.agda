@@ -202,5 +202,4 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
     ; jnat   = λ x y f S → cong (¬S {x}) (¬-nat x y f S) ∙ ¬-nat x y f (¬S {y} S)
     ; j-⊤    = j-⊤-¬¬
     ; j-idem = j-idem-¬¬
-    ; j-∧    = j-∧-¬¬
-    ; j-infl = λ c S → dne-unit S }
+    ; j-∧    = j-∧-¬¬ }

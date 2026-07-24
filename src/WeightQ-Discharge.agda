@@ -147,6 +147,20 @@ z0≤z1 = ℤO.zero-≤pos
 z0<z1    : z0 <r z1
 z0<z1 = 0 , refl
 
+-- A strictly interior value ½ = [1/2], witnessing that the unit
+-- interval has a point strictly between its endpoints.  Both strict
+-- bounds are the same (0 , refl) cross-multiplication witness as
+-- z0<z1 (0·2 < 1·1 and 1·1 < 1·2).  This is what makes a confounded
+-- model non-degenerate downstream (WeightQ.wHalf).
+zHalf : ℝ
+zHalf = [ pos 1 / 2 ]
+
+z0<zHalf : z0 <r zHalf
+z0<zHalf = 0 , refl
+
+zHalf<z1 : zHalf <r z1
+zHalf<z1 = 0 , refl
+
 <r-implies-≤r : ∀ {x y} → x <r y → x ≤r y
 <r-implies-≤r {x} {y} = QO.<Weaken≤ x y
 
@@ -397,10 +411,10 @@ z0-decide x 0≤x with x QO.≟ z0
 -- ============================================================
 -- VERIFICATION: every postulate from WeightQ.agda's abstract
 -- "ordered field" interface is now provided as a concrete
--- definition or theorem above. Only the 5 new ℝ-level axioms
+-- definition or theorem above. The 5 remaining ℝ-level laws
 -- (<r-irrefl, ≡z1-or-<z1, +r-eq-z0-l, ·r-/r-pos, /r-·r-pos)
--- remain postulated; each is a standard theorem of ℚ that
--- could be discharged with additional cubical-library lemmas.
+-- are discharged too --- proved for ℚ, the division laws in
+-- WeightQ-Discharge-Division. Nothing here is postulated.
 --
 -- The full inventory of discharged WeightQ ℝ-postulates:
 --   ℝ, isSet-ℝ          ✓ (= ℚ, isSetℚ)
@@ -420,7 +434,7 @@ z0-decide x 0≤x with x QO.≟ z0
 --   isProp-z0≤          ✓ (from QO.isProp≤)
 --   isProp-x≤z1         ✓ (from QO.isProp≤)
 --   1-r, 1-r-def        ✓ (concrete definition)
---   _/r_                ✓ (trivial defensive implementation; see comment above)
+--   _/r_                ✓ (honest ℚ division; see WeightQ-Discharge-Division)
 --
 -- TOTAL: 28 of 28 WeightQ ℝ-interface postulates discharged.
 -- WeightQ-Discharge.agda contains zero postulates.

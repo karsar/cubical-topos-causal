@@ -2,24 +2,26 @@
 
 -- ============================================================
 -- Topos.InflationarityIndependence — a counter-model showing that
--- the three standard Lawvere-Tierney equations do NOT entail
--- inflationarity.
+-- the three Lawvere-Tierney equations, taken pointwise on an
+-- arbitrary Heyting algebra, do NOT by themselves entail
+-- inflationarity (S ≤ j S).
 --
--- The modal layer (Topos.LawvereTierney) adds inflationarity
--- (S ≤ j S, the field `j-infl`) as a FOURTH axiom, on top of the
--- three usually given:
---     j ⊤ = ⊤            (preserves truth)
---     j (x ∧ y) = j x ∧ j y   (preserves meets)
---     j (j x) = j x      (idempotent).
--- The paper claims this fourth law is independent of the first
--- three.  Here we machine-check that claim with the minimal
--- counter-model: the three-element chain ⊥ < a < ⊤ with the
--- operator j that fixes ⊥ and ⊤ but sends a ↦ ⊥.  It satisfies all
--- three equations yet collapses `a` strictly below itself, so it is
--- not inflationary and not a closure operator.  Hence the three
--- equations are satisfiable without inflationarity: they do not
--- entail it.  (A genuine Lawvere-Tierney topology — e.g. ¬¬ in
--- Topos.DoubleNegation — does satisfy all four.)
+-- For a Lawvere-Tierney topology proper — a NATURAL morphism
+-- j : Ω ⇒ Ω — inflationarity is derivable, not assumed: naturality
+-- together with j ⊤ = ⊤ force it (Topos.InflationarityDerivable).
+-- Naturality is what does the work; this module isolates that by
+-- dropping it.  On the bare three-element Heyting chain ⊥ < a < ⊤,
+-- with the operator j that fixes ⊥ and ⊤ but sends a ↦ ⊥, the three
+-- equations
+--     j ⊤ = ⊤                  (preserves truth)
+--     j (x ∧ y) = j x ∧ j y    (preserves meets)
+--     j (j x) = j x            (idempotent)
+-- all hold, yet j collapses `a` strictly below itself: it is not
+-- inflationary and not a closure operator.  The chain is a Heyting
+-- algebra but not a subobject classifier, and without the naturality
+-- a topos Ω supplies, the three equations alone leave inflationarity
+-- underdetermined.  (The double-negation topology in
+-- Topos.DoubleNegation, a topology proper, is inflationary.)
 -- ============================================================
 
 module Topos.InflationarityIndependence where

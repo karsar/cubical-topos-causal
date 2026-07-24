@@ -102,7 +102,8 @@ open import WeightQ-Field public using
   ; 1-r ; 1-r-def ; _/r_
   ; <r-irrefl ; ≡z1-or-<z1 ; +r-eq-z0-l ; ·r-/r-pos ; /r-·r-pos
   ; /r-pos-bound-l ; /r-pos-bound-u ; z0-decide ; ≤r-+-cancel-r
-  ; <r-·-pos-factor-l ; <r-z1→pos-1-r )
+  ; <r-·-pos-factor-l ; <r-z1→pos-1-r
+  ; zHalf ; z0<zHalf ; zHalf<z1 )
 
 -- ============================================================
 -- The Weight type: ℝ values in [z0, z1].
@@ -693,17 +694,10 @@ pos-*w pp pq = <r-·-pos pp pq
 -- ============================================================
 -- _/w_pf: PARTIAL division taking explicit preconditions.
 --
--- This is the migration target for _/w_. Each call site of _/w_
--- in the framework is in a context where these preconditions
--- are derivable from facts already in scope. After migration,
--- the defensive /r-bound-* postulates can be eliminated.
---
--- For now, the implementation reuses the defensive postulates
--- internally — but unlike _/w_, the SIGNATURE captures the
--- contract that the framework's call sites honor. Once a real
--- ℚ division is plumbed through, the bound proofs can be
--- DERIVED from the precondition arguments, eliminating the
--- defensive postulates.
+-- This is the partial division the framework uses. The value is
+-- honest ℚ division (WeightQ-Discharge-Division), and the bound
+-- proofs are derived from the Pos and ≤ precondition arguments;
+-- nothing here is postulated.
 -- ============================================================
 _/wPf_⟨_,_⟩ : (a b : Weight) → Pos b → (val a ≤r val b) → Weight
 (mkW v₁ l₁ _) /wPf (mkW v₂ _ _) ⟨ pb , le ⟩ =
@@ -720,6 +714,24 @@ _/wPf_⟨_,_⟩ : (a b : Weight) → Pos b → (val a ≤r val b) → Weight
 -- into z0<z1 gives z0<z0, impossible by <r-irrefl.
 w0≢w1 : ¬ (w0 ≡ w1)
 w0≢w1 w0≡w1 = <r-irrefl z0 (subst (z0 <r_) (sym (cong val w0≡w1)) z0<z1)
+
+-- wHalf: a strictly interior weight (½).  It is the concrete witness
+-- that an interior confounding strength exists, so the do≠see theorem
+-- (Topos.DoSeeDistinct) is not vacuous.  Both Pos wHalf and
+-- Pos (1-w wHalf) hold, from the strict bounds z0 < ½ < z1.
+wHalf : Weight
+wHalf = mkW zHalf (<r-implies-≤r z0<zHalf) (<r-implies-≤r zHalf<z1)
+
+Pos-wHalf : Pos wHalf
+Pos-wHalf = z0<zHalf
+
+Pos-1-wHalf : Pos (1-w wHalf)
+Pos-1-wHalf = <r-z1→pos-1-r zHalf<z1
+
+-- wHalf ≢ w1: the interior weight is not the top point (its complement
+-- is positive).  This is the scalar gap that separates do from see.
+wHalf≢w1 : ¬ (wHalf ≡ w1)
+wHalf≢w1 h = ¬Pos-w0 (subst Pos (cong 1-w_ h ∙ 1-w-1) Pos-1-wHalf)
 
 -- +w-cancel-l: derived from +r-cancel-l-ℝ (which is itself
 -- derived from the abstract ring axioms).
@@ -745,8 +757,9 @@ w0≢w1 w0≡w1 = <r-irrefl z0 (subst (z0 <r_) (sym (cong val w0≡w1)) z0<z1)
 -- Direct: from Pos (p·q), case-split on whether val p = z0 or z0 < val p.
 -- We use the fact that z0 ≤ val p (lb p) and discrimination at z0.
 -- Cleaner: contrapositive via ≡z1-or-<z1 isn't directly applicable; use
--- a different route via the ordered field structure already postulated.
--- Below: we postulate a direct ℝ-level analogue and lift.
+-- a different route via the ordered field structure.
+-- Below: we use the ℝ-level lemma <r-·-pos-factor-l (proved in
+-- WeightQ-Discharge) and lift it via lb p.
 pos-*w-factor-l : ∀ {p q : Weight} → Pos (p *w q) → Pos p
 pos-*w-factor-l {p} {q} pp·q = <r-·-pos-factor-l (lb p) pp·q
 
@@ -778,77 +791,14 @@ weight-trichotomy p with ≡z1-or-<z1 (val p) (lb p) (ub p)
 -- ============================================================
 
 -- ============================================================
--- Three-tier inventory
---
--- The Weight signature of FDist.agda is split by this module
--- into three tiers:
---
---   TIER A (DISCHARGED as Weight-level theorems): the
---   structural identities of the convex algebra of Weight,
---   proved by lifting ℝ-level identities via WeightPath:
---     +w-comm, *w-comm, *w-1, *w-0, +w-0,
---     1-w-invol, 1-w-0, 1-w-1, compl, weighted-idem,
---     *w-assoc, *w-distrib-+w,
---     commuteProof, bdy0Proof, bdy1Proof, interchangeProof,
---     pos-w1, pos-+w-l, pos-*w, isProp-Pos.
---   These are bona fide theorems in this module: their proofs
---   are algebraic chains lifting ℝ-level identities to Weight.
---
---   The supporting ℝ-level identities are themselves derived
---   in this module from the basic ring and ordering axioms:
---     1-r-z0-ℝ, 1-r-z1-ℝ, +r-compl-ℝ, weighted-idem-ℝ,
---     1-r-invol-ℝ, ·r-bdy0-eq, ·r-bdy1-eq, ·r-commute-eq,
---     ·r-interchange-eq, +r-medial.
---   The interchange identity ·r-interchange-eq is derived
---   from distributivity, the medial law for +r, ·r-comm,
---   and ·r-assoc, in approximately 30 lines of equational
---   reasoning. With these derivations in place, the trust
---   footprint at the ℝ level reduces to the basic axioms of
---   a totally ordered commutative ring with division, plus
---   the additional ring helpers -r-distrib, -r-invol, -r-z0
---   (each a standard ring fact).
---
---   TIER B (REMAINS as postulates at the Weight level): the
---   bayesW-related identities involving division --
---     bayesW-pos, bayesW-1mp-pos, bayesW-swap, bayesW-dummy,
---     bayesW-cond-outer/left/right, bayesW-comm, bayesPf.
---   These are theorems of ordered-field arithmetic, but their
---   proofs require careful handling of division by positive
---   quantities (the standard difficulty of Bayes-style
---   reasoning in constructive settings). We postulate them
---   here at the Weight level; in a fully developed ordered-
---   field library with positivity-tracked division, each
---   would be provable.
---
---   The remaining structural postulates at the Weight level
---   --- isSetWeight, +r-bound-convex, 1-r-bound-l/u, /r-bound-*
---   --- are closure laws that follow from standard properties
---   of the ordered field; we postulate them for module brevity.
---
---   TIER C (REMAINS as a path postulate on FDist): the path
---   constructor mix-bayes-interchange. This is a path between
---   FDist objects; this module contributes the algebraic
---   identity relating their underlying weights (provable from
---   the bayesW identities of Tier B), but the path itself
---   between FDist values is not derivable in this module.
---   Discharging it would require either parameterizing FDist
---   over the Weight signature or proving the path from the
---   existing FDist axioms plus the rational arithmetic
---   identity, neither of which is taken on here.
---
--- The result of this module is threefold. First, the structural
--- identities of Tier A are now bona fide Weight-level theorems,
--- supported by ℝ-level derivations from the ring axioms.
--- Second, the polynomial identities at the heart of the
--- expectation-related laws (bdy0, bdy1, commute, interchange)
--- are derived from distributivity and ring-theoretic moves
--- rather than postulated. Third, the trust footprint of the
--- development is now: (a) the basic axioms of a totally
--- ordered commutative ring (Tier A backbone, all standard);
--- (b) the closure laws of the unit interval under the convex
--- operations (Tier B closure, mechanical); and (c) the
--- bayesW arithmetic identities under positive-divisor
--- division (Tier B Bayes, substantial but standard).
+-- The Weight-level convex algebra (the structural identities, the
+-- bayesW division identities, and the unit-interval closure laws)
+-- is proved here, not postulated: each is lifted via WeightPath
+-- from an ℝ-level identity, and ℝ is the concrete cubical-library
+-- ℚ (WeightQ-Field, with positivity-tracked division in
+-- WeightQ-Discharge-Division).  The FDist path constructor
+-- mix-bayes-interchange lives in the FDist higher inductive type
+-- (FDist-Convex), not here.  This module contains no postulate.
 -- ============================================================
 
 -- ============================================================

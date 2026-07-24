@@ -22,7 +22,8 @@ module Topos.CechCohomology where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Data.List using (List; []; _∷_)
-open import Cubical.Data.Sigma using (Σ-syntax; _,_; fst; snd)
+open import Cubical.Data.Sigma using (Σ-syntax; _,_; fst; snd; _×_)
+open import Cubical.Data.Unit using (Unit*; tt*)
 open import Cubical.Data.Bool using (Bool; true; false; not; true≢false)
 open import Cubical.Relation.Nullary using (¬_)
 import Cubical.Data.Empty as ⊥
@@ -90,19 +91,46 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
       cong ((δ⁰ f v₀ v₁) ·_) (hol-δ⁰ f v₁ vs)
     ∙ cancel (f v₁) (inv (f v₀)) (f (lastV v₁ vs))
 
-  is-coboundary : Cochain1 → Type (ℓ-max ℓv ℓ)
-  is-coboundary g = Σ[ f ∈ Cochain0 ] ((i j : V) → δ⁰ f i j ≡ g i j)
+  -- Directed edges of a cover: the ordered pairs actually measured
+  -- (the 1-cells of the nerve).  A coboundary realises g on these
+  -- edges only, as in the Abramsky-style Čech reading.
+  Edge : Type ℓv
+  Edge = V × V
 
-  -- THE GENERAL OBSTRUCTION: a 1-cochain with non-trivial holonomy
-  -- around a closed walk is not a coboundary --- a non-zero class
-  -- in H¹.  (Coboundaries telescope to ε around any closed walk.)
+  -- the consecutive directed edges of the walk v₀ ∷ vs
+  edges-of : V → List V → List Edge
+  edges-of v₀ []        = []
+  edges-of v₀ (v₁ ∷ vs) = (v₀ , v₁) ∷ edges-of v₁ vs
+
+  -- f realises g as a coboundary on each edge of the given list
+  realises-on : List Edge → Cochain0 → Cochain1 → Type (ℓ-max ℓv ℓ)
+  realises-on []             f g = Unit*
+  realises-on ((i , j) ∷ es) f g = (δ⁰ f i j ≡ g i j) × realises-on es f g
+
+  -- g is a coboundary ON A GIVEN SET OF EDGES: some 0-cochain f has
+  -- δ⁰ f ≡ g on exactly those measured contexts.
+  is-coboundary : List Edge → Cochain1 → Type (ℓ-max ℓv ℓ)
+  is-coboundary es g = Σ[ f ∈ Cochain0 ] realises-on es f g
+
+  -- restricted hol-resp: holonomy respects a coboundary equation
+  -- supplied only on the walk's own consecutive edges.
+  hol-resp-walk : (g : Cochain1) (f : Cochain0) (v₀ : V) (vs : List V)
+                → realises-on (edges-of v₀ vs) f g
+                → hol g v₀ vs ≡ hol (δ⁰ f) v₀ vs
+  hol-resp-walk g f v₀ []        _        = refl
+  hol-resp-walk g f v₀ (v₁ ∷ vs) (p , ps) =
+    cong₂ _·_ (sym p) (hol-resp-walk g f v₁ vs ps)
+
+  -- A 1-cochain with non-trivial holonomy around a closed walk is not
+  -- a coboundary on that walk's edges --- a non-zero class in H¹.
+  -- (Any edge-realiser would give the walk holonomy ε, by the telescope.)
   holonomy-obstruction :
       (g : Cochain1) (v₀ : V) (vs : List V)
     → lastV v₀ vs ≡ v₀
     → ¬ (hol g v₀ vs ≡ ε)
-    → ¬ is-coboundary g
-  holonomy-obstruction g v₀ vs closed nontriv (f , p) =
-    nontriv ( hol-resp g (δ⁰ f) (λ i j → sym (p i j)) v₀ vs
+    → ¬ is-coboundary (edges-of v₀ vs) g
+  holonomy-obstruction g v₀ vs closed nontriv (f , allEq) =
+    nontriv ( hol-resp-walk g f v₀ vs allEq
             ∙ hol-δ⁰ f v₀ vs
             ∙ cong (λ w → inv (f v₀) · f w) closed
             ∙ invl (f v₀) )
@@ -152,7 +180,11 @@ gTri tB tC = true
 gTri tC tA = true
 gTri _  _  = false
 
-triangle-contextual : ¬ is-coboundary Z₂ gTri
+-- No 0-cochain realises gTri on the triangle's three measured edges
+-- tA→tB→tC→tA: such a realiser would give the closed walk holonomy ε,
+-- but gTri's holonomy is 1.
+triangle-contextual :
+  ¬ is-coboundary Z₂ (edges-of Z₂ tA (tB ∷ tC ∷ tA ∷ [])) gTri
 triangle-contextual =
   holonomy-obstruction Z₂ gTri tA (tB ∷ tC ∷ tA ∷ []) refl true≢false
 
@@ -171,20 +203,22 @@ gQuad _  _  = false
 square-holonomy-trivial : hol Z₂ gQuad q0 (q1 ∷ q2 ∷ q3 ∷ q0 ∷ []) ≡ false
 square-holonomy-trivial = refl
 
--- The obstruction not firing is not vacuous: the square is genuinely
--- SATISFIABLE.  A global 2-colouring realises every edge anti-
--- correlation (endpoints differ) --- the global section the triangle
--- provably lacks (Topos.Contextuality.no-global).  So the holonomy
--- invariant separates the contextual triangle from the satisfiable
--- square.  (Note gQuad, like gTri, is a DIRECTED 1-cochain, so it is
--- not literally a coboundary; satisfiability is the underlying 2-
--- colouring, which is what an "even cycle of anti-correlations is
--- satisfiable" means.)
+-- The square is satisfiable: a global 2-colouring realises every edge
+-- anti-correlation (endpoints differ), the global section the triangle
+-- lacks (Topos.Contextuality.no-global).  So the holonomy invariant
+-- separates the contextual triangle from the satisfiable square.
 colour : Quad → Bool
 colour q0 = false
 colour q1 = true
 colour q2 = false
 colour q3 = true
+
+-- The square's cochain is a coboundary on its 4-cycle: δ⁰ colour ≡
+-- gQuad on every edge.  So is-coboundary is inhabited, and
+-- triangle-contextual is a negation of an attainable predicate.
+square-coboundary :
+  is-coboundary Z₂ (edges-of Z₂ q0 (q1 ∷ q2 ∷ q3 ∷ q0 ∷ [])) gQuad
+square-coboundary = colour , (refl , refl , refl , refl , tt*)
 
 square-satisfiable : (i j : Quad) → gQuad i j ≡ true → colour i ≡ not (colour j)
 square-satisfiable q0 q1 _ = refl

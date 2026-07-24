@@ -260,7 +260,7 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
     c≡0 = ℤ-no-zero-div c (pos (suc b)) (λ p → ℕ.snotz (ℤP.injPos p)) c·b≡0
       where
         open import Cubical.Data.Nat using (snotz)
-        -- ℤ has no zero divisors (postulated as a lemma here, or use std lib).
+        -- ℤ has no zero divisors (proved below via integer cancellation).
         -- Standard: a · b ≡ 0 → a ≡ 0 ⊎ b ≡ 0. With b ≢ 0, conclude a ≡ 0.
         -- Use the integer cancellation lemma.
         ℤ-no-zero-div : (a b : ℤ) → ¬ (b ≡ pos 0) → a ℤ.· b ≡ pos 0 → a ≡ pos 0

@@ -34,6 +34,7 @@ open import Topos.Cat
 open import Topos.PSh
 open import Topos.Omega
 open import Topos.LawvereTierney
+open import Topos.InflationarityDerivable
 open LawvereTierney
 
 module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
@@ -75,7 +76,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
 
   -- unit η : S → ◯S  (inflationarity)
   η : (c : Ob) (S : Sieve {C = C} c) → S ≤S ◯ c S
-  η c S = j-infl J c S
+  η c S = j-infl-derivable J c S
 
   -- ◯S is modal (idempotence)
   ◯-modal : (c : Ob) (S : Sieve {C = C} c) → is-j-closed J c (◯ c S)

@@ -64,13 +64,9 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       -- j preserves binary meets
       j-∧    : (c : Ob) (S T : Sieve {C = C} c)
              → jop c (S ∧S T) ≡ (jop c S) ∧S (jop c T)
-      -- j is inflationary: every sieve is contained in its closure.
-      -- NOT derivable from the three axioms above (the 3-chain with
-      -- j a ↦ ⊥ satisfies them but collapses a), so it is a separate
-      -- field — it is exactly the unit S → ◯S of the modality, and
-      -- makes j a universal closure operator (nucleus).
-      j-infl : (c : Ob) (S : Sieve {C = C} c) (d : Ob) (f : Hom d c)
-             → fst (fst S d f) → fst (fst (jop c S) d f)
+      -- NOTE: inflationarity (S ≤ j S, the unit S → ◯S) is NOT a
+      -- field: it is DERIVABLE from jnat + j-⊤ — see
+      -- Topos.InflationarityDerivable.j-infl-derivable.
 
   open LawvereTierney
 
@@ -89,8 +85,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     ; jnat = λ x y f S → refl
     ; j-⊤ = λ c → refl
     ; j-idem = λ c S → refl
-    ; j-∧ = λ c S T → refl
-    ; j-infl = λ c S d f x → x }
+    ; j-∧ = λ c S T → refl }
 
   -- ----------------------------------------------------------
   -- j-closed subobjects.  A sieve S is j-closed when it equals

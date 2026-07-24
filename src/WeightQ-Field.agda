@@ -132,6 +132,12 @@ opaque
   <r-·-pos-factor-l {a} {b} = D.<r-·-pos-factor-l {a} {b}
   <r-z1→pos-1-r : ∀ {x} → x <r z1 → z0 <r (1-r x)
   <r-z1→pos-1-r {x} = D.<r-z1→pos-1-r {x}
+  zHalf : ℝ
+  zHalf = D.zHalf
+  z0<zHalf : z0 <r zHalf
+  z0<zHalf = D.z0<zHalf
+  zHalf<z1 : zHalf <r z1
+  zHalf<z1 = D.zHalf<z1
 
 infixl 7 _·r_ _/r_
 infixl 6 _+r_
