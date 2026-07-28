@@ -182,7 +182,7 @@ module DoSee (p : Weight) (pp : Pos p) (p≢1 : ¬ (p ≡ w1)) where
 
   -- ----------------------------------------------------------
   -- The theorem: intervening differs from observing.  do gives the
-  -- the prior p; see gives 1; and p ≠ 1.
+  -- prior p; see gives 1; and p ≠ 1.
   -- ----------------------------------------------------------
 
   do≢see : ¬ (𝔼 (do-joint true bc) indYtrue ≡ condProb)

@@ -7,7 +7,7 @@
 -- The trivial topology (Topos.LawvereTierney.trivialLT) makes the
 -- modal results (do-j-stable, modal-rule1) hold but vacuously.
 -- The double-negation topology is the canonical non-degenerate
--- example: its sheaves are the ¬¬-separated objects, and it is the
+-- example: its sheaves are the ¬¬-closed (Boolean) objects, and it is the
 -- modality whose internal logic is Boolean.  Instantiating
 -- do-j-stable / modal-rule1 at ¬¬ says interventions and Rule 1
 -- survive the double-negation (Boolean) localization.

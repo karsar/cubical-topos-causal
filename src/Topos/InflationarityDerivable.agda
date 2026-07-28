@@ -4,10 +4,9 @@
 -- Topos.InflationarityDerivable
 --
 -- The inflationarity law  S ≤ j S  is DERIVABLE from naturality
--- (jnat) together with truth-preservation (j-⊤).  Hence the
--- `j-infl` field of `LawvereTierney` is redundant: a genuine
--- Lawvere–Tierney topology (a *natural* morphism j : Ω ⇒ Ω) is
--- automatically inflationary.
+-- (jnat) together with truth-preservation (j-⊤).  So `LawvereTierney`
+-- needs no `j-infl` field: a Lawvere–Tierney topology (a *natural*
+-- morphism j : Ω ⇒ Ω) is automatically inflationary.
 --
 -- Argument: for f ∈ S, the pullback  S · f = ⊤  (sieves are
 -- downward closed); by naturality  j S · f = j (S · f) = j ⊤ = ⊤,
