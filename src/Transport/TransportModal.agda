@@ -17,11 +17,17 @@
 -- for every topology, i.e. INVARIANT under every localization, by the
 -- paper's own ⊤-j-closed.
 --
---   transportable→⊤        : forced at the global context ⟹ the
---                            counterfactual's truth value is ⊤.
---   transportable→invariant: hence j-closed for EVERY topology J —
---                            the same ⊤-collapse the paper's
---                            do-j-stable / modal-rules use.
+--   transportable→⊤-gen        : forced at the global context ⟹ the
+--                                counterfactual's truth value is ⊤,
+--                                for ANY R : RegPred.
+--   transportable→invariant-gen: hence j-closed for EVERY topology J —
+--                                the same ⊤-collapse the paper's
+--                                do-j-stable / modal-rules use.
+--   transportable→⊤, transportable→invariant: the scmPred instances.
+--
+-- Both general forms quantify over the regime predicate; the base
+-- category of regimes is still the fixed two-object one of
+-- Transport.CounterfactualForcing.
 --
 -- So: transportability = j-stability = invariance.  The modality the
 -- paper studies for interventions is, for counterfactuals, exactly
@@ -56,24 +62,35 @@ open import Transport.Transportability using (χ; scmPred; transports-to; RegPre
 -- Both regimes satisfy it: g by the forcing hypothesis, e by
 -- restriction-stability (the sieve closure).
 -- ----------------------------------------------------------
-transportable→⊤ : (u : U) → transports-to scmPred g u
-                → fst (χ scmPred) g u ≡ maximal {C = C} g
-transportable→⊤ u t =
-  Sieve≡ {C = C} (fst (χ scmPred) g u) (maximal {C = C} g)
+-- General form: ANY restriction-stable regime predicate, not just scmPred.
+-- The proof uses only RegPred.stable and RegPred.isPropP.
+transportable→⊤-gen : (R : RegPred) (u : U) → transports-to R g u
+                    → fst (χ R) g u ≡ maximal {C = C} g
+transportable→⊤-gen R u t =
+  Sieve≡ {C = C} (fst (χ R) g u) (maximal {C = C} g)
     (funExt λ d → funExt λ h → inhab d)
   where
     inhab : (d : Obj)
-          → (RegPred.P scmPred d u , RegPred.isPropP scmPred d u) ≡ (Unit* , isPropUnit*)
+          → (RegPred.P R d u , RegPred.isPropP R d u) ≡ (Unit* , isPropUnit*)
     inhab g = ⇔toPath (λ _ → tt*) (λ _ → t)
-    inhab e = ⇔toPath (λ _ → tt*) (λ _ → RegPred.stable scmPred g e ι u t)
+    inhab e = ⇔toPath (λ _ → tt*) (λ _ → RegPred.stable R g e ι u t)
+
+transportable→⊤ : (u : U) → transports-to scmPred g u
+                → fst (χ scmPred) g u ≡ maximal {C = C} g
+transportable→⊤ = transportable→⊤-gen scmPred
 
 -- ----------------------------------------------------------
 -- Hence transportability ⟹ invariance: a transported counterfactual
 -- is j-closed for EVERY Lawvere-Tierney topology, by the paper's
 -- ⊤-j-closed.  This is the same collapse-to-⊤ as do-j-stable.
 -- ----------------------------------------------------------
+transportable→invariant-gen :
+    (R : RegPred) (u : U) → transports-to R g u
+  → (J : LawvereTierney {C = C}) → is-j-closed J g (fst (χ R) g u)
+transportable→invariant-gen R u t J =
+  subst (λ S → is-j-closed J g S) (sym (transportable→⊤-gen R u t)) (⊤-j-closed J g)
+
 transportable→invariant :
     (u : U) → transports-to scmPred g u
   → (J : LawvereTierney {C = C}) → is-j-closed J g (fst (χ scmPred) g u)
-transportable→invariant u t J =
-  subst (λ S → is-j-closed J g S) (sym (transportable→⊤ u t)) (⊤-j-closed J g)
+transportable→invariant = transportable→invariant-gen scmPred
