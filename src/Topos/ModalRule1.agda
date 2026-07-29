@@ -13,8 +13,11 @@
 -- of every sheaf subtopos, so it survives sheafification /
 -- localization to any modality.  Unlike do-j-stable (which is about
 -- the INTERVENTION classifier), this is about a do-calculus RULE's
--- conclusion — and the proof genuinely runs through rule1-E, the
--- causal content, not just ⊤.
+-- conclusion.  Scope caveat: the modality is applied only to ⊤ here,
+-- since rule1-E collapses the truth value to ⊤ before j acts, so this
+-- result carries no causal content on its own — it would typecheck
+-- with the causal content deleted.  Topos.ContingentCI and
+-- Topos.ModalCI supply the non-maximal case.
 -- ============================================================
 
 module Topos.ModalRule1 where
