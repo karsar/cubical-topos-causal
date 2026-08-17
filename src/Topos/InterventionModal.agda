@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
 -- Topos.InterventionModal — the Stage-2 causal payload: the

@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
 -- Topos.NonTrivialModal — Stage 2 (a) payoff: the modal results

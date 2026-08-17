@@ -1,13 +1,14 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
 -- Topos.Classicality — internal validity versus stagewise validity
 -- on the intervention site Iv (do0 → obs ← do1).
 --
 -- Forcing at a stage, c ⊩ S, is INTERNAL validity: the identity of c
--- lies in S.  "Stagewise" validity is the classical, context-by-
--- context reading: the claim holds under do(X:=0) and under
--- do(X:=1), with no demand that it hold observationally.
+-- lies in S.  "Stagewise" validity is validity over the covering
+-- family: the claim holds under do(X:=0) and under do(X:=1), with
+-- no demand that it hold observationally.  It is what a context-by-
+-- context argument establishes.
 --
 -- Two facts, and a third that names the gap between them:
 --
@@ -33,7 +34,9 @@
 --
 -- The failure in (2) comes from the base having a non-trivial
 -- refinement, not from any undecidability in the ambient logic:
--- every membership here is ⊤ or ⊥.  On a DISCRETE base the only
+-- the ATOM assigns ⊤ or ⊥ to every arrow (the compound sieves built
+-- from it, an implication and a join, of course do not).  On a
+-- DISCRETE base the only
 -- arrow into c is the identity, stagewise and internal validity
 -- coincide, and the modal layer carries no information — which is
 -- the degeneracy Topos.ContingentCI and Topos.ModalCI exhibit.
@@ -62,9 +65,9 @@ private
 
 -- ------------------------------------------------------------
 -- Stagewise validity: the claim holds under BOTH interventions.
--- This is the classical, context-by-context reading — exactly the
--- membership of `jS S` at the identity of `obs`, by definition of
--- the covering closure.
+-- This is what a context-by-context argument establishes — exactly
+-- the membership of `jS S` at the identity of `obs`, by definition
+-- of the covering closure.
 -- ------------------------------------------------------------
 stagewise : Sieve {C = Iv} obs → Type
 stagewise S = fst (fst S do0 e0) × fst (fst S do1 e1)
@@ -88,10 +91,12 @@ stagewise→⊩j S p = p
 -- ------------------------------------------------------------
 -- (2) STRICTNESS: the converse fails.
 --
--- Take the excluded-middle instance for `ci-one`, the claim that
--- holds under do(X:=0) only.  Classically the claim is decided at
--- each intervention context — it holds at do0, its negation holds
--- at do1 — but the disjunction is not forced observationally.
+-- Take the excluded-middle instance for `ci-one`, the sieve that
+-- holds under do(X:=0) only.  (It is an abstract sieve, not an
+-- independence computed from kernels; the causal gloss on it is
+-- interpretation.)  The claim is settled at each intervention
+-- context — it holds at do0, its negation holds at do1 — but the
+-- disjunction is not forced observationally.
 -- ------------------------------------------------------------
 em : Sieve {C = Iv} obs
 em = _∨S_ {C = Iv} {c = obs} ci-one (¬S {C = Iv} {c = obs} ci-one)
@@ -125,8 +130,8 @@ em-not-forced x = E.rec* (⊔-elim (fst ci-one obs idₒ)
                                  x)
 
 -- The theorem: stagewise validity does not imply internal validity.
--- Internal (topos) validity is STRICTLY stronger than the classical
--- context-by-context reading on this site.
+-- Internal (topos) validity is STRICTLY stronger than validity over
+-- the covering family, on this site.
 internal-strictly-stronger
   : Σ[ S ∈ Sieve {C = Iv} obs ] (stagewise S × (¬ (_⊩_ {C = Iv} obs S)))
 internal-strictly-stronger = em , em-stagewise , em-not-forced

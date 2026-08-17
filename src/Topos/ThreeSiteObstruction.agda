@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-}
+{-# OPTIONS --safe --cubical --guardedness #-}
 -- ============================================================
 -- Topos.ThreeSiteObstruction
 --
