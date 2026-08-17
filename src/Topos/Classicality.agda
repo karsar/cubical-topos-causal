@@ -17,10 +17,12 @@
 --
 --  (2) STRICT.  The converse FAILS.  The excluded-middle instance
 --      for a one-intervention claim, ci-one ∨ ¬ ci-one, is forced
---      at do0 and at do1 but NOT at obs.  So the topos reading
---      proves strictly FEWER causal statements than the stagewise
---      one, on any base with a non-trivial refinement.  It is not
---      conservative over the pointwise reading; it is weaker.
+--      at do0 and at do1 but NOT at obs.  So on this base the topos
+--      reading forces strictly FEWER causal statements than the
+--      stagewise one.  Internal validity is the stricter criterion,
+--      and the set of statements meeting it is smaller.  We check
+--      this base only; we do not prove it of every base carrying a
+--      non-trivial refinement.
 --
 --  (3) WHAT j SUPPLIES.  Stagewise validity of S is, definitionally,
 --      internal validity of its covering closure: `obs ⊩ jS S` and
