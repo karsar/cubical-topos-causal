@@ -18,7 +18,7 @@
 module Topos.InterventionSite where
 
 open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.HLevels using (isProp→isSet)
+open import Cubical.Foundations.Prelude using (isProp→isSet)
 
 open import Topos.Cat
 
