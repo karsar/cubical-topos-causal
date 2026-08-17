@@ -8,6 +8,7 @@ module Everything where
 open import Topos.CIObject
 open import Topos.Cat
 open import Topos.CechCohomology
+open import Topos.Classicality
 open import Topos.Classifier
 open import Topos.Cohomology
 open import Topos.Contextuality
