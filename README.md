@@ -4,7 +4,7 @@ Cubical Agda artifact accompanying the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
 The artifact implements the 1-topos core of Mahadevan's topos causal models —
-thirty-two modules in `src/Topos/` and eight in `src/Transport/`, over an
+thirty-four modules in `src/Topos/` and eight in `src/Transport/`, over an
 eight-module probability layer:
 
 - the subobject classifier of sieves, with the value-fixing subobject
@@ -33,7 +33,19 @@ agda --safe src/Everything.agda
 
 `Everything.agda` imports the whole development; it checks under `--safe` with
 **zero postulates and zero holes**, and the ordered field the probability layer
-depends on is realized concretely at ℚ.
+depends on is realized concretely at ℚ. Every module declares `--safe` in its own
+options pragma, so the artifact certifies this rather than relying on the flag
+being passed on the command line.
+
+One qualification, stated the same way in the paper: the distribution carrier
+`FDist` is a higher inductive type, and one of its path constructors —
+`mix-bayes-interchange`, the Bayesian interchange law that full conditioning
+needs — is taken as primitive. Whether it follows from the remaining
+constructors together with the arithmetic of the weights is open, and `--safe`
+does not adjudicate it, since a path constructor belongs to a datatype
+declaration and is not a postulate. The results that compute with distributions
+inherit that assumption; the classifier, gluing, forcing and modal-closure
+layers are statements about sieves and are independent of it.
 
 ## Probability layer
 
