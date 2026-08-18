@@ -37,6 +37,7 @@ open import Topos.Cat
 open import Topos.PSh
 open import Topos.Omega
 open import Topos.LawvereTierney
+open import Topos.DoubleNegation using (_⇒S_)
 open import Topos.InterventionSite
 open import Topos.InterventionModality using (jS)
 
@@ -209,3 +210,83 @@ ci-both-not-descends h = h (tt* , tt*)
 
 ci-both-not-closed : ¬ (is-j-closed {C = Iv} interventionLT obs ci-both)
 ci-both-not-closed p = ci-both-not-descends (closed→descends ci-both p)
+
+-- ------------------------------------------------------------
+-- The modality is OPEN.
+--
+-- Everything above verifies the Lawvere-Tierney axioms by hand.  It
+-- is better to say which topology this is, and it is one of the
+-- well-understood kind: the OPEN modality of a subterminal.
+--
+-- Subterminals of a presheaf topos on a poset are the down-closed
+-- sets of objects.  Take the one picking out the interventional
+-- contexts --- `ci-both` at `obs`, and everything at each
+-- intervention, both being minimal --- and form the Heyting
+-- implication out of it.  That is exactly the closure computed
+-- above.
+--
+-- Two things follow at no cost.  The four axioms are instances of
+-- the standard facts about open modalities rather than four
+-- separate computations.  And an open subtopos has a complementary
+-- CLOSED one, here supported on the single object `obs`, so the
+-- site splits into an interventional part and an observational
+-- part; ¬¬ admits no such splitting, being dense.
+-- ------------------------------------------------------------
+
+-- the subterminal picking out the interventional contexts
+uInt : (c : IObj) → Sieve {C = Iv} c
+uInt obs = ci-both
+uInt do0 = maximal {C = Iv} do0
+uInt do1 = maximal {C = Iv} do1
+
+-- the open modality it induces
+jopen : (c : IObj) → Sieve {C = Iv} c → Sieve {C = Iv} c
+jopen c S = _⇒S_ {C = Iv} {c = c} (uInt c) S
+
+open-is-intervention : (c : IObj) (S : Sieve {C = Iv} c)
+                     → jopen c S ≡ jopI c S
+open-is-intervention obs S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f → go d f)
+  where
+    back : fst (fst S do0 e0) → fst (fst S do1 e1)
+         → (e : IObj) (g : IHom e obs)
+         → fst (fst (uInt obs) e (g ⋆I idₒ)) → fst (fst S e (g ⋆I idₒ))
+    back p q obs idₒ w = E.rec w
+    back p q do0 e0  _ = p
+    back p q do1 e1  _ = q
+
+    back0 : fst (fst S do0 e0)
+          → (e : IObj) (g : IHom e do0)
+          → fst (fst (uInt obs) e (g ⋆I e0)) → fst (fst S e (g ⋆I e0))
+    back0 p do0 id₀ _ = p
+
+    back1 : fst (fst S do1 e1)
+          → (e : IObj) (g : IHom e do1)
+          → fst (fst (uInt obs) e (g ⋆I e1)) → fst (fst S e (g ⋆I e1))
+    back1 q do1 id₁ _ = q
+
+    go : (d : IObj) (f : IHom d obs)
+       → fst (jopen obs S) d f ≡ fst (jopI obs S) d f
+    go obs idₒ = ⇔toPath (λ h → h do0 e0 tt* , h do1 e1 tt*)
+                         (λ p → back (fst p) (snd p))
+    go do0 e0  = ⇔toPath (λ h → h do0 id₀ tt*) back0
+    go do1 e1  = ⇔toPath (λ h → h do1 id₁ tt*) back1
+open-is-intervention do0 S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f → go d f)
+  where
+    back : fst (fst S do0 id₀)
+         → (e : IObj) (g : IHom e do0)
+         → fst (fst (uInt do0) e (g ⋆I id₀)) → fst (fst S e (g ⋆I id₀))
+    back s do0 id₀ _ = s
+
+    go : (d : IObj) (f : IHom d do0)
+       → fst (jopen do0 S) d f ≡ fst (jopI do0 S) d f
+    go do0 id₀ = ⇔toPath (λ h → h do0 id₀ tt*) back
+open-is-intervention do1 S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f → go d f)
+  where
+    back : fst (fst S do1 id₁)
+         → (e : IObj) (g : IHom e do1)
+         → fst (fst (uInt do1) e (g ⋆I id₁)) → fst (fst S e (g ⋆I id₁))
+    back s do1 id₁ _ = s
+
+    go : (d : IObj) (f : IHom d do1)
+       → fst (jopen do1 S) d f ≡ fst (jopI do1 S) d f
+    go do1 id₁ = ⇔toPath (λ h → h do1 id₁ tt*) back
