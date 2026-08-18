@@ -155,20 +155,57 @@ open import Cubical.Data.Empty as E using (⊥)
 open import Topos.InterventionModality
   using (ci-one; ci-both; j-both-collapses; j-one-survives)
 
--- a claim holding under only one intervention is already closed
-ci-one-closed : is-j-closed {C = Iv} interventionLT obs ci-one
-ci-one-closed = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → go d g)
+-- ------------------------------------------------------------
+-- Which truth values the modality fixes.
+--
+-- The two facts above are instances of one characterisation, and
+-- it is the descent condition for the two-chart cover: a truth
+-- value at obs is j-closed exactly when holding under both
+-- interventions forces it to hold observationally.  The converse
+-- implication is free, being downward closure of the sieve, so the
+-- content is entirely in that direction.
+--
+-- Causally: the claims this modality fixes are exactly the ones
+-- that already descend along the cover, and the claims it moves
+-- are exactly those that hold under every intervention without
+-- holding observationally --- which it sends to ⊤.
+-- ------------------------------------------------------------
+
+-- "holding under both interventions forces holding observationally"
+Descends : Sieve {C = Iv} obs → Type
+Descends S = fst (fst S do0 e0) × fst (fst S do1 e1) → fst (fst S obs idₒ)
+
+closed→descends : (S : Sieve {C = Iv} obs)
+                → is-j-closed {C = Iv} interventionLT obs S → Descends S
+closed→descends S p pq = transport (λ i → fst (fst (p i) obs idₒ)) pq
+
+descends→closed : (S : Sieve {C = Iv} obs)
+                → Descends S → is-j-closed {C = Iv} interventionLT obs S
+descends→closed S h = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → go d g)
   where
+    -- the reverse implication is downward closure: a sieve holding
+    -- at the identity holds along every arrow into obs
     go : (d : IObj) (g : IHom d obs)
-       → fst (jopI obs ci-one) d g ≡ fst ci-one d g
-    go obs idₒ = ⇔toPath (λ p → snd p) (λ q → E.rec q , q)
+       → fst (jopI obs S) d g ≡ fst S d g
+    go obs idₒ = ⇔toPath h (λ r → snd S obs do0 e0 idₒ r , snd S obs do1 e1 idₒ r)
     go do0 e0  = refl
     go do1 e1  = refl
 
--- a claim holding under both is not closed: the modality moves it,
--- and moves it all the way to ⊤
-ci-both≢⊤ : ¬ (ci-both ≡ maximal {C = Iv} obs)
-ci-both≢⊤ q = transport (λ i → fst (fst (q (~ i)) obs idₒ)) tt*
+-- Both facts are instances of the characterisation above, which is
+-- the sense in which it explains them rather than accompanying them.
+
+-- a claim holding under only one intervention already descends
+-- vacuously, its second conjunct being empty
+ci-one-descends : Descends ci-one
+ci-one-descends pq = snd pq
+
+ci-one-closed : is-j-closed {C = Iv} interventionLT obs ci-one
+ci-one-closed = descends→closed ci-one ci-one-descends
+
+-- a claim holding under both does not descend: it holds at each
+-- intervention and fails observationally
+ci-both-not-descends : ¬ (Descends ci-both)
+ci-both-not-descends h = h (tt* , tt*)
 
 ci-both-not-closed : ¬ (is-j-closed {C = Iv} interventionLT obs ci-both)
-ci-both-not-closed p = ci-both≢⊤ (sym p ∙ j-both-collapses)
+ci-both-not-closed p = ci-both-not-descends (closed→descends ci-both p)
