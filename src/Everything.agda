@@ -23,6 +23,7 @@ open import Topos.InflationarityDerivable
 open import Topos.InflationarityIndependence
 open import Topos.InternalDist
 open import Topos.InterventionModal
+open import Topos.InterventionLT
 open import Topos.InterventionModality
 open import Topos.InterventionSite
 open import Topos.LawvereTierney

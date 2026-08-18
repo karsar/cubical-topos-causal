@@ -4,7 +4,7 @@ Cubical Agda artifact accompanying the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
 The artifact implements the 1-topos core of Mahadevan's topos causal models —
-thirty-four modules in `src/Topos/` and eight in `src/Transport/`, over an
+thirty-five modules in `src/Topos/` and eight in `src/Transport/`, over an
 eight-module probability layer:
 
 - the subobject classifier of sieves, with the value-fixing subobject
