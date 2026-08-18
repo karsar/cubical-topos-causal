@@ -290,3 +290,60 @@ open-is-intervention do1 S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f 
     go : (d : IObj) (f : IHom d do1)
        → fst (jopen do1 S) d f ≡ fst (jopI do1 S) d f
     go do1 id₁ = ⇔toPath (λ h → h do1 id₁ tt*) back
+
+-- ------------------------------------------------------------
+-- What a j-stable truth value IS.
+--
+-- Being open pins down the sheaves, not just the criterion.  The
+-- open subtopos here is carried by the two interventions, which are
+-- discrete, so a j-closed truth value at `obs` should be nothing but
+-- a pair of truth values, one per intervention.  It is: the
+-- observational membership of a closed sieve is forced to be the
+-- conjunction of the two interventional ones, and every pair arises.
+--
+-- Causally, this is the sharpest statement the site supports.  A
+-- j-stable claim carries no observational content of its own; it is
+-- exactly what its behaviour under the two interventions says, and
+-- `Descends` is the criterion for having no more.
+-- ------------------------------------------------------------
+
+-- the closed sieve determined by a pair of interventional verdicts
+fromPair : hProp ℓ-zero → hProp ℓ-zero → Sieve {C = Iv} obs
+fromPair P Q = mem , clo
+  where
+    mem : (d : IObj) → IHom d obs → hProp ℓ-zero
+    mem obs idₒ = (fst P × fst Q) , isProp× (snd P) (snd Q)
+    mem do0 e0  = P
+    mem do1 e1  = Q
+    clo : Closure {C = Iv} obs mem
+    clo obs obs idₒ idₒ pf = pf
+    clo obs do0 e0  idₒ pf = fst pf
+    clo obs do1 e1  idₒ pf = snd pf
+    clo do0 do0 id₀ e0  pf = pf
+    clo do1 do1 id₁ e1  pf = pf
+
+fromPair-closed : (P Q : hProp ℓ-zero)
+                → is-j-closed {C = Iv} interventionLT obs (fromPair P Q)
+fromPair-closed P Q = descends→closed (fromPair P Q) (λ pq → pq)
+
+-- reading the pair back off
+toPair : Sieve {C = Iv} obs → hProp ℓ-zero × hProp ℓ-zero
+toPair S = fst S do0 e0 , fst S do1 e1
+
+-- every pair is realised, on the nose
+toPair-fromPair : (P Q : hProp ℓ-zero) → toPair (fromPair P Q) ≡ (P , Q)
+toPair-fromPair P Q = refl
+
+-- and a closed sieve is recovered from its pair: the observational
+-- membership was never independent data
+fromPair-toPair : (S : Sieve {C = Iv} obs)
+                → is-j-closed {C = Iv} interventionLT obs S
+                → fromPair (fst S do0 e0) (fst S do1 e1) ≡ S
+fromPair-toPair S cl = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f → go d f)
+  where
+    go : (d : IObj) (f : IHom d obs)
+       → fst (fromPair (fst S do0 e0) (fst S do1 e1)) d f ≡ fst S d f
+    go obs idₒ = ⇔toPath (closed→descends S cl)
+                         (λ r → snd S obs do0 e0 idₒ r , snd S obs do1 e1 idₒ r)
+    go do0 e0  = refl
+    go do1 e1  = refl
