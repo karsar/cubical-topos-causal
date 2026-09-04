@@ -23,6 +23,10 @@ open import Topos.DoSeeDistinct
 open import Topos.DoubleNegation
 open import Topos.Example
 open import Topos.Forcing
+open import Topos.MechanismGeometric
+open import Topos.MechanismSeparation
+open import Topos.MechanismObject
+open import Topos.Exponential
 open import Topos.Gluing
 open import Topos.HiddenRefinement
 open import Topos.InflationarityDerivable
