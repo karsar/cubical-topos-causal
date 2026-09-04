@@ -3,39 +3,40 @@
 -- ============================================================
 -- Transport.Transportability — from witness to theorem.
 --
--- The weld (Transport.CounterfactualWeld) showed, for two specific
+-- The weld (Transport.CounterfactualWeld) shows, for two specific
 -- worlds, that forcing the computed counterfactual at the global
--- context is transportability.  Here we upgrade it twice:
+-- context is transportability.  This module upgrades that twice:
 --
---   1.  The counterfactual becomes a PROPER internal predicate
---       χ : W ⇒ Ω — an actual natural transformation (classified
---       subobject) over a presheaf W of worlds, with naturality
---       PROVED (not per-world sieves).
+--   1.  The counterfactual becomes a proper internal predicate
+--       χ : W ⇒ Ω over a presheaf W of worlds.  That is a natural
+--       transformation, so a classified subobject, and naturality is
+--       PROVED.  The weld gave only one sieve per world.
 --
---   2.  The transport result becomes a GENERAL theorem, quantified
---       over predicates, not a pair of witnesses:
+--   2.  The transport result is stated for all predicates instead of
+--       for a pair of witnesses:
 --         global-transport→everywhere :
 --           for ANY restriction-stable regime predicate, if the
 --           counterfactual transports to the global context then it
 --           transports to every regime the context covers.
---       The hypothesis (restriction-stability) is exactly the sieve
---       closure — the causal condition that a globally-true
---       counterfactual is locally true.  Predicates that fail it are
---       not internalisable as truth values at all: that is the
---       obstruction to transportability, internal-logically.
+--       The hypothesis, restriction-stability, is the sieve closure
+--       condition.  Causally it says a globally-true counterfactual
+--       is locally true.  A predicate that fails it has no internal
+--       truth value at all, and that failure is the obstruction to
+--       transportability inside the internal logic.
 --
--- We then instantiate at the SCM counterfactual of the weld
--- (do(X:=true), query Y=true), recovering the transportable and
--- non-transportable worlds as corollaries of the general theorem.
+-- We then instantiate at the SCM counterfactual of the weld,
+-- do(X:=true) with query Y=true.  The transportable world and the
+-- non-transportable world come back as corollaries of the general
+-- theorem.
 --
--- HONEST LIMITS (unchanged from the weld).  Deterministic; finite
--- regime category; worlds are the shared exogenous noise.  "Transport"
--- is the internal notion (forcing at a context), NOT yet proved
--- equivalent to the Bareinboim-Pearl s-hedge criterion — that
--- equivalence, and the probabilistic (FDist-kernel) case, are the
--- remaining theory.  What is new here over the weld: the predicate is
--- a genuine W ⇒ Ω, and transport-invariance is a theorem about a class
--- of models.
+-- HONEST LIMITS (unchanged from the weld).  The model is
+-- deterministic.  The regime category is finite.  Worlds are the
+-- shared exogenous noise.  "Transport" here is the internal notion,
+-- forcing at a context.  It is NOT yet proved equivalent to the
+-- Bareinboim-Pearl s-hedge criterion; that equivalence and the
+-- probabilistic (FDist-kernel) case are the remaining theory.  What
+-- this module adds over the weld: the predicate is a genuine
+-- W ⇒ Ω, and transport-invariance holds for a class of models.
 -- ============================================================
 
 module Transport.Transportability where
@@ -59,8 +60,9 @@ open import Transport.CounterfactualWeld using (cfoG; cfoE; andb-R)
 open PSh
 
 -- ----------------------------------------------------------
--- The presheaf of worlds: the shared exogenous noise (twin network),
--- the same in every regime, so restriction is the identity.
+-- The presheaf of worlds.  A world is the shared exogenous noise of
+-- the twin network.  It is the same in every regime, so restriction
+-- is the identity.
 -- ----------------------------------------------------------
 W : PSh C ℓ-zero
 W = record
@@ -71,9 +73,10 @@ W = record
   ; isSetF₀ = λ _ → isSet× isSetBool isSetBool }
 
 -- ----------------------------------------------------------
--- A regime predicate: "the counterfactual holds at regime c, world u",
--- prop-valued and RESTRICTION-STABLE (holds at c and d → c implies
--- holds at d).  Stability is exactly what makes the predicate a sieve.
+-- A regime predicate says "the counterfactual holds at regime c and
+-- world u".  It is prop-valued and RESTRICTION-STABLE: if it holds
+-- at c and there is an arrow d → c, then it holds at d.  Stability
+-- is what makes the predicate a sieve.
 -- ----------------------------------------------------------
 record RegPred : Type₁ where
   field
@@ -82,9 +85,9 @@ record RegPred : Type₁ where
     stable  : (c d : Obj) (k : Hom₀ d c) (u : U) → P c u → P d u
 
 -- ----------------------------------------------------------
--- Every restriction-stable regime predicate is a genuine internal
--- predicate χ : W ⇒ Ω.  Naturality is proved (it holds because sieve
--- membership reads only the source regime).
+-- Every restriction-stable regime predicate gives a genuine internal
+-- predicate χ : W ⇒ Ω.  Naturality is proved.  It holds because
+-- sieve membership reads only the source regime.
 -- ----------------------------------------------------------
 χ : (R : RegPred) → Nat W Ω
 χ R = α , nat
@@ -95,13 +98,14 @@ record RegPred : Type₁ where
     nat : IsNat W Ω α
     nat x y f u = Sieve≡ {C = C} (α x u) (pull {C = C} f (α y u)) refl
 
--- The counterfactual TRANSPORTS to regime c (at world u) iff it is
--- forced there, i.e. c ⊩ (the sieve component of χ at c, u).
+-- The counterfactual TRANSPORTS to regime c at world u exactly when
+-- it is forced there, that is, when c ⊩ S for S the sieve component
+-- of χ at c and u.
 transports-to : RegPred → Obj → U → Type
 transports-to R c u = _⊩_ {C = C} c (fst (χ R) c u)
 
--- Forcing the predicate at a regime is exactly the predicate holding
--- there (definitional — the forcing IS the per-regime truth).
+-- Forcing the predicate at a regime is the predicate holding there.
+-- The two are definitionally equal: forcing is the per-regime truth.
 forced→holds : (R : RegPred) (c : Obj) (u : U)
              → transports-to R c u → RegPred.P R c u
 forced→holds R c u h = h
@@ -109,10 +113,11 @@ holds→forced : (R : RegPred) (c : Obj) (u : U)
              → RegPred.P R c u → transports-to R c u
 holds→forced R c u h = h
 
--- THE GENERAL THEOREM.  If the counterfactual transports to the global
--- context, it transports to every regime that context covers.  This is
--- the internal-logic locality (sieve closure = restriction-stability),
--- and it is the content the graphical single-graph view cannot state.
+-- THE GENERAL THEOREM.  If the counterfactual transports to the
+-- global context, it transports to every regime that context covers.
+-- This is locality in the internal logic, where sieve closure is
+-- restriction-stability.  A single causal graph has no way to state
+-- it.
 global-transport→everywhere :
     (R : RegPred) (u : U)
   → transports-to R g u → (d : Obj) → transports-to R d u
@@ -120,9 +125,9 @@ global-transport→everywhere R u tg g = tg
 global-transport→everywhere R u tg e = RegPred.stable R g e ι u tg
 
 -- ----------------------------------------------------------
--- Instantiation: the SCM counterfactual of the weld
--- (do(X:=true), query Y=true).  cfoG / cfoE are its global and
--- environment outcomes; restriction-stability is andb-R.
+-- Instantiation at the SCM counterfactual of the weld: do(X:=true)
+-- with query Y=true.  cfoG and cfoE are its global outcome and its
+-- environment outcome.  Restriction-stability is andb-R.
 -- ----------------------------------------------------------
 cfo : Obj → U → Bool
 cfo g u = cfoG u

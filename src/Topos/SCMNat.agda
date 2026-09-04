@@ -1,21 +1,21 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.SCMNat — NATURAL internal SCMs, closing the gap left by
+-- Topos.SCMNat — natural internal SCMs, closing the gap left by
 -- Topos.Rule1.rule1-E-nat.
 --
--- A natural internal SCM carries, beyond the regime-wise data,
--- the coherence with restriction:
+-- A natural internal SCM carries the regime-wise data together
+-- with its coherence with restriction:
 --   * the prior is a section of Dist_E X   (pX-nat),
 --   * the kernel is a natural transformation X ⇒ Dist_E Y (kY-nat).
--- From these we DERIVE that the internal Y-marginal is natural
--- (marg-nat) — so it is a genuine internal global element
--- (marginalSection), with no naturality taken as hypothesis.
+-- From these two we derive that the internal Y-marginal is
+-- natural (marg-nat).  So the marginal is an internal global
+-- element (marginalSection), and naturality is not assumed of it.
 --
--- Intervention is by a SECTION x₀ : 𝟙 ⇒ X (a regime-coherent
--- value); the intervened SCM is again natural.  Internal Rule 1
--- then holds as an equality of internal morphisms 𝟙 ⇒ Dist_E Y,
--- fully derived.
+-- Intervention is by a section x₀ : 𝟙 ⇒ X, that is, by a value
+-- that is coherent across regimes.  The intervened SCM is again
+-- natural.  Internal Rule 1 then holds as an equality of
+-- internal morphisms 𝟙 ⇒ Dist_E Y, and every step is derived.
 -- ============================================================
 
 module Topos.SCMNat where
@@ -38,7 +38,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- a natural internal SCM
+  -- A natural internal SCM.
   record SCM-E-nat {ℓ ℓ'} (X : PSh C ℓ) (Y : PSh C ℓ')
          : Type (ℓ-max (ℓ-max ℓo ℓh) (ℓ-max ℓ ℓ')) where
     field
@@ -51,15 +51,15 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   module _ {ℓ ℓ'} {X : PSh C ℓ} {Y : PSh C ℓ'} where
     open SCM-E-nat
 
-    -- underlying regime-wise family
+    -- The underlying regime-wise family.
     toFam : SCM-E-nat X Y → SCM-E {C = C} X Y
     toFam M c = record { pX = pXs M c ; kY = kYs M c }
 
-    -- structural independence, on the underlying family
+    -- Structural independence, stated on the underlying family.
     Indep-E-nat : SCM-E-nat X Y → Type (ℓ-max ℓo (ℓ-max ℓ ℓ'))
     Indep-E-nat M = (c : Ob) → Y-indep-X (toFam M c)
 
-    -- DERIVED: the internal Y-marginal is natural
+    -- Derived: the internal Y-marginal is natural.
     marg-nat : (M : SCM-E-nat X Y) (x y : Ob) (f : Hom x y)
              → mapF snd (joint-of (toFam M x))
                ≡ mapF (F₁ Y f) (mapF snd (joint-of (toFam M y)))
@@ -71,13 +71,15 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ∙ sym (mapF-bindR (F₁ Y f) (pXs M y) (kYs M y))
       ∙ cong (mapF (F₁ Y f)) (sym (marginal-Y-fuse (toFam M y)))
 
-    -- the internal Y-marginal as a genuine internal global element
+    -- The internal Y-marginal, read as an internal global
+    -- element.
     marginalSection : SCM-E-nat X Y → Section {C = C} (Dist_E Y)
     marginalSection M =
       (λ c _ → mapF snd (joint-of (toFam M c))) ,
       (λ x y f _ → marg-nat M x y f)
 
-    -- internal intervention by a regime-coherent value x₀ : 𝟙 ⇒ X
+    -- Internal intervention by a value x₀ : 𝟙 ⇒ X that is
+    -- coherent across regimes.
     do-XE-nat : Section {C = C} X → SCM-E-nat X Y → SCM-E-nat X Y
     do-XE-nat x₀ M = record
       { pXs    = λ c → pure (fst x₀ c tt)
@@ -86,8 +88,9 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ; kY-nat = kY-nat M
       }
 
-    -- THE GAP CLOSED: internal Rule 1 as an equality of internal
-    -- morphisms 𝟙 ⇒ Dist_E Y, with marginal naturality DERIVED.
+    -- This closes the gap.  Internal Rule 1 holds as an
+    -- equality of internal morphisms 𝟙 ⇒ Dist_E Y, and the
+    -- naturality of the marginal is derived, not assumed.
     rule1-E-section : (M : SCM-E-nat X Y) (ind : Indep-E-nat M) (x₀ : Section {C = C} X)
                     → marginalSection (do-XE-nat x₀ M) ≡ marginalSection M
     rule1-E-section M ind x₀ =

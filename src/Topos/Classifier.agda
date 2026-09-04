@@ -1,21 +1,25 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Classifier — Ω is THE subobject classifier.
+-- Topos.Classifier — Ω is the subobject classifier.
 --
--- Topos.Omega builds Ω (the presheaf of sieves); Topos.DoClassifier
--- classifies the single value-fixing subobject {x₀} ↪ X.  Here we
--- prove the universal property in general: every restriction-closed
--- subpresheaf-predicate P on a presheaf B is classified by a
--- characteristic map χ : B ⇒ Ω whose ⊤-fibre is exactly P, and that
--- map is UNIQUE — any natural χ' : B ⇒ Ω with the same ⊤-fibre equals
--- χ.  The intervention classifier of Topos.DoClassifier is recovered
--- as the instance  P c b = (b ≡ x₀ c).
+-- Topos.Omega builds Ω, the presheaf of sieves.
+-- Topos.DoClassifier classifies one subobject, the value-fixing
+-- {x₀} ↪ X.  This module proves the universal property in
+-- general.
 --
--- Uniqueness rests on one fact about sieves: a sieve containing the
--- identity is maximal (closure under precomposition spreads idn to
--- every arrow).  Hence membership of χ'_c(b) at f is forced to be
--- "F₁ B f b ∈ P", which is χ_c(b) by definition.
+-- Take a presheaf B and a predicate P on B that is closed under
+-- restriction.  Then P is classified by a characteristic map
+-- χ : B ⇒ Ω whose ⊤-fibre is exactly P.  That map is unique:
+-- any natural χ' : B ⇒ Ω with the same ⊤-fibre is equal to χ.
+-- The intervention classifier of Topos.DoClassifier is the
+-- instance  P c b = (b ≡ x₀ c).
+--
+-- Uniqueness rests on one fact about sieves.  A sieve that
+-- contains the identity is maximal, because closure under
+-- precomposition carries idn to every arrow.  So membership of
+-- χ'_c(b) at f is forced to be "F₁ B f b ∈ P", which is χ_c(b)
+-- by definition.
 -- ============================================================
 
 module Topos.Classifier where
@@ -32,8 +36,8 @@ open import Topos.PSh
 open import Topos.Omega
 
 -- ------------------------------------------------------------
--- Sieve fact: a sieve containing the identity is maximal, and a
--- maximal sieve contains every arrow.
+-- A fact about sieves.  A sieve that contains the identity is
+-- maximal.  A maximal sieve contains every arrow.
 -- ------------------------------------------------------------
 module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
@@ -54,8 +58,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   maximal→mem S eq d f = transport (λ i → fst (fst (eq (~ i)) d f)) tt*
 
 -- ------------------------------------------------------------
--- The universal property of Ω, for an arbitrary restriction-closed
--- subpresheaf-predicate P on B.
+-- The universal property of Ω.  Here P is any predicate on the
+-- presheaf B that is closed under restriction.
 -- ------------------------------------------------------------
 module _ {ℓ} {C : Precategory ℓ ℓ} (B : PSh C ℓ)
          (P : (c : Precategory.Ob C) → PSh.F₀ B c → hProp ℓ)
@@ -66,7 +70,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (B : PSh C ℓ)
   open Precategory C
   open PSh
 
-  -- χ_c(b) is the sieve of arrows along which b restricts into P.
+  -- χ_c(b) is the sieve of the arrows along which b restricts
+  -- into P.
   χ-mem : (c : Ob) → F₀ B c → SieveMem {C = C} c
   χ-mem c b d f = P d (F₁ B f b)
 
@@ -86,7 +91,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (B : PSh C ℓ)
   χ : Nat B Ω
   χ = (λ c b → χ-sieve c b) , χ-nat
 
-  -- The ⊤-fibre of χ is exactly P (both directions).
+  -- The ⊤-fibre of χ is exactly P.  We prove both directions.
   classifies-fwd : (c : Ob) (b : F₀ B c)
                  → fst (P c b) → χ-sieve c b ≡ maximal {C = C} c
   classifies-fwd c b hyp =
@@ -102,7 +107,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (B : PSh C ℓ)
     subst (λ z → fst (P c z)) (F-id B b)
           (maximal→mem {C = C} (χ-sieve c b) eq c idn)
 
-  -- The property "α has ⊤-fibre P", and the uniqueness theorem.
+  -- The property "α has ⊤-fibre P", and the uniqueness proof.
   Classifies : ((c : Ob) → F₀ B c → Sieve {C = C} c) → Type (ℓ-suc ℓ)
   Classifies α =
     (c : Ob) (b : F₀ B c)
@@ -129,10 +134,11 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (B : PSh C ℓ)
                        d idn)) ))
 
 -- ------------------------------------------------------------
--- The intervention classifier as an instance: P c b = (b ≡ x₀ c).
--- This is the subobject {x₀} ↪ X of Topos.DoClassifier, now exhibited
--- as one case of the general construction (χ-mem here computes to
--- (F₁ X f b ≡ x₀ d), i.e. DoClassifier.χ-mem definitionally).
+-- The intervention classifier as an instance.  Take the
+-- predicate P c b = (b ≡ x₀ c).  This is the subobject
+-- {x₀} ↪ X of Topos.DoClassifier, now one case of the general
+-- construction.  Here χ-mem computes to (F₁ X f b ≡ x₀ d),
+-- which is DoClassifier.χ-mem definitionally.
 -- ------------------------------------------------------------
 module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C} X) where
   open Precategory C
@@ -148,7 +154,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
                → fst (P-fix d b) → fst (P-fix e (F₁ X k b))
   P-fix-closed d e k b hyp = cong (F₁ X k) hyp ∙ sym (snd x₀ e d k tt)
 
-  -- the value-fixing classifier, with its full universal property
+  -- The value-fixing classifier, with its universal property.
   do-classifier : Nat X Ω
   do-classifier = χ X P-fix P-fix-closed
 

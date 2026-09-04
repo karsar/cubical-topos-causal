@@ -1,17 +1,18 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InternalDist — THE REUSE SEAM.
+-- Topos.InternalDist — the internal distribution object, reusing
+-- the core probability monad.
 --
 -- The internal distribution object of the presheaf topos Set^Cᵒᵖ
 -- is the verified probability monad FDist applied regime-wise:
 --
 --     (Dist_E X)(c) = FDist (X c),   restriction = mapF (X-restriction).
 --
--- Its presheaf functor laws reduce to functoriality of `mapF`,
--- which in turn is exactly the monad laws already proved in the
--- core (RuleDoCalc.>>=-unitR / >>=-assoc). Nothing about the
--- probability monad is re-proved here.
+-- Its presheaf functor laws reduce to functoriality of `mapF`.
+-- That functoriality is the monad laws already proved in the
+-- core, RuleDoCalc.>>=-unitR and RuleDoCalc.>>=-assoc.  Nothing
+-- about the probability monad is re-proved here.
 -- ============================================================
 
 module Topos.InternalDist where
@@ -25,7 +26,8 @@ open import RuleDoCalc  using (>>=-unitR; >>=-assoc)
 open import Topos.Cat
 open import Topos.PSh
 
--- functoriality of mapF — pure corollaries of the core monad laws
+-- Functoriality of mapF.  Both facts are corollaries of the core
+-- monad laws.
 mapF-id : ∀ {ℓ} {A : Type ℓ} (d : FDist A) → mapF (λ a → a) d ≡ d
 mapF-id d = >>=-unitR d
 
@@ -34,7 +36,7 @@ mapF-∘ : ∀ {ℓ ℓ' ℓ''} {A : Type ℓ} {B : Type ℓ'} {C : Type ℓ''}
        → mapF (λ a → g (f a)) d ≡ mapF g (mapF f d)
 mapF-∘ g f d = sym (>>=-assoc d (λ a → pure (f a)) (λ b → pure (g b)))
 
--- mapF interacts with bind on both sides (from associativity)
+-- mapF interacts with bind on both sides, by associativity
 mapF-bindL : ∀ {ℓ ℓ' ℓ''} {A : Type ℓ} {B : Type ℓ'} {C : Type ℓ''}
              (h : A → B) (d : FDist A) (k : B → FDist C)
            → (mapF h d >>= k) ≡ (d >>= (λ a → k (h a)))

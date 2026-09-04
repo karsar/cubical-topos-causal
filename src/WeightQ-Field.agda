@@ -1,28 +1,29 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- WeightQ-Field — the ordered-field interface, made OPAQUE.
+-- WeightQ-Field — the ordered-field interface, made opaque.
 --
--- WeightQ.agda used to `postulate` an abstract ordered field ℝ.
--- The postulate worked because a postulated symbol is RIGID: the
--- typechecker never unfolds `x +r y` or `x ≤r y`, so the implicit
--- arguments of the field lemmas are inferable by rigid-rigid
--- unification throughout the probability layer.
+-- WeightQ.agda once used `postulate` for an abstract ordered
+-- field ℝ.  A postulated symbol is rigid.  The typechecker
+-- never unfolds `x +r y` or `x ≤r y`.  Rigid-rigid unification
+-- can therefore infer the implicit arguments of the field
+-- lemmas everywhere in the probability layer.
 --
--- WeightQ-Discharge.agda exhibits ℚ as a concrete model with no
--- postulates, but its definitions are TRANSPARENT: `x ≤r y`
--- unfolds to a stuck SetQuotient/order projection that the unifier
--- cannot invert, so dropping the concrete field in directly breaks
--- implicit-argument inference at hundreds of downstream sites.
+-- WeightQ-Discharge.agda gives ℚ as a concrete model with no
+-- postulates.  Its definitions are transparent.  `x ≤r y`
+-- unfolds to a stuck SetQuotient/order projection, and the
+-- unifier cannot invert that.  Substituting the concrete field
+-- directly breaks implicit-argument inference at hundreds of
+-- downstream sites.
 --
--- This module bridges the two.  We re-export every field name from
--- WeightQ-Discharge inside a single `opaque` block.  Inside the
--- block the definitions are transparent (so each alias typechecks
--- against the concrete ℚ proof); outside it they are rigid (so
--- downstream unification behaves exactly as it did with the
--- postulate).  The result: ℝ is concretely ℚ, nothing is
--- postulated, and the whole development typechecks under --safe
--- with NO change to any downstream proof.
+-- This module keeps both properties.  Every field name from
+-- WeightQ-Discharge is re-exported inside one `opaque` block.
+-- Inside the block the definitions are transparent, so each
+-- alias typechecks against the concrete ℚ proof.  Outside the
+-- block they are rigid, so downstream unification behaves as it
+-- did with the postulate.  ℝ is therefore ℚ, and nothing is
+-- postulated.  The development typechecks under --safe, and no
+-- downstream proof changes.
 -- ============================================================
 
 module WeightQ-Field where

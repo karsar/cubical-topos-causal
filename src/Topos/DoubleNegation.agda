@@ -4,19 +4,21 @@
 -- Topos.DoubleNegation — Stage 2 (a): a NON-TRIVIAL Lawvere–
 -- Tierney topology, j = ¬¬.
 --
--- The trivial topology (Topos.LawvereTierney.trivialLT) makes the
--- modal results (do-j-stable, modal-rule1) hold but vacuously.
--- The double-negation topology is the canonical non-degenerate
--- example: its sheaves are the ¬¬-closed (Boolean) objects, and it is the
--- modality whose internal logic is Boolean.  Instantiating
--- do-j-stable / modal-rule1 at ¬¬ says interventions and Rule 1
--- survive the double-negation (Boolean) localization.
+-- The trivial topology, Topos.LawvereTierney.trivialLT, makes the
+-- modal results do-j-stable and modal-rule1 hold.  It makes them
+-- hold vacuously, since its closure is the identity.  The
+-- double-negation topology is the standard non-degenerate
+-- example.  Its sheaves are the ¬¬-closed objects, which are the
+-- Boolean ones, and its internal logic is Boolean.  Instantiating
+-- do-j-stable and modal-rule1 at ¬¬ says that interventions and
+-- Rule 1 survive the Boolean localization.
 --
--- We first build the Heyting structure on sieves that this needs
--- (bottom ⊥, implication ⇒, negation ¬), then prove ¬¬ satisfies
--- the three Lawvere–Tierney axioms.  Everything is at a single
--- level ℓ so the ∀-quantified implication membership stays in
--- hProp ℓ (= the hom level).
+-- The module first builds the Heyting structure on sieves that
+-- this needs: bottom ⊥, implication ⇒, and negation ¬.  It then
+-- proves that ¬¬ satisfies the three Lawvere–Tierney axioms.
+-- Everything sits at a single level ℓ.  That keeps the
+-- ∀-quantified implication membership in hProp ℓ, which is the
+-- hom level.
 -- ============================================================
 
 module Topos.DoubleNegation where
@@ -43,11 +45,11 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- Heyting structure on sieves.
   -- ----------------------------------------------------------
 
-  -- bottom: the empty sieve (membership is always ⊥)
+  -- Bottom: the empty sieve.  Membership is always ⊥.
   ⊥S : (c : Ob) → Sieve {C = C} c
   ⊥S c = (λ d f → ⊥* , isProp⊥*) , (λ d e k f x → x)
 
-  -- Heyting implication: f ∈ (S ⇒ T) iff every restriction of f
+  -- Heyting implication.  f ∈ (S ⇒ T) when every restriction of f
   -- that lands in S also lands in T.
   _⇒S_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Sieve {C = C} c
   _⇒S_ {c} S T =
@@ -59,7 +61,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
         (pf e'' (g ⋆ k)
           (subst (λ h → fst (fst S e'' h)) (sym (⋆-assoc g k f)) sm)))
 
-  -- negation and double negation
+  -- Negation and double negation.
   ¬S : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c
   ¬S {c} S = _⇒S_ {c} S (⊥S c)
 
@@ -70,8 +72,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- ¬¬ satisfies the Lawvere–Tierney axioms.
   -- ----------------------------------------------------------
 
-  -- j ⊤ = ⊤ : ¬¬⊤ = ⊤.  (¬⊤ is empty — apply the witness at idn —
-  -- so ¬¬⊤ is inhabited everywhere.)
+  -- j ⊤ = ⊤, that is ¬¬⊤ = ⊤.  ¬⊤ is empty: apply the witness at
+  -- idn.  So ¬¬⊤ is inhabited at every arrow.
   j-⊤-¬¬ : (c : Ob) → ¬¬S {c} (maximal {C = C} c) ≡ maximal {C = C} c
   j-⊤-¬¬ c =
     Sieve≡ {C = C} (¬¬S {c} (maximal {C = C} c)) (maximal {C = C} c)
@@ -84,36 +86,37 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- Order-theoretic infrastructure for the remaining axioms.
   -- ----------------------------------------------------------
 
-  -- sieve inclusion (the Heyting order)
+  -- Sieve inclusion, which is the Heyting order.
   _≤S_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Type ℓ
   _≤S_ {c} S T = (d : Ob) (f : Hom d c) → fst (fst S d f) → fst (fst T d f)
 
-  -- membership is prop-valued, so mutual inclusion is equality
+  -- Membership is prop-valued, so mutual inclusion is equality.
   ≤-antisym : {c : Ob} (S T : Sieve {C = C} c)
             → S ≤S T → T ≤S S → S ≡ T
   ≤-antisym {c} S T p q =
     Sieve≡ {C = C} S T
       (funExt λ d → funExt λ f → ⇔toPath (p d f) (q d f))
 
-  -- p ≤ ¬¬p
+  -- p ≤ ¬¬p.
   dne-unit : {c : Ob} (S : Sieve {C = C} c) → S ≤S ¬¬S {c} S
   dne-unit {c} S d f s e g r =
     r e idn (subst (λ h → fst (fst S e h)) (sym (⋆-idL (g ⋆ f)))
                    (snd S d e g f s))
 
-  -- negation is antitone: S ≤ T ⟹ ¬T ≤ ¬S
+  -- Negation is antitone: S ≤ T ⟹ ¬T ≤ ¬S.
   ¬-anti : {c : Ob} (S T : Sieve {C = C} c)
          → S ≤S T → ¬S {c} T ≤S ¬S {c} S
   ¬-anti {c} S T leq d f nt e g s = nt e g (leq e (g ⋆ f) s)
 
-  -- triple negation: ¬¬¬S = ¬S
+  -- Triple negation: ¬¬¬S = ¬S.
   tnn : {c : Ob} (S : Sieve {C = C} c) → ¬S {c} (¬¬S {c} S) ≡ ¬S {c} S
   tnn {c} S =
     ≤-antisym (¬S (¬¬S S)) (¬S S)
       (¬-anti S (¬¬S S) (dne-unit S))   -- ¬¬¬S ≤ ¬S
       (dne-unit (¬S S))                  -- ¬S ≤ ¬¬(¬S) = ¬¬¬S
 
-  -- j idempotent: ¬¬(¬¬S) = ¬¬S, i.e. ¬⁴S = ¬²S, by congruence on tnn
+  -- j is idempotent: ¬¬(¬¬S) = ¬¬S, that is ¬⁴S = ¬²S.  The proof
+  -- is congruence applied to tnn.
   j-idem-¬¬ : (c : Ob) (S : Sieve {C = C} c)
             → ¬¬S {c} (¬¬S {c} S) ≡ ¬¬S {c} S
   j-idem-¬¬ c S = cong (¬S {c}) (tnn S)
@@ -122,11 +125,12 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- Meet preservation: ¬¬(S ∩ T) = ¬¬S ∩ ¬¬T.
   -- ----------------------------------------------------------
 
-  -- C-pinned meet alias (the bare ∧S leaves its {C} a metavariable)
+  -- Meet alias pinned at C.  The bare ∧S leaves its {C} a
+  -- metavariable.
   _∩_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Sieve {C = C} c
   _∩_ {c} S T = _∧S_ {C = C} {c = c} S T
 
-  -- meet projections and pairing (∧ membership is a product)
+  -- Meet projections and pairing.  ∧ membership is a product.
   ∧S-≤L : {c : Ob} (S T : Sieve {C = C} c) → (S ∩ T) ≤S S
   ∧S-≤L S T d f pf = fst pf
   ∧S-≤R : {c : Ob} (S T : Sieve {C = C} c) → (S ∩ T) ≤S T
@@ -135,22 +139,23 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
        → R ≤S S → R ≤S T → R ≤S (S ∩ T)
   ≤-∧S R S T p q d f r = (p d f r , q d f r)
 
-  -- ¬¬ is monotone (two antitone steps)
+  -- ¬¬ is monotone, by two antitone steps.
   ¬¬-mono : {c : Ob} (S T : Sieve {C = C} c)
           → S ≤S T → ¬¬S {c} S ≤S ¬¬S {c} T
   ¬¬-mono S T leq = ¬-anti (¬S T) (¬S S) (¬-anti S T leq)
 
-  -- forward: ¬¬(S∧T) ≤ ¬¬S ∩ ¬¬T  (monotonicity)
+  -- Forward: ¬¬(S∧T) ≤ ¬¬S ∩ ¬¬T, by monotonicity.
   ∧-fwd : {c : Ob} (S T : Sieve {C = C} c)
         → ¬¬S {c} (S ∩ T) ≤S (¬¬S {c} S ∩ ¬¬S {c} T)
   ∧-fwd S T = ≤-∧S (¬¬S (S ∩ T)) (¬¬S S) (¬¬S T)
                 (¬¬-mono (S ∩ T) S (∧S-≤L S T))
                 (¬¬-mono (S ∩ T) T (∧S-≤R S T))
 
-  -- backward: ¬¬S ∩ ¬¬T ≤ ¬¬(S∧T).  Intuitionistically valid; the
-  -- witness restricts both double-negations along the test arrow,
-  -- then feeds the refutation r the required (S∧T)-membership built
-  -- from an S-witness and a T-witness, reassociating composites.
+  -- Backward: ¬¬S ∩ ¬¬T ≤ ¬¬(S∧T).  This direction is
+  -- intuitionistically valid.  The witness restricts both
+  -- double-negations along the test arrow.  It then hands the
+  -- refutation r a membership in S∧T, built from an S-witness and
+  -- a T-witness, with the composites reassociated.
   ∧-bwd : {c : Ob} (S T : Sieve {C = C} c)
         → (¬¬S {c} S ∩ ¬¬S {c} T) ≤S ¬¬S {c} (S ∩ T)
   ∧-bwd {c} S T d f pf e g r = nns' e idn nsf'
@@ -177,8 +182,9 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
     ≤-antisym (¬¬S (S ∩ T)) (¬¬S S ∩ ¬¬S T) (∧-fwd S T) (∧-bwd S T)
 
   -- ----------------------------------------------------------
-  -- Naturality: ¬ (hence ¬¬) commutes with restriction (pullback),
-  -- by reassociating the composite test arrows.
+  -- Naturality.  ¬ commutes with restriction, that is with
+  -- pullback, by reassociating the composite test arrows.  So ¬¬
+  -- commutes with restriction as well.
   -- ----------------------------------------------------------
   ¬-nat : (x y : Ob) (f : Hom x y) (S : Sieve {C = C} y)
         → ¬S {x} (pull {C = C} f S) ≡ pull {C = C} f (¬S {y} S)
@@ -192,9 +198,9 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
                                     (⋆-assoc h g f) s)))
 
   -- ----------------------------------------------------------
-  -- The double-negation topology, assembled.  (jnat is inlined so
-  -- its expected type — the record field — pins C; ¬¬ commutes with
-  -- pullback by applying ¬-nat twice.)
+  -- The double-negation topology, assembled.  jnat is inlined so
+  -- that its expected type, the record field, pins C.  ¬¬
+  -- commutes with pullback by applying ¬-nat twice.
   -- ----------------------------------------------------------
   ¬¬LT : LawvereTierney {C = C}
   ¬¬LT = record

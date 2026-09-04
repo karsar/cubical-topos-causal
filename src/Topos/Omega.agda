@@ -4,14 +4,18 @@
 -- Topos.Omega — the subobject classifier of the presheaf topos,
 -- and interventions as characteristic maps into it.
 --
--- Ω(c) = sieves on c (downward-closed families of morphisms into
--- c); restriction is sieve pullback.  The truth ⊤ : 𝟙 ⇒ Ω is the
--- maximal sieve.  A subpresheaf is classified by a characteristic
--- map χ : B ⇒ Ω, with b ∈ A iff χ(b) is the maximal sieve.
+-- A sieve on c is a family of morphisms into c that is closed
+-- under precomposition.  Ω(c) is the set of sieves on c.  The
+-- action of Ω on a morphism is sieve pullback.  The truth map
+-- ⊤ : 𝟙 ⇒ Ω picks out the maximal sieve at each object.
+--
+-- A subpresheaf A ↪ B is classified by a characteristic map
+-- χ : B ⇒ Ω.  An element b lies in A exactly when χ(b) is the
+-- maximal sieve.
 --
 -- This realises Mahadevan's "intervention via the subobject
--- classifier" directed-topos-internally: do(X := x₀) is the
--- characteristic map of the value-fixing subobject.
+-- classifier" internally to the directed topos.  do(X := x₀) is
+-- the characteristic map of the value-fixing subobject.
 -- ============================================================
 
 module Topos.Omega where
@@ -29,11 +33,12 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- membership of a sieve on c: a prop-valued predicate on morphisms into c
+  -- Membership in a sieve on c.  It is a predicate on the
+  -- morphisms into c, and it takes values in propositions.
   SieveMem : Ob → Type (ℓ-max ℓo (ℓ-suc ℓh))
   SieveMem c = (d : Ob) → Hom d c → hProp ℓh
 
-  -- closure under precomposition
+  -- Closure under precomposition.
   Closure : (c : Ob) → SieveMem c → Type (ℓ-max ℓo ℓh)
   Closure c mem = (d e : Ob) (k : Hom e d) (f : Hom d c)
                 → fst (mem d f) → fst (mem e (k ⋆ f))
@@ -45,7 +50,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   isPropClosure mem = isPropΠ λ d → isPropΠ λ e → isPropΠ λ k → isPropΠ λ f →
                       isPropΠ λ _ → snd (mem e (k ⋆ f))
 
-  -- two sieves are equal as soon as their membership predicates agree
+  -- Two sieves are equal as soon as their membership
+  -- predicates agree.
   Sieve≡ : {c : Ob} (S T : Sieve c) → fst S ≡ fst T → S ≡ T
   Sieve≡ S T p = ΣPathP (p , isProp→PathP (λ i → isPropClosure (p i)) (snd S) (snd T))
 
@@ -53,14 +59,15 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   isSetSieve = isSetΣ (isSetΠ λ d → isSetΠ λ f → isSetHProp)
                       (λ mem → isProp→isSet (isPropClosure mem))
 
-  -- pullback of a sieve along a morphism = the action of Ω on morphisms
+  -- Pullback of a sieve along a morphism.  This is the action
+  -- of Ω on morphisms.
   pull : {c' c : Ob} → Hom c' c → Sieve c → Sieve c'
   pull h S =
     (λ d f → fst S d (f ⋆ h)) ,
     (λ d e k f pf → subst (λ q → fst (fst S e q)) (sym (⋆-assoc k f h))
                           (snd S d e k (f ⋆ h) pf))
 
-  -- the subobject classifier
+  -- The subobject classifier.
   Ω : PSh C (ℓ-max ℓo (ℓ-suc ℓh))
   Ω = record
     { F₀ = Sieve
@@ -72,7 +79,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     ; isSetF₀ = λ c → isSetSieve
     }
 
-  -- truth: the maximal sieve (all morphisms), as an internal global element
+  -- Truth is the maximal sieve, the one that contains every
+  -- morphism.  ⊤Ω presents it as an internal global element.
   maximal : (c : Ob) → Sieve c
   maximal c = (λ d f → (Unit* , isPropUnit*)) , (λ d e k f _ → tt*)
 

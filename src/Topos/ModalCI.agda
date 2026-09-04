@@ -2,23 +2,24 @@
 
 -- ============================================================
 -- Topos.ModalCI — Stage 3 of the modal-layer repair: j-stability
--- of the contingent CI, applied to something that is NOT ⊤.
+-- of the contingent CI, applied to a truth value that is not ⊤.
 --
--- Topos.ContingentCI exhibited `ci-Ω`, a causal claim whose internal
--- truth value is ⊤ at one regime and a non-maximal (in fact empty)
--- sieve at another — the first non-vacuous input the modality has.
--- Here we ask the Stage-3 question: is that contingent truth value
--- j-stable?  For the double-negation topology (Topos.DoubleNegation,
--- the one non-degenerate instance we have) the answer is YES at BOTH
--- regimes, and — crucially — non-vacuously:
+-- Topos.ContingentCI built `ci-Ω`.  It is a causal claim whose
+-- internal truth value is ⊤ at one regime and the empty sieve at
+-- the other.  That is the first input to the modality which is
+-- not ⊤ everywhere.  The Stage-3 question is whether this
+-- contingent truth value is j-stable.  For the double-negation
+-- topology (Topos.DoubleNegation, the one non-degenerate topology
+-- available here) it is, at BOTH regimes:
 --   • at `false`, ci-Ω = ⊤, and ⊤ is ¬¬-closed;
 --   • at `true`,  ci-Ω = ⊥ (the CI fails), and ⊥ is ¬¬-closed.
--- Neither case is the "always ⊤" collapse of `modal-rule1/2/3`: the
--- true-regime value is genuinely non-maximal, yet still ¬¬-stable.
+-- The true-regime instance applies to a sieve that is not
+-- maximal, so it avoids the "always ⊤" collapse of
+-- `modal-rule1/2/3`.
 --
--- Causal reading: whether the conditional-independence claim holds
--- (⊤) or fails (⊥) at a regime, that verdict survives the Boolean
--- (¬¬) localisation — j-stability with content, not with ⊤.
+-- Causal reading.  At a regime the conditional-independence claim
+-- either holds (⊤) or fails (⊥).  Either verdict survives the
+-- Boolean (¬¬) localisation.
 -- ============================================================
 
 module Topos.ModalCI where
@@ -37,14 +38,15 @@ open import Topos.DoubleNegation using (¬¬S; ¬¬LT; ⊥S; _≤S_; ≤-antisym
 open import Topos.ContingentCI using (C; ci-Ω; ci-Ω-false-⊤; P; ¬P-true)
 
 -- ------------------------------------------------------------
--- The true regime: ci-Ω true is the empty sieve (the CI fails), and
--- the empty sieve is its own double negation.
+-- The true regime.  ci-Ω true is the empty sieve, because the CI
+-- fails there.  The empty sieve is its own double negation.
 -- ------------------------------------------------------------
 private
   open Precategory C using (Ob; Hom; idn)
 
-  -- ci-Ω true IS the empty sieve: its membership (the false prop
-  -- P true) is logically equivalent to ⊥ at every arrow.
+  -- ci-Ω true is the empty sieve.  Its membership is the false
+  -- proposition `P true`, which is equivalent to ⊥ at every
+  -- arrow.
   ci-Ω-true-⊥ : ci-Ω true ≡ ⊥S {C = C} true
   ci-Ω-true-⊥ =
     Sieve≡ {C = C} (ci-Ω true) (⊥S {C = C} true)
@@ -69,7 +71,7 @@ private
   true-closed =
     cong (¬¬S {ℓ = ℓ-zero} {C = C}) ci-Ω-true-⊥ ∙ ¬¬-⊥-closed ∙ sym ci-Ω-true-⊥
 
-  -- The false regime: ci-Ω false = ⊤, and ¬¬⊤ = ⊤.
+  -- The false regime.  ci-Ω false = ⊤, and ¬¬⊤ = ⊤.
   false-closed : is-j-closed (¬¬LT {C = C}) false (ci-Ω false)
   false-closed =
     cong (¬¬S {ℓ = ℓ-zero} {C = C}) ci-Ω-false-⊤
@@ -77,9 +79,9 @@ private
 
 -- ------------------------------------------------------------
 -- STAGE 3 DELIVERABLE: the contingent CI is ¬¬-stable at every
--- regime — a j-stability theorem whose true-regime instance is
--- applied to a NON-maximal sieve, so it is not the vacuous
--- "j ⊤ = ⊤" of the modal-rule theorems.
+-- regime.  The true-regime instance applies to a sieve that is
+-- NOT maximal, so it says more than the "j ⊤ = ⊤" step used by
+-- the modal-rule theorems.
 -- ------------------------------------------------------------
 ci-Ω-¬¬-closed : (c : Bool) → is-j-closed (¬¬LT {C = C}) c (ci-Ω c)
 ci-Ω-¬¬-closed false = false-closed

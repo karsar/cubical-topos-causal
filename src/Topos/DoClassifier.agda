@@ -5,25 +5,26 @@
 -- operator.
 --
 -- Stage 1 built Ω (Topos.Omega) and proved do-calculus Rule1/2/3
--- on a do-operator defined OPERATIONALLY (do-X replaces the X-
--- prior with a point mass).  Here we close the loop: we exhibit
--- the intervention do(X := x₀) as a genuine CHARACTERISTIC MAP
+-- for a do-operator defined operationally.  There, do-X replaces
+-- the X-prior with a point mass.  This module connects the two
+-- descriptions.  It exhibits the intervention do(X := x₀) as a
+-- characteristic map
 --
 --     χ : X ⇒ Ω
 --
--- into the subobject classifier, classifying the value-fixing
+-- into the subobject classifier.  χ classifies the value-fixing
 -- subobject  {x₀} ↪ X.  This is the topos-internal content of
--- Mahadevan's "intervention via the subobject classifier",
--- previously only asserted in Omega's header comment.
+-- Mahadevan's "intervention via the subobject classifier", which
+-- Omega's header comment only asserted.
 --
--- Design point: a topos-internal intervention fixes X to a
--- NATURAL global element  x₀ : Section X  (not the bare regime-
--- indexed family that Topos.SCM.do-XE currently accepts).  That
--- naturality is exactly what makes the value-fixing family a
--- subpresheaf — and what makes χ natural.
+-- One point of scope.  A topos-internal intervention fixes X to
+-- a natural global element  x₀ : Section X.  Topos.SCM.do-XE
+-- currently accepts a bare regime-indexed family, which is
+-- weaker.  The naturality is what makes the value-fixing family
+-- a subpresheaf, and it is also what makes χ natural.
 --
--- Deliverables:
---   χ              : X ⇒ Ω                       (a real internal morphism)
+-- This module provides:
+--   χ              : X ⇒ Ω                       (an internal morphism)
 --   true→fixed     : χ c b = ⊤  →  b = x₀ c       (χ classifies {x₀})
 --   fixed→true     : b = x₀ c  →  χ c b = ⊤
 --   do-classified  : χ c (x₀ c) = ⊤              (the forced value is χ-true)
@@ -47,16 +48,17 @@ open import Topos.PSh
 open import Topos.Omega
 open import Topos.SCM
 
--- We work at a single level ℓ (base regimes, hom-sets, and value
--- spaces all at ℓ); this is the regime of Topos.Example and keeps
--- Ω's membership level (= the hom level) aligned with the value
--- presheaf's fibres.  X is the value presheaf, x₀ the intervened
--- value as a natural global element.
+-- We work at a single universe level ℓ.  Base regimes, hom-sets
+-- and value spaces all sit at ℓ.  This is the setting of
+-- Topos.Example.  It also keeps Ω's membership level, which is
+-- the hom level, equal to the level of the value presheaf's
+-- fibres.  X is the value presheaf.  x₀ is the intervened value,
+-- given as a natural global element.
 module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C} X) where
   open Precategory C
   open PSh
 
-  -- the intervened value, regime-wise, and its naturality
+  -- The intervened value, regime by regime, and its naturality.
   pt : (c : Ob) → F₀ X c
   pt c = fst x₀ c tt
 
@@ -66,9 +68,10 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
   -- ----------------------------------------------------------
   -- The characteristic map χ : X ⇒ Ω.
   --
-  -- χ_c(b) is the sieve of those f : d → c along which b restricts
-  -- to the fixed value:  { f | F₁ X f b = pt d }.  b sits in the
-  -- value-fixing subobject iff this sieve is maximal (below).
+  -- χ_c(b) is the sieve of those f : d → c along which b
+  -- restricts to the fixed value.  That is, { f | F₁ X f b =
+  -- pt d }.  b lies in the value-fixing subobject exactly when
+  -- this sieve is maximal.  The proof is below.
   -- ----------------------------------------------------------
 
   χ-mem : (c : Ob) → F₀ X c → SieveMem {C = C} c
@@ -81,7 +84,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
   χ-sieve : (c : Ob) → F₀ X c → Sieve {C = C} c
   χ-sieve c b = χ-mem c b , χ-closed c b
 
-  -- naturality: χ commutes with restriction (sieve pullback)
+  -- Naturality.  χ commutes with restriction, which on Ω is
+  -- sieve pullback.
   χ-nat : IsNat X Ω (λ c b → χ-sieve c b)
   χ-nat x y f b =
     Sieve≡ {C = C} (χ-sieve x (F₁ X f b)) (pull {C = C} f (χ-sieve y b))
@@ -109,20 +113,21 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
   true→fixed c b eq =
     sym (F-id X b) ∙ transport (λ i → fst (q (~ i))) tt*
     where
-      -- membership of the identity at c: (F₁ X idn b ≡ pt c) ≡ Unit*
+      -- Membership of the identity at c.  It is the equality
+      -- (F₁ X idn b ≡ pt c) ≡ Unit*.
       q : ((F₁ X idn b ≡ pt c) , isSetF₀ X c (F₁ X idn b) (pt c))
         ≡ (Unit* , isPropUnit*)
       q = cong (λ S → fst S c idn) eq
 
-  -- the value that do(X := x₀) forces is exactly the χ-true point
+  -- The value that do(X := x₀) forces is the χ-true point.
   do-classified : (c : Ob) → χ-sieve c (pt c) ≡ maximal {C = C} c
   do-classified c = fixed→true c (pt c) refl
 
   -- ----------------------------------------------------------
-  -- Bridge to Stage 1: the OPERATIONAL intervention do-XE (which
-  -- sets the X-prior to a point mass) forces precisely pt c — the
-  -- point classified ⊤ by χ.  Hence χ is the characteristic map
-  -- of the do-XE intervention.
+  -- Bridge to Stage 1.  The operational intervention do-XE sets
+  -- the X-prior to a point mass.  It forces the value pt c, and
+  -- χ sends that point to ⊤.  So χ is the characteristic map of
+  -- the do-XE intervention.
   -- ----------------------------------------------------------
   module _ {ℓ'} (Y : PSh C ℓ') (m : SCM-E {C = C} X Y) where
     do-prior : (c : Ob) → SCM₂.pX (do-XE {C = C} {X = X} {Y = Y} pt m c) ≡ pure (pt c)

@@ -1,20 +1,24 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Rule1 — THE STAGE-1 DELIVERABLE.
+-- Topos.Rule1 — internal Pearl Rule 1, the Stage 1 result.
 --
--- Internal Pearl Rule 1: under structural independence Y ⫫ X,
--- the internal intervention do(X := x₀) leaves the internal
--- Y-marginal invariant, at every regime — by lifting the
--- verified core theorem RuleDoCalc.rule1-marginal pointwise.
--- No causal content is re-proved: the topos layer wraps the
--- machine-checked Rule 1 of the core.
+-- A regime is an object of the base category C.  An internal
+-- SCM is a family of SCMs, one for each regime.
 --
--- The statement is written in the manifestly-checking inline
--- form; it is *definitionally* the internal statement
+-- Internal Pearl Rule 1.  Assume structural independence Y ⫫ X.
+-- Then the internal intervention do(X := x₀) leaves the internal
+-- Y-marginal unchanged, at every regime.  The proof applies the
+-- verified core theorem RuleDoCalc.rule1-marginal at each regime.
+-- The topos layer adds no causal content of its own.  It wraps
+-- the machine-checked Rule 1 of the core.
+--
+-- The statement is written inline, in the form that checks
+-- without unfolding.  It is definitionally the internal
+-- statement
 --     marginalY-E (do-XE x₀ m) c ≡ marginalY-E m c
--- with marginalY-E / do-XE the internal API of Topos.SCM
--- (mapF snd ∘ joint-of, and regime-wise do-X).
+-- where marginalY-E and do-XE are the internal operations of
+-- Topos.SCM: mapF snd ∘ joint-of, and regime-wise do-X.
 -- ============================================================
 
 module Topos.Rule1 where
@@ -35,8 +39,9 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- internal Rule 1, regime-wise.
-  -- LHS ≡ marginalY-E (do-XE x₀ m) c ,  RHS ≡ marginalY-E m c   (definitionally).
+  -- Internal Rule 1, one regime at a time.  The left side is
+  -- marginalY-E (do-XE x₀ m) c and the right side is
+  -- marginalY-E m c, both definitionally.
   rule1-E : ∀ {ℓ ℓ'} {X : PSh C ℓ} {Y : PSh C ℓ'}
             (m : SCM-E X Y) (ind : Indep-E {X = X} {Y = Y} m) (x₀ : (c : Ob) → F₀ X c)
           → (c : Ob)
@@ -44,15 +49,16 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   rule1-E m ind x₀ c = rule1-marginal (m c) (ind c) (x₀ c)
 
   -- ----------------------------------------------------------------
-  -- Nat≡ upgrade: internal Rule 1 at the level of internal MORPHISMS.
+  -- Internal Rule 1 at the level of internal morphisms.
   --
-  -- When the internal Y-marginal of m is natural (coheres with regime
-  -- restriction) — supplied here as the witnesses `ndo`, `nm`, the
-  -- separately-establishable fact that holds once the SCM's prior and
-  -- kernel are natural — it is an internal global element (a Section of
-  -- Dist_E Y).  Internal Rule 1 then upgrades from a pointwise family
-  -- identity to an EQUALITY OF INTERNAL MORPHISMS `𝟙 ⇒ Dist_E Y`,
-  -- obtained by feeding the pointwise rule1-E to Nat≡.
+  -- Natural means that the internal Y-marginal of m commutes with
+  -- regime restriction.  A natural marginal is an internal global
+  -- element, that is, a Section of Dist_E Y.  Naturality is a
+  -- hypothesis here, carried by the witnesses `ndo` and `nm`.  It
+  -- is established separately, and holds once the SCM's prior and
+  -- kernel are natural.  Given the witnesses, Nat≡ turns the
+  -- pointwise rule1-E into an equality of internal morphisms
+  -- `𝟙 ⇒ Dist_E Y`.
   -- ----------------------------------------------------------------
   rule1-E-nat : ∀ {ℓ ℓ'} {X : PSh C ℓ} {Y : PSh C ℓ'}
     (m : SCM-E X Y) (ind : Indep-E {X = X} {Y = Y} m) (x₀ : (c : Ob) → F₀ X c)

@@ -4,13 +4,17 @@
 -- Topos.Cat — the regime base category for directed topos
 -- causal models (Stage 1).
 --
--- A minimal (pre)category record. Objects are regimes /
--- contexts; morphisms are admissible regime maps. For Stage 1
--- a finite poset instance suffices, but we keep C abstract.
+-- A record for a precategory.  An object is a regime, that is,
+-- a context in which the causal model is read.  A morphism is
+-- an admissible map between regimes.  Stage 1 needs only a
+-- finite poset instance.  We keep C abstract, so that later
+-- stages can use another base.
 --
--- Composition is in DIAGRAMMATIC order:  f ⋆ g  is  "f then g".
--- This makes contravariant presheaf restriction read cleanly
--- in Topos.PSh.
+-- Composition is written in diagrammatic order.  So  f ⋆ g  is
+-- "f then g".  Topos.PSh restricts presheaves contravariantly.
+-- In this order the restriction law reads
+-- F₁ (f ⋆ g) a ≡ F₁ f (F₁ g a), with f and g in the same order
+-- on both sides.
 -- ============================================================
 
 module Topos.Cat where

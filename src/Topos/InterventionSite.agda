@@ -1,18 +1,22 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionSite — the intervention poset as a site, for
--- Gate 1 of the topos-directed-homotopy programme: recompute the
--- modality on a NON-degenerate coverage and see whether the
--- ⊤-collapse survives (coverage cause) or persists (invertibility).
+-- Topos.InterventionSite — the intervention poset as a site.
+--
+-- This is the base for Gate 1 of the topos-directed-homotopy
+-- programme.  Gate 1 recomputes the modality on a coverage that
+-- is not degenerate.  The question is whether the ⊤-collapse is
+-- caused by the coverage or by invertibility.
 --
 -- Base category (a thin poset):
 --     do0 ─→ obs ←─ do1
--- `obs` is the observational context (do(∅)); `do0`, `do1` are the
--- two interventions do(X:=0), do(X:=1), each refining `obs`.  Unlike
--- the discrete two-regime site of Topos.ContingentCI, here `obs` has
--- a genuine non-trivial covering family {do0, do1} — the causal
--- reading "observing is covered by intervening at every value".
+-- `obs` is the observational context, that is, do(∅).  `do0` and
+-- `do1` are the two interventions do(X:=0) and do(X:=1).  Each of
+-- them refines `obs`.  In the discrete two-regime site of
+-- Topos.ContingentCI the only arrow into an object is its
+-- identity.  Here `obs` has the covering family {do0, do1}.  The
+-- causal reading is "observing is covered by intervening at every
+-- value".
 -- ============================================================
 
 module Topos.InterventionSite where
@@ -47,7 +51,7 @@ isPropIHom obs do1 ()
 isPropIHom do0 do1 ()
 isPropIHom do1 do0 ()
 
--- Identities and composition (determined, since thin).
+-- Identities and composition.  Thinness determines both.
 idI : ∀ {x} → IHom x x
 idI {obs} = idₒ
 idI {do0} = id₀
@@ -61,8 +65,8 @@ e0  ⋆I idₒ = e0
 e1  ⋆I idₒ = e1
 
 -- ------------------------------------------------------------
--- The intervention poset as a Precategory.  All the category laws
--- are equalities in a hom-set, hence hold by propositionality.
+-- The intervention poset as a Precategory.  Every category law
+-- is an equality in a hom-set, so propositionality proves it.
 -- ------------------------------------------------------------
 Iv : Precategory ℓ-zero ℓ-zero
 Iv = record

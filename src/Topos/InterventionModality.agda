@@ -1,16 +1,19 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionModality — Gate 1 payload.  On the intervention
--- site Iv (do0 → obs ← do1) with the genuine coverage "obs is
--- covered by {do0, do1}", the closure operator j is NON-TRIVIAL:
---   * a CI that holds under BOTH interventions ({e0,e1}) closes up
---     to the maximal sieve (⊤) — real modal work;
+-- Topos.InterventionModality — Gate 1 payload.
+--
+-- The site is Iv (do0 → obs ← do1) from Topos.InterventionSite,
+-- with the coverage "obs is covered by {do0, do1}".  On it the
+-- closure operator j moves truth values:
+--   * a CI that holds under BOTH interventions ({e0,e1}) closes
+--     up to the maximal sieve ⊤;
 --   * a CI that holds under only ONE intervention ({e0}) SURVIVES
 --     closure (j {e0} ≠ maximal).
--- So the ⊤-collapse of the discrete two-regime site is a
--- coverage/site DEGENERACY, not an invertibility obstruction: on a
--- genuine intervention coverage the modality is non-degenerate.
+-- So the ⊤-collapse of the discrete two-regime site comes from
+-- that site's degenerate coverage.  It is not an obstruction from
+-- invertibility.  On the intervention coverage the modality is
+-- non-degenerate.
 -- ============================================================
 
 module Topos.InterventionModality where
@@ -68,7 +71,8 @@ ci-one = mem , clo
 
 -- ------------------------------------------------------------
 -- The closure operator j on sieves over `obs`, induced by the
--- coverage.  j S ∋ e_i iff e_i ∈ S; j S ∋ idₒ iff e0,e1 ∈ S.
+-- coverage.  j S contains e_i exactly when S does.  j S contains
+-- idₒ exactly when S contains both e0 and e1.
 -- ------------------------------------------------------------
 jS : Sieve {C = Iv} obs → Sieve {C = Iv} obs
 jS S = mem , clo
@@ -100,12 +104,14 @@ j-both-collapses = Sieve≡ {C = Iv} (jS ci-both) (maximal {C = Iv} obs)
     go do0 e0  = ⇔toPath (λ _ → tt*) (λ _ → tt*)
     go do1 e1  = ⇔toPath (λ _ → tt*) (λ _ → tt*)
 
--- (2) The CI holding under only ONE intervention SURVIVES: j {e0}
--- is not the maximal sieve (they differ at idₒ: ⊥ vs ⊤).
+-- (2) The CI holding under only ONE intervention SURVIVES.  j {e0}
+-- is not the maximal sieve.  The two differ at idₒ, where one is
+-- ⊥ and the other is ⊤.
 j-one-survives : ¬ (jS ci-one ≡ maximal {C = Iv} obs)
 j-one-survives p = E.rec (snd bad)
   where
-    -- membership at (obs, idₒ): (Unit* × ⊥) on the left, Unit* on the right
+    -- Membership at (obs, idₒ) is (Unit* × ⊥) on the left and
+    -- Unit* on the right.
     mempath : fst (jS ci-one) obs idₒ ≡ fst (maximal {C = Iv} obs) obs idₒ
     mempath i = fst (fst (p i) obs idₒ) , snd (fst (p i) obs idₒ)
     bad : Unit* × ⊥

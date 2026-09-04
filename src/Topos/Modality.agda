@@ -6,21 +6,23 @@
 --
 -- A Lawvere–Tierney topology J gives a closure operator
 --     ◯ = jop J : Ω → Ω
--- with unit η (= inflationarity j-infl), idempotence (◯S modal),
--- and the REFLECTOR universal property:
+-- with unit η, which is inflationarity j-infl, and with
+-- idempotence, which makes ◯S modal.  It also has the reflector
+-- universal property:
 --     T modal  ⟹  ( S ≤ T  ⇔  ◯S ≤ T ).
--- So the j-closed sieves form a reflective sub-poset of Ω, with ◯
--- the reflector and η the unit — the (−1)-truncated / subobject
--- shadow of sheafification.  "◯-modal" is now a property one can
--- state and discharge directly (is-j-closed), which is what (b)
--- asked for.
+-- So the j-closed sieves form a reflective sub-poset of Ω.  ◯ is
+-- the reflector and η is the unit.  This is sheafification
+-- restricted to subobjects, that is, at the (−1)-truncated level.
+-- "◯-modal" becomes a property one can state and discharge
+-- directly, namely is-j-closed.  That is what (b) asked for.
 --
--- SCOPE: this is the modality on PROPOSITIONS (truth values).  The
--- full TYPE-level reflector — sheafification of arbitrary
--- presheaves, with descent — is the ∞-categorical part and remains
--- paper-only (it needs the modal/Cat machinery outside current
--- cubical Agda).  Monotonicity of ◯ is DERIVED here
--- from meet-preservation, not assumed.
+-- SCOPE: the modality here acts on propositions, that is, on
+-- truth values.  The full type-level reflector is sheafification
+-- of arbitrary presheaves, with descent.  That part is
+-- ∞-categorical and stays paper-only, because it needs the
+-- modal/Cat machinery that current cubical Agda lacks.
+-- Monotonicity of ◯ is derived here from meet-preservation.  It
+-- is not assumed.
 -- ============================================================
 
 module Topos.Modality where
@@ -42,8 +44,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
   open PSh
 
   -- ----------------------------------------------------------
-  -- Sieve order and meet (C-pinned, as the bare operators leave
-  -- their {C} a metavariable).
+  -- Sieve order and meet, pinned at C.  The bare operators leave
+  -- their {C} a metavariable.
   -- ----------------------------------------------------------
   _≤S_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Type ℓ
   _≤S_ {c} S T = (d : Ob) (f : Hom d c) → fst (fst S d f) → fst (fst T d f)
@@ -63,7 +65,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
   ≤∩ : {c : Ob} (R S T : Sieve {C = C} c) → R ≤S S → R ≤S T → R ≤S (S ∩ T)
   ≤∩ R S T p q d f x = (p d f x , q d f x)
 
-  -- from A ≡ A ∩ B extract A ≤ B (take the second meet component)
+  -- From A ≡ A ∩ B extract A ≤ B, by taking the second meet
+  -- component.
   ≤-of-meet-eq : {c : Ob} (A B : Sieve {C = C} c) → A ≡ (A ∩ B) → A ≤S B
   ≤-of-meet-eq A B eq d f x =
     snd (transport (cong (λ Sv → fst (fst Sv d f)) eq) x)
@@ -74,11 +77,11 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
   ◯ : (c : Ob) → Sieve {C = C} c → Sieve {C = C} c
   ◯ c = jop J c
 
-  -- unit η : S → ◯S  (inflationarity)
+  -- Unit η : S → ◯S, which is inflationarity.
   η : (c : Ob) (S : Sieve {C = C} c) → S ≤S ◯ c S
   η c S = j-infl-derivable J c S
 
-  -- ◯S is modal (idempotence)
+  -- ◯S is modal, by idempotence.
   ◯-modal : (c : Ob) (S : Sieve {C = C} c) → is-j-closed J c (◯ c S)
   ◯-modal c S = j-idem J c S
 
@@ -95,7 +98,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (J : LawvereTierney {C = C}) where
       ◯S≡◯S∩◯T = cong (◯ c) S≡S∩T ∙ j-∧ J c S T
 
   -- ----------------------------------------------------------
-  -- The reflector universal property:  for modal T,
+  -- The reflector universal property.  For modal T,
   --     S ≤ T   ⇔   ◯S ≤ T.
   -- ----------------------------------------------------------
   ◯-rec : (c : Ob) (S T : Sieve {C = C} c)
