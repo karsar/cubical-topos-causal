@@ -3,41 +3,45 @@
 -- ============================================================
 -- Transport.TransportProbabilistic — step 2, the probabilistic lift.
 --
--- The general theorem (Transport.TransportGeneral) is stated for
--- ANY presheaf of worlds and ANY prop-valued, restriction-stable
--- predicate.  The probabilistic case is therefore an INSTANTIATION,
--- not new scaffolding: worlds are finite probability distributions
--- (the companion paper's FDist monad), and the counterfactual is a
--- DISTRIBUTIONAL equality.
+-- The general theorem (Transport.TransportGeneral) is stated for ANY
+-- presheaf of worlds and ANY prop-valued, restriction-stable
+-- predicate.  The probabilistic case is therefore an INSTANTIATION
+-- of it, and it needs no new scaffolding.  Worlds are finite
+-- probability distributions, from the companion paper's FDist monad,
+-- and the counterfactual is an equality of distributions.
 --
--- The one fact that makes this work: FDist A is a SET (its HIT carries
--- the `trunc` constructor), so a distributional statement `d ≡ q` is a
--- PROPOSITION — exactly what StablePred requires.  Hence:
+-- One fact makes this work.  FDist A is a SET, because its HIT
+-- carries the `trunc` constructor.  A statement `d ≡ q` about
+-- distributions is then a PROPOSITION, which is what StablePred
+-- requires.  Hence:
 --
 --   Wp        — a presheaf of probabilistic worlds (FDist Bool);
---   probPred  — the predicate "the world distribution equals a target",
---               restriction-stable, so a genuine StablePred;
---   χp        — therefore a subobject χ : Wp ⇒ Ω (from the general
---               theorem): probabilistic counterfactual statements are
---               internal truth values;
---   prob-transport-invariant — and transport (forcing) of a
---               distributional counterfactual is downward-closed, for
---               free, exactly as in the deterministic case.
+--   probPred  — the predicate "the world distribution equals a
+--               target".  It is restriction-stable, so it is a
+--               genuine StablePred;
+--   χp        — the general theorem then gives a subobject
+--               χ : Wp ⇒ Ω, so probabilistic counterfactual
+--               statements are internal truth values;
+--   prob-transport-invariant — transport, that is forcing, of a
+--               distributional counterfactual is downward-closed.
+--               The proof is the one from the deterministic case;
 --
---   transport→dist — the bridge: a transported (deterministic)
---               counterfactual has a determinate DISTRIBUTION — the
---               point mass at the queried outcome — in every regime.
---               (cfd c u = pure (cfo c u); transport ⟹ cfd ≡ pure true.)
+--   transport→dist — the bridge.  A transported deterministic
+--               counterfactual has a determinate DISTRIBUTION in
+--               every regime, the point mass at the queried outcome.
+--               Here cfd c u = pure (cfo c u), and transport gives
+--               cfd ≡ pure true.
 --
--- So the whole transport / forcing / invariance story carries over
--- from Boolean outcomes to probability distributions unchanged.
+-- So the transport, forcing and invariance results carry over from
+-- Boolean outcomes to probability distributions unchanged.
 --
--- STILL OPEN (step 3 territory).  Here the per-regime distributions are
--- point masses and restriction-stability is the Boolean one lifted.  The
--- genuinely probabilistic refinement — worlds carrying kernels, abduction
--- as Bayesian conditioning, restriction-stability as conditioning-
--- invariance, and the SOUNDNESS direction (invariant ⟹ transportable) —
--- is the next step, built on this instantiation.
+-- STILL OPEN (step 3 territory).  In this module the per-regime
+-- distributions are point masses, and restriction-stability is the
+-- Boolean condition lifted.  The genuinely probabilistic refinement
+-- is the next step, built on this instantiation: worlds carrying
+-- kernels, abduction as Bayesian conditioning, restriction-stability
+-- as invariance under conditioning, and the SOUNDNESS direction,
+-- that invariant implies transportable.
 -- ============================================================
 
 module Transport.TransportProbabilistic where
@@ -64,9 +68,9 @@ isSetFDistBool : isSet (FDist Bool)
 isSetFDistBool = trunc
 
 -- ----------------------------------------------------------
--- A presheaf of probabilistic worlds: a world is a finite distribution
--- over outcomes, shared across regimes (twin network), so restriction
--- is the identity.
+-- A presheaf of probabilistic worlds.  A world is a finite
+-- distribution over outcomes.  It is shared across regimes, as in
+-- the twin network, so restriction is the identity.
 -- ----------------------------------------------------------
 Wp : PSh C ℓ-zero
 Wp = record
@@ -77,9 +81,10 @@ Wp = record
   ; isSetF₀ = λ _ → isSetFDistBool }
 
 -- ----------------------------------------------------------
--- The probabilistic counterfactual predicate: "the world distribution
--- equals the target".  Prop-valued (FDist is a set) and restriction-
--- stable, hence a genuine StablePred — so the general theorem applies.
+-- The probabilistic counterfactual predicate says "the world
+-- distribution equals the target".  It is prop-valued, because FDist
+-- is a set, and it is restriction-stable.  It is therefore a genuine
+-- StablePred, and the general theorem applies.
 -- ----------------------------------------------------------
 probPred : TG.StablePred {C = C} Wp
 probPred = record
@@ -90,17 +95,18 @@ probPred = record
 χp : Nat Wp Ω
 χp = TG.chi probPred
 
--- Transport (forcing) of a distributional counterfactual is downward-
--- closed: forced at a regime ⟹ forced at every regime restricting in.
+-- Transport, that is forcing, of a distributional counterfactual is
+-- downward-closed.  Forced at a regime gives forced at every regime
+-- restricting into it.
 prob-transport-invariant :
     {c : Obj} (w : FDist Bool) → _⊩_ {C = C} c (TG.chiSieve probPred c w)
   → {d : Obj} (f : Hom₀ d c) → _⊩_ {C = C} d (TG.chiSieve probPred d w)
 prob-transport-invariant w h f = TG.transport-invariant probPred w h f
 
 -- ----------------------------------------------------------
--- Bridge to the deterministic transport result: the transported
--- counterfactual has a determinate distribution (a point mass) in
--- every regime.
+-- Bridge to the deterministic transport result.  The transported
+-- counterfactual has a determinate distribution in every regime,
+-- namely a point mass.
 -- ----------------------------------------------------------
 cfd : Obj → U → FDist Bool
 cfd c u = pure (cfo c u)

@@ -4,12 +4,15 @@
 -- Topos.PSh — presheaves over a regime base C (= objects of
 -- the presheaf topos Set^Cᵒᵖ) and their natural transformations.
 --
--- Contravariant: a morphism f : Hom x y restricts F₀ y → F₀ x.
--- `Nat≡` is the extensionality lemma: two natural transformations
--- are equal as soon as their components agree pointwise (the
--- naturality square is propositional because the codomain is a set).
--- This is the lemma that lets Topos.Rule1 assemble a pointwise
--- identity into an equality of internal morphisms.
+-- A presheaf is contravariant.  A morphism f : Hom x y gives a
+-- restriction map F₀ y → F₀ x.
+--
+-- Nat≡ is the extensionality lemma for natural transformations.
+-- Two of them are equal as soon as their components agree
+-- pointwise.  The naturality square is a proposition, because
+-- the codomain presheaf takes values in sets.  Topos.Rule1 uses
+-- Nat≡ to turn a pointwise identity into an equality of
+-- internal morphisms.
 -- ============================================================
 
 module Topos.PSh where
@@ -36,17 +39,18 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- naturality of a family of component maps
+  -- Naturality of a family of component maps.
   IsNat : ∀ {ℓ ℓ'} (X : PSh C ℓ) (Y : PSh C ℓ')
         → (∀ c → F₀ X c → F₀ Y c) → Type (ℓ-max (ℓ-max ℓo ℓh) (ℓ-max ℓ ℓ'))
   IsNat X Y α = ∀ x y (f : Hom x y) (a : F₀ X y)
               → α x (F₁ X f a) ≡ F₁ Y f (α y a)
 
-  -- a natural transformation X ⇒ Y
+  -- A natural transformation X ⇒ Y.
   Nat : ∀ {ℓ ℓ'} (X : PSh C ℓ) (Y : PSh C ℓ') → Type _
   Nat X Y = Σ[ α ∈ (∀ c → F₀ X c → F₀ Y c) ] IsNat X Y α
 
-  -- the terminal presheaf, and internal global elements (sections)
+  -- The terminal presheaf, and the internal global elements of
+  -- a presheaf, which we call sections.
   𝟙 : PSh C ℓ-zero
   𝟙 = record
     { F₀ = λ _ → Unit ; F₁ = λ _ _ → tt
@@ -55,7 +59,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   Section : ∀ {ℓ} → PSh C ℓ → Type (ℓ-max (ℓ-max ℓo ℓh) ℓ)
   Section Y = Nat 𝟙 Y
 
-  -- product of presheaves (restriction componentwise)
+  -- Product of presheaves.  Restriction acts componentwise.
   _×ᴾ_ : ∀ {ℓ ℓ'} → PSh C ℓ → PSh C ℓ' → PSh C (ℓ-max ℓ ℓ')
   X ×ᴾ Y = record
     { F₀ = λ c → F₀ X c × F₀ Y c
@@ -69,7 +73,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   isPropIsNat {Y = Y} α =
     isPropΠ λ x → isPropΠ λ y → isPropΠ λ f → isPropΠ λ a → isSetF₀ Y x _ _
 
-  -- extensionality: pointwise-equal components ⇒ equal natural transformations
+  -- Extensionality.  Components that are equal pointwise give
+  -- equal natural transformations.
   Nat≡ : ∀ {ℓ ℓ'} {X : PSh C ℓ} {Y : PSh C ℓ'} (n₁ n₂ : Nat X Y)
        → (∀ c a → fst n₁ c a ≡ fst n₂ c a) → n₁ ≡ n₂
   Nat≡ {X = X} {Y} n₁ n₂ h =

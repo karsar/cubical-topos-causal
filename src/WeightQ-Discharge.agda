@@ -4,31 +4,31 @@
 -- WeightQ-Discharge.agda
 --
 -- This module discharges the abstract ordered-field interface
--- postulated in WeightQ.agda by exhibiting ℚ (the rationals,
--- as defined in Cubical.Data.Rationals) as a concrete model.
+-- postulated in WeightQ.agda.  It exhibits ℚ, the rationals of
+-- Cubical.Data.Rationals, as a concrete model.
 --
--- Together with WeightQ.agda's lift from this abstract interface
--- to the [0,1]-bounded Weight type, this completes the SOUNDNESS
--- STORY for the representation theorem:
+-- WeightQ.agda lifts that abstract interface to the
+-- [0,1]-bounded Weight type.  The two modules together complete
+-- the soundness chain for the representation theorem:
 --
 --    FDist.agda                  (abstract Weight axioms)
 --      ↑ discharged by
 --    WeightQ.agda               (concrete Weight = [z0, z1] ⊆ ℝ)
 --      ↑ ℝ discharged by
---    WeightQ-Discharge.agda     (THIS FILE: ℝ ≔ ℚ from cubical lib)
+--    WeightQ-Discharge.agda     (this file: ℝ ≔ ℚ from cubical lib)
 --
--- Every "ordered-field with bounded division" axiom postulated
--- at the WeightQ level is here exhibited as a concrete theorem
--- about ℚ. The remaining gap is the bound-preservation laws on
--- division (postulated defensively in WeightQ); these need a
--- defensive total division operator on ℚ which we define here
+-- Every "ordered field with bounded division" axiom postulated
+-- at the WeightQ level appears here as a concrete theorem about
+-- ℚ.  The remaining gap is the bound-preservation laws on
+-- division, which WeightQ postulates defensively.  Those need a
+-- defensive total division operator on ℚ.  We define one here,
 -- by case analysis on Q ≡ 0.
 --
--- Status: this file is a demonstration of soundness, not a
--- replacement for WeightQ.agda. It exhibits one concrete model;
--- WeightQ.agda's parametricity over the abstract interface
--- means anything proven there is sound under any model
--- satisfying the interface (with ℚ being the canonical one).
+-- Status: this file demonstrates soundness.  It does not
+-- replace WeightQ.agda.  It exhibits one concrete model.
+-- WeightQ.agda is parametric over the abstract interface, so
+-- anything proved there holds in every model of the interface.
+-- ℚ is the canonical model.
 -- ============================================================
 
 module WeightQ-Discharge where
@@ -88,7 +88,7 @@ isProp-<r : ∀ {x y} → isProp (x <r y)
 isProp-<r {x} {y} = QO.isProp< x y
 
 -- ============================================================
--- Ring laws (every WeightQ ℝ-postulate is here a theorem)
+-- Ring laws.  Every WeightQ ℝ-postulate is a theorem here.
 -- ============================================================
 
 +r-comm   : ∀ x y → x +r y ≡ y +r x
@@ -143,15 +143,16 @@ isProp-<r {x} {y} = QO.isProp< x y
 z0≤z1    : z0 ≤r z1
 z0≤z1 = ℤO.zero-≤pos
 
--- 0 < 1 is constructed directly as (0 , refl): pos 1 = pos (suc 0) = pos 0 + 1.
+-- 0 < 1 is constructed as (0 , refl), since
+-- pos 1 = pos (suc 0) = pos 0 + 1.
 z0<z1    : z0 <r z1
 z0<z1 = 0 , refl
 
--- A strictly interior value ½ = [1/2], witnessing that the unit
--- interval has a point strictly between its endpoints.  Both strict
--- bounds are the same (0 , refl) cross-multiplication witness as
--- z0<z1 (0·2 < 1·1 and 1·1 < 1·2).  This is what makes a confounded
--- model non-degenerate downstream (WeightQ.wHalf).
+-- A strictly interior value ½ = [1/2].  It witnesses that the
+-- unit interval has a point strictly between its endpoints.
+-- Both strict bounds use the same (0 , refl) cross-multiplication
+-- witness as z0<z1: 0·2 < 1·1, and 1·1 < 1·2.  Downstream this
+-- value keeps a confounded model non-degenerate (WeightQ.wHalf).
 zHalf : ℝ
 zHalf = [ pos 1 / 2 ]
 
@@ -169,10 +170,12 @@ zHalf<z1 = 0 , refl
 
 -- ============================================================
 -- The two-factor monotone product inequality.
--- This is a chained application of single-factor monotonicity:
---   a ≤ b and 0 ≤ c imply a·c ≤ b·c     (by ≤-·o, monotone in left factor)
---   c ≤ d and 0 ≤ b imply b·c ≤ b·d     (by symmetric application after ·Comm)
--- We need 0 ≤ b, which follows from 0 ≤ a and a ≤ b by transitivity.
+-- It chains two uses of single-factor monotonicity:
+--   a ≤ b and 0 ≤ c give a·c ≤ b·c   (≤-·o, monotone in the
+--                                     left factor)
+--   c ≤ d and 0 ≤ b give b·c ≤ b·d   (the same after ·Comm)
+-- The side condition 0 ≤ b follows from 0 ≤ a and a ≤ b, by
+-- transitivity.
 -- ============================================================
 ≤r-·-mono : ∀ {a b c d} → z0 ≤r a → z0 ≤r c
           → a ≤r b → c ≤r d → (a ·r c) ≤r (b ·r d)
@@ -190,9 +193,9 @@ zHalf<z1 = 0 , refl
                    (QO.≤-·o c d b z0≤b c≤d)
 
 -- ============================================================
--- Strict positivity of products: 0 < a · b when 0 < a, 0 < b.
--- From <-·o : 0 < o → m < n → m·o < n·o, applied with m=0, n=a, o=b,
--- using ·AnnihilL to convert 0·b = 0.
+-- Strict positivity of products: 0 < a · b when 0 < a and
+-- 0 < b.  Apply <-·o : 0 < o → m < n → m·o < n·o with m=0, n=a,
+-- o=b, and use ·AnnihilL to rewrite 0·b as 0.
 -- ============================================================
 <r-·-pos  : ∀ {a b} → z0 <r a → z0 <r b → z0 <r (a ·r b)
 <r-·-pos {a} {b} z0<a z0<b =
@@ -201,11 +204,12 @@ zHalf<z1 = 0 , refl
 
 -- ============================================================
 -- 0 < a + b when 0 < a and 0 ≤ b.
--- a < a + b: by translating the < hypothesis 0 < a using +-monotonicity
--- with b on the right.
--- Concretely: 0 < a means there's k with a = pos (suc k) + 0, lifted to ℚ.
--- We use: (0 < a) → (0 + b) < (a + b) by <-+o (additive monotone), giving b < a+b.
--- Then 0 ≤ b combined with b < a+b gives 0 < a+b.
+-- For a < a + b, translate the hypothesis 0 < a by
+-- +-monotonicity, with b on the right.
+-- In detail: 0 < a means there is a k with a = pos (suc k) + 0,
+-- lifted to ℚ.  Then <-+o, additive monotonicity, gives
+-- (0 + b) < (a + b), that is b < a+b.  With 0 ≤ b this gives
+-- 0 < a+b.
 -- ============================================================
 <r-+-pos-l : ∀ {a b} → z0 <r a → z0 ≤r b → z0 <r (a +r b)
 <r-+-pos-l {a} {b} z0<a z0≤b =
@@ -244,36 +248,35 @@ isProp-x≤z1 {x} = QO.isProp≤ x z1
 -- Division: defensive total operator.
 --
 -- In the abstract WeightQ.agda development, _/r_ is used only
--- via the bayesW formulas, and only the algebraic IDENTITIES
--- on _/w_ matter (which are postulated separately as bayesW-*).
--- The concrete value returned by _/r_ in WeightQ-Discharge is
--- not used to prove any theorem in Representation.agda or
--- Intersection.agda.
+-- through the bayesW formulas.  Only the algebraic identities on
+-- _/w_ matter there, and those are postulated separately as
+-- bayesW-*.  No theorem in Representation.agda or
+-- Intersection.agda uses the concrete value that _/r_ returns in
+-- WeightQ-Discharge.
 --
--- Therefore, to eliminate the final ℝ-interface postulate, we
--- provide a TRIVIAL implementation that returns z0 always.
--- This is a sound discharge: every Weight axiom and theorem
--- holds without depending on _/r_'s actual semantic content,
--- because all _/r_-using lemmas are themselves separately
--- postulated as bayesW-* identities. A semantically-correct
--- ℚ division (with z0 returned on zero divisor and the
--- standard quotient otherwise) would be a strict refinement
--- of this implementation; we provide the trivial version
--- since it suffices to discharge the postulate.
+-- So, to remove the last ℝ-interface postulate, we give a
+-- trivial implementation that always returns z0.  The discharge
+-- is sound.  Every Weight axiom and theorem holds without any
+-- appeal to the semantic content of _/r_, because every
+-- _/r_-using lemma is postulated separately as a bayesW-*
+-- identity.  A semantically correct ℚ division would refine this
+-- implementation.  Such a division returns z0 on a zero divisor
+-- and the standard quotient otherwise.  The trivial version is
+-- enough to discharge the postulate.
 -- ============================================================
 -- ============================================================
--- HONEST division on ℚ.
+-- Honest division on ℚ.
 --
--- Imported from WeightQ-Discharge-Division.agda, which builds
--- the inverse construction directly on Cubical.Data.Rationals.ℚ
--- via SetQuot.elimProp + inverseUniqueness from the ℚ-CommRing
--- instance.
+-- Imported from WeightQ-Discharge-Division.agda.  That module
+-- builds the inverse construction on Cubical.Data.Rationals.ℚ,
+-- using SetQuot.elimProp together with inverseUniqueness from the
+-- ℚ-CommRing instance.
 --
 -- For non-zero y: x /r y returns the actual quotient.
 -- For y ≡ z0:     returns z0 (defensive default).
 --
--- This eliminates the soundness gap: ·r-/r-pos and /r-·r-pos
--- are now DERIVED theorems, not postulates.
+-- This closes the soundness gap.  ·r-/r-pos and /r-·r-pos are
+-- now derived theorems, not postulates.
 -- ============================================================
 open import WeightQ-Discharge-Division
   using (honest/r; ·r-/r-pos-derived; /r-·r-pos-derived)
@@ -290,47 +293,49 @@ infixl 7 _/r_
 -- ============================================================
 
 -- Strict ordering is irreflexive.
--- ℚ has < as a strict order; (0, refl) for 0 < 1 cannot match
--- 0 < 0. We use the QO.isIrrefl< lemma if available, otherwise
--- explicit refutation via Σ-type properties.
--- For ℚ: x < x means ∃ k. x ≡ pos (suc k) + x, which forces
--- pos (suc k) ≡ pos 0, contradiction.
+-- ℚ has < as a strict order.  The witness (0, refl) for 0 < 1
+-- cannot match 0 < 0.  We use QO.isIrrefl< where the library
+-- supplies it, and otherwise refute directly from the Σ-type.
+-- For ℚ, x < x means there is a k with x ≡ pos (suc k) + x.
+-- That forces pos (suc k) ≡ pos 0, which is false.
 -- ============================================================
--- Order/positivity axioms — DERIVED.
+-- Order/positivity axioms, derived.
 --
--- Five of the seven previous postulates are now theorems built
--- from cubical-stdlib's ℚ order infrastructure.
+-- Five of the seven earlier postulates are now theorems.  They
+-- are built from the ℚ order infrastructure of cubical-stdlib.
 -- ============================================================
 
--- Item 1: irreflexivity of strict order. Direct from cubical lib.
+-- Item 1: irreflexivity of the strict order.  Direct from the
+-- cubical library.
 <r-irrefl : ∀ x → ¬ (x <r x)
 <r-irrefl x = QO.isIrrefl< x
 
 -- Item 2: at z1, totality decomposes ≤ into < or ≡.
--- Use trichotomy: x ≟ z1 gives lt, eq, or gt. The gt case contradicts
--- x ≤ z1 via ≤→≯.
+-- Use trichotomy.  x ≟ z1 gives lt, eq, or gt.  The gt case
+-- contradicts x ≤ z1, by ≤→≯.
 ≡z1-or-<z1 : ∀ x → z0 ≤r x → x ≤r z1 → (x ≡ z1) ⊎ (x <r z1)
 ≡z1-or-<z1 x _ x≤1 with x QO.≟ z1
 ... | QO.lt x<1 = inr x<1
 ... | QO.eq x≡1 = inl x≡1
 ... | QO.gt 1<x = ⊥.rec (QO.≤→≯ x z1 x≤1 1<x)
 
--- Item 3: sum-zero on non-negatives forces left summand zero.
--- Trichotomy on a vs z0:
---   a < z0:  contradicts z0 ≤ a via ≤→≯.
+-- Item 3: a zero sum of non-negatives forces the left summand to
+-- be zero.  Trichotomy on a against z0:
+--   a < z0:  contradicts z0 ≤ a, by ≤→≯.
 --   a ≡ z0:  done.
---   a > z0:  0 < a, with 0 ≤ b gives 0 < a + b (via <r-+-pos-l, defined above).
---            But a + b ≡ z0, so 0 < z0, contradicting <r-irrefl.
+--   a > z0:  0 < a and 0 ≤ b give 0 < a + b, by <r-+-pos-l above.
+--            But a + b ≡ z0, so 0 < z0, which <r-irrefl refutes.
 +r-eq-z0-l : ∀ a b → z0 ≤r a → z0 ≤r b → a +r b ≡ z0 → a ≡ z0
 +r-eq-z0-l a b z0≤a z0≤b a+b≡0 with a QO.≟ z0
 ... | QO.lt a<0 = ⊥.rec (QO.≤→≯ z0 a z0≤a a<0)
 ... | QO.eq a≡0 = a≡0
 ... | QO.gt z0<a = ⊥.rec (<r-irrefl z0 (subst (z0 <r_) a+b≡0 (<r-+-pos-l {a} {b} z0<a z0≤b)))
 
--- Item 6: product positivity factor (left). 0 ≤ a, 0 < a·b → 0 < a.
--- Trichotomy on a vs z0:
+-- Item 6: positivity of the left factor of a product.
+-- From 0 ≤ a and 0 < a·b, derive 0 < a.
+-- Trichotomy on a against z0:
 --   a < 0:  contradicts 0 ≤ a.
---   a ≡ 0:  then a·b ≡ 0·b ≡ 0, contradicting 0 < a·b.
+--   a ≡ 0:  then a·b ≡ 0·b ≡ 0, which contradicts 0 < a·b.
 --   a > 0:  done.
 <r-·-pos-factor-l : ∀ {a b} → z0 ≤r a → z0 <r (a ·r b) → z0 <r a
 <r-·-pos-factor-l {a} {b} z0≤a 0<ab with a QO.≟ z0
@@ -342,9 +347,10 @@ infixl 7 _/r_
       (cong (_·r b) a≡0 ∙ ·r-AnnihL b)
       0<ab))
 
--- Item 7: complement positivity. x < z1 → z0 < 1-r x = z1 + (-x).
--- From x < z1, by <-+o on right: x + (-x) < z1 + (-x).
--- x + (-x) ≡ z0 (by +r-inv). So z0 < z1 + (-x) = 1-r x.
+-- Item 7: positivity of the complement.
+-- x < z1 → z0 < 1-r x = z1 + (-x).
+-- From x < z1, by <-+o on the right, x + (-x) < z1 + (-x).
+-- And x + (-x) ≡ z0, by +r-inv.  So z0 < z1 + (-x) = 1-r x.
 <r-z1→pos-1-r : ∀ {x} → x <r z1 → z0 <r (1-r x)
 <r-z1→pos-1-r {x} x<1 =
   subst2 _<r_ (+r-inv x) refl step
@@ -354,25 +360,25 @@ infixl 7 _/r_
     step = QO.<-+o x z1 (-r x) x<1
 
 -- ============================================================
--- The remaining two postulates require real ℚ division.
--- The current trivial `_/r_ _ _ = z0` makes them literally
--- false (e.g., (x ·r y) /r y reduces to z0, not x). To
--- discharge them we would need to define a real division on
--- ℚ (using its field structure on the QuoQ representation, or
--- a SetQuotient-level inverse construction).
+-- The remaining two postulates require real ℚ division.  With
+-- the trivial `_/r_ _ _ = z0` they are false: (x ·r y) /r y
+-- reduces to z0 instead of x.  To discharge them one would
+-- define a real division on ℚ, using the field structure on the
+-- QuoQ representation, or a SetQuotient-level inverse
+-- construction.
 --
--- The convex framework above WeightQ.agda does not actually
--- depend on these two identities being honest — they are used
--- only inside Bayesian-style derivations that the convex
--- framework re-derives without them. Eliminating the
--- defensive `_/r_` is a separate refactoring.
+-- The convex framework above WeightQ.agda does not depend on
+-- these two identities being correct.  They are used only inside
+-- Bayesian-style derivations, and the convex framework re-derives
+-- those without them.  Removing the defensive `_/r_` is a
+-- separate refactoring.
 -- ============================================================
 -- ============================================================
--- DERIVED: the round-trip identities for honest division.
+-- Derived: the round-trip identities for honest division.
 --
--- These were previously postulated (when _/r_ was the trivial
--- z0 stub). Now that _/r_ is honest division built on the
--- ℚ-CommRing inverse, both are direct consequences:
+-- These were postulated while _/r_ was the trivial z0 stub.
+-- _/r_ is now honest division, built on the ℚ-CommRing inverse,
+-- so both follow directly:
 --   ·r-/r-pos = ·-/r-non-zero (via pos→non-zero)
 --   /r-·r-pos = /r-·-non-zero (via pos→non-zero)
 -- See WeightQ-Discharge-Division.agda for the construction.
@@ -384,8 +390,9 @@ infixl 7 _/r_
 /r-·r-pos {y} 0<y x = /r-·r-pos-derived {y = y} 0<y x
 
 -- ============================================================
--- /r bound discharges, derived from honest division bounds.
--- These eliminate /r-bound-{l,u}-defensive's role in _/wPf_⟨_,_⟩.
+-- /r bound discharges, derived from the honest-division bounds.
+-- They remove the role of /r-bound-{l,u}-defensive in
+-- _/wPf_⟨_,_⟩.
 -- ============================================================
 open WeightQ-Discharge-Division using (honest/r-lb; honest/r-ub)
 
@@ -402,19 +409,21 @@ z0-decide x 0≤x with x QO.≟ z0
 ... | QO.eq x≡0 = inl x≡0
 ... | QO.gt 0<x = inr 0<x
 
--- ≤r-+-cancel-r: a + c ≤r b + c → a ≤r b. Cubical's ≤-o+-cancel does this
--- (with operands reordered to o + m form).
+-- ≤r-+-cancel-r: a + c ≤r b + c → a ≤r b.  Cubical's
+-- ≤-o+-cancel proves this, once the operands are reordered into
+-- o + m form.
 ≤r-+-cancel-r : ∀ a b c → (a +r c) ≤r (b +r c) → a ≤r b
 ≤r-+-cancel-r a b c h =
   QO.≤-o+-cancel a b c (subst2 _≤r_ (+r-comm a c) (+r-comm b c) h)
 
 -- ============================================================
--- VERIFICATION: every postulate from WeightQ.agda's abstract
--- "ordered field" interface is now provided as a concrete
--- definition or theorem above. The 5 remaining ℝ-level laws
--- (<r-irrefl, ≡z1-or-<z1, +r-eq-z0-l, ·r-/r-pos, /r-·r-pos)
--- are discharged too --- proved for ℚ, the division laws in
--- WeightQ-Discharge-Division. Nothing here is postulated.
+-- Verification.  Every postulate of the abstract "ordered
+-- field" interface of WeightQ.agda now has a concrete definition
+-- or theorem above.  The 5 remaining ℝ-level laws (<r-irrefl,
+-- ≡z1-or-<z1, +r-eq-z0-l, ·r-/r-pos, /r-·r-pos) are discharged
+-- as well.  All are proved for ℚ, and the two division laws are
+-- proved in WeightQ-Discharge-Division.  Nothing here is
+-- postulated.
 --
 -- The full inventory of discharged WeightQ ℝ-postulates:
 --   ℝ, isSet-ℝ          ✓ (= ℚ, isSetℚ)
@@ -436,6 +445,6 @@ z0-decide x 0≤x with x QO.≟ z0
 --   1-r, 1-r-def        ✓ (concrete definition)
 --   _/r_                ✓ (honest ℚ division; see WeightQ-Discharge-Division)
 --
--- TOTAL: 28 of 28 WeightQ ℝ-interface postulates discharged.
+-- Total: 28 of 28 WeightQ ℝ-interface postulates discharged.
 -- WeightQ-Discharge.agda contains zero postulates.
 -- ============================================================

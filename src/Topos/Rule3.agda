@@ -4,13 +4,16 @@
 -- Topos.Rule3 — internal Pearl Rule 3 (insertion/deletion of
 -- actions) on the chain model, lifting RuleDoCalc.rule3-* .
 --
--- Rule 3 is UNCONDITIONAL: intervening on the downstream Z leaves
--- an upstream marginal unchanged, because that marginal does not
--- bind kZ at all.  We lift both the X- and (X,Y)-marginal forms
--- pointwise, and give the X-marginal at the level of internal
--- morphisms — which is especially clean, since the X-marginal IS
--- the prior section (marginal-X-fuse), so do(Z)-invariance and
--- naturality are immediate from the prior's naturality.
+-- The chain model has a prior pX and two kernels, kY from X and
+-- kZ from Y.  Rule 3 needs no independence hypothesis.  An
+-- intervention on the downstream Z leaves an upstream marginal
+-- unchanged, because that marginal never binds kZ.
+--
+-- We lift the X-marginal and the (X,Y)-marginal forms at each
+-- regime.  The X-marginal also holds at the level of internal
+-- morphisms.  That case is short, because marginal-X-fuse says
+-- the X-marginal is the prior itself.  Invariance under do(Z)
+-- and naturality then follow from naturality of the prior.
 -- ============================================================
 
 module Topos.Rule3 where
@@ -32,17 +35,19 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- internal chain SCM (bare regime-indexed family)
+  -- An internal chain SCM: one SCM₃ per regime, with no
+  -- naturality condition.
   SCM₃-E : ∀ {ℓ ℓ' ℓ''} → PSh C ℓ → PSh C ℓ' → PSh C ℓ'' → Type _
   SCM₃-E X Y Z = (c : Ob) → SCM₃ (F₀ X c) (F₀ Y c) (F₀ Z c)
 
   module _ {ℓ ℓ' ℓ''} {X : PSh C ℓ} {Y : PSh C ℓ'} {Z : PSh C ℓ''} where
 
-    -- internal intervention do(Z := z₀), regime-wise
+    -- The internal intervention do(Z := z₀), applied at each regime.
     do-ZE : ((c : Ob) → F₀ Z c) → SCM₃-E X Y Z → SCM₃-E X Y Z
     do-ZE z₀ m = λ c → do-Z₃ (z₀ c) (m c)
 
-    -- pointwise internal Rule 3 (both forms), lifting the core
+    -- Internal Rule 3 in both forms, one regime at a time, lifting
+    -- the core theorems.
     rule3-X-E : (m : SCM₃-E X Y Z) (z₀ : (c : Ob) → F₀ Z c) (c : Ob)
               → marginal-X (do-Z₃ (z₀ c) (m c)) ≡ marginal-X (m c)
     rule3-X-E m z₀ c = rule3-X-marginal (m c) (z₀ c)
@@ -51,7 +56,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
                → marginal-XY (do-Z₃ (z₀ c) (m c)) ≡ marginal-XY (m c)
     rule3-XY-E m z₀ c = rule3-XY-marginal (m c) (z₀ c)
 
-  -- natural internal chain SCM
+  -- A natural internal chain SCM.  The prior and both kernels
+  -- commute with regime restriction.
   record SCM₃-E-nat {ℓ ℓ' ℓ''} (X : PSh C ℓ) (Y : PSh C ℓ') (Z : PSh C ℓ'')
          : Type (ℓ-max (ℓ-max ℓo ℓh) (ℓ-max ℓ (ℓ-max ℓ' ℓ''))) where
     field
@@ -70,7 +76,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     toFam₃ : SCM₃-E-nat X Y Z → SCM₃-E X Y Z
     toFam₃ M c = record { pX = pXs M c ; kY = kYs M c ; kZ = kZs M c }
 
-    -- DERIVED: the X-marginal is natural — it is the prior section
+    -- Derived: the X-marginal is natural, because it is the prior.
     margX-nat : (M : SCM₃-E-nat X Y Z) (x y : Ob) (f : Hom x y)
               → marginal-X (toFam₃ M x) ≡ mapF (F₁ X f) (marginal-X (toFam₃ M y))
     margX-nat M x y f =
@@ -78,13 +84,13 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ∙ pX-nat M x y f
       ∙ cong (mapF (F₁ X f)) (sym (marginal-X-fuse (toFam₃ M y)))
 
-    -- the X-marginal as an internal global element of Dist_E X
+    -- The X-marginal as an internal global element of Dist_E X.
     marginalXSection : SCM₃-E-nat X Y Z → Section {C = C} (Dist_E X)
     marginalXSection M =
       (λ c _ → marginal-X (toFam₃ M c)) ,
       (λ x y f _ → margX-nat M x y f)
 
-    -- internal do(Z := z₀) by a regime-coherent value z₀ : 𝟙 ⇒ Z
+    -- Internal do(Z := z₀) for a regime-coherent value z₀ : 𝟙 ⇒ Z.
     do-ZE-nat : Section {C = C} Z → SCM₃-E-nat X Y Z → SCM₃-E-nat X Y Z
     do-ZE-nat z₀ M = record
       { pXs    = pXs M
@@ -95,8 +101,9 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ; kZ-nat = λ x y f b → cong pure (snd z₀ x y f tt)
       }
 
-    -- THE DELIVERABLE: internal Rule 3 (X-marginal) as an equality of
-    -- internal morphisms 𝟙 ⇒ Dist_E X — unconditional, naturality derived.
+    -- Internal Rule 3 for the X-marginal, as an equality of
+    -- internal morphisms 𝟙 ⇒ Dist_E X.  It carries no hypothesis,
+    -- and the naturality is derived.
     rule3-X-section : (M : SCM₃-E-nat X Y Z) (z₀ : Section {C = C} Z)
                     → marginalXSection (do-ZE-nat z₀ M) ≡ marginalXSection M
     rule3-X-section M z₀ =

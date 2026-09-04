@@ -3,24 +3,25 @@
 -- ============================================================
 -- RuleDoCalc.agda
 --
--- Pearl's do-calculus in kernel form, on small structural causal
--- models. Built directly on FDist-Convex.
+-- Pearl's do-calculus in kernel form, on small structural
+-- causal models.  It is built on FDist-Convex.
 --
 -- Rules verified:
 --   * Rule 1 (insertion/deletion of observations) on SCM₂ and
---     the SCM₃ chain — observing a variable that the outcome
---     does not depend on leaves the outcome's marginal unchanged.
---   * Rule 3 (insertion/deletion of actions) on SCM₃ chain —
---     intervening on a downstream variable leaves an upstream
+--     on the SCM₃ chain.  Observing a variable that the outcome
+--     does not depend on leaves the outcome's marginal
+--     unchanged.
+--   * Rule 3 (insertion/deletion of actions) on the SCM₃ chain.
+--     Intervening on a downstream variable leaves an upstream
 --     marginal unchanged.
 --
--- Rule 2 (action/observation exchange) is in a sibling file
--- once the substitution-conditioning agreement lemma is proved.
+-- Rule 2 (action/observation exchange) is in a sibling file.
+-- It needs the substitution-conditioning agreement lemma first.
 --
--- The proofs use only the monad laws (which we derive here from
--- the bind definition in FDist-Convex) and constBind (the
--- structural lemma asserting d >>= λ_ → e ≡ e). No new
--- postulates beyond what FDist-Convex provides.
+-- The proofs use the monad laws and constBind.  The monad laws
+-- are derived here from the bind definition in FDist-Convex.
+-- constBind is the structural lemma d >>= λ_ → e ≡ e.  There
+-- are no postulates beyond those of FDist-Convex.
 -- ============================================================
 
 module RuleDoCalc where
@@ -37,10 +38,11 @@ open import FDist-Convex
 -- ============================================================
 -- Section 1: Monad laws.
 --
--- We derive >>=-unitR, >>=-assoc, and constBind on the
--- convex-framework FDist (which has mix-assoc-pos instead of
--- full mix-assoc; one extra path-constructor case compared to
--- the original FDist-base derivation).
+-- We derive >>=-unitR, >>=-assoc, and constBind for the
+-- convex-framework FDist.  That FDist has mix-assoc-pos in
+-- place of full mix-assoc.  Each derivation therefore has one
+-- extra path-constructor case, compared with the original
+-- FDist-base version.
 -- ============================================================
 
 -- Right unit: d >>= pure ≡ d
@@ -206,9 +208,9 @@ open import FDist-Convex
 -- ============================================================
 -- Section 2: constBind.
 --
--- constBind d e ≡ e: binding d against a constant kernel
--- collapses to the constant value, regardless of d's structure.
--- This is the structural lemma underlying Rule 1 and Rule 3.
+-- constBind d e ≡ e.  Binding d against a constant kernel gives
+-- the constant value, whatever the structure of d.  Rule 1 and
+-- Rule 3 both use this lemma.
 -- ============================================================
 
 constBind : ∀ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'}
@@ -448,18 +450,18 @@ rule1-chain m ind x₀ =
 -- Section 6: Rule 3 (insertion/deletion of actions).
 --
 -- Rule 3 in kernel form: intervening on a downstream variable
--- leaves an upstream marginal unchanged. The structural reason
--- is that the upstream marginal does not bind kZ in its
--- definition, so substituting kZ with `λ _ → pure z₀` cannot
--- affect the result.
+-- leaves an upstream marginal unchanged.  The reason is
+-- structural.  The upstream marginal does not bind kZ in its
+-- definition, so replacing kZ by `λ _ → pure z₀` cannot change
+-- the result.
 -- ============================================================
 
--- Helper: marginal-X fuses, dropping kY and kZ entirely.
--- The proof: marginal-X is mapF fst applied to the joint, and
--- by associativity this peels through the binds, producing
--- pX >>= kY >>= kZ >>= λ _ → pure x_outer; the inner pure-x
--- is constant in z, so constBind collapses the kZ-bind and
--- then constBind again collapses the kY-bind, leaving pX.
+-- Helper: marginal-X fuses, and drops kY and kZ entirely.
+-- marginal-X is mapF fst applied to the joint.  Associativity
+-- moves the projection through the binds and gives
+-- pX >>= kY >>= kZ >>= λ _ → pure x_outer.  The inner pure-x is
+-- constant in z, so constBind collapses the kZ-bind.  A second
+-- use of constBind collapses the kY-bind, and pX remains.
 marginal-X-fuse : ∀ {ℓ ℓ' ℓ''} {X : Type ℓ} {Y : Type ℓ'} {Z : Type ℓ''}
   → (m : SCM₃ X Y Z)
   → marginal-X m ≡ pX m
@@ -489,10 +491,9 @@ marginal-X-fuse {X = X} {Y = Y} {Z = Z} m =
     -- ≡ pX m >>= λ x → pure x  (by outer = constBind on each fiber)
     ∙ >>=-unitR (pX m)
 
--- Pearl's Rule 3 for the chain: any intervention on Z
--- leaves the X-marginal unchanged.
--- The proof: both sides reduce to pX m via marginal-X-fuse,
--- which holds for every kZ (including pure z₀).
+-- Pearl's Rule 3 for the chain: any intervention on Z leaves
+-- the X-marginal unchanged.  Both sides reduce to pX m by
+-- marginal-X-fuse, which holds for every kZ, including pure z₀.
 rule3-X-marginal : ∀ {ℓ ℓ' ℓ''} {X : Type ℓ} {Y : Type ℓ'} {Z : Type ℓ''}
   (m : SCM₃ X Y Z) (z₀ : Z)
   → marginal-X (do-Z₃ z₀ m) ≡ marginal-X m
@@ -504,9 +505,9 @@ rule3-X-marginal m z₀ =
 -- Rule 3 strengthened: any intervention on Z leaves the
 -- (X, Y) joint marginal unchanged.
 --
--- Same structural reason: the (X, Y) marginal does not bind
--- kZ in a way that affects the output, so substitution of kZ
--- is invisible to the marginal.
+-- The reason is the same.  The (X, Y) marginal does not bind kZ
+-- in a way that affects the output, so replacing kZ does not
+-- change the marginal.
 -- ============================================================
 
 -- Helper: marginal-XY fuses to a chain that drops kZ.
@@ -529,8 +530,8 @@ marginal-XY-fuse {X = X} {Y = Y} {Z = Z} m =
               (λ z → pure (x , (y , z)))
               (λ p → pure (fst p , fst (snd p)))))
 
--- The (X, Y) marginal further reduces by collapsing the kZ-bind
--- via constBind, since the body pure (x , y) does not depend on z.
+-- The (X, Y) marginal reduces further.  The body pure (x , y)
+-- does not depend on z, so constBind collapses the kZ-bind.
 marginal-XY-collapse : ∀ {ℓ ℓ' ℓ''} {X : Type ℓ} {Y : Type ℓ'} {Z : Type ℓ''}
   → (m : SCM₃ X Y Z)
   → marginal-XY m
@@ -542,8 +543,8 @@ marginal-XY-collapse {X = X} {Y = Y} {Z = Z} m =
           constBind (kZ m y) (pure (x , y))))
 
 -- Pearl's Rule 3 for (X, Y): any intervention on Z leaves the
--- (X, Y) marginal unchanged. The collapsed form is independent
--- of kZ.
+-- (X, Y) marginal unchanged.  The collapsed form does not
+-- mention kZ.
 rule3-XY-marginal : ∀ {ℓ ℓ' ℓ''} {X : Type ℓ} {Y : Type ℓ'} {Z : Type ℓ''}
   (m : SCM₃ X Y Z) (z₀ : Z)
   → marginal-XY (do-Z₃ z₀ m) ≡ marginal-XY m
@@ -554,22 +555,20 @@ rule3-XY-marginal m z₀ =
 -- ============================================================
 -- Honest framing notes
 --
--- These theorems are "Pearl's do-calculus in kernel form" on
--- small fixed structural causal models, paralleling the original
--- Rule 1 verification in this paper. They are not the full
--- general do-calculus, which would require defining DAGs as
--- types in cubical Agda, defining d-separation on graphs, and
--- the graph-mutilation operations the rules' classical
--- statements reference; that is a separate development of
--- substantially larger scope.
+-- These theorems are Pearl's do-calculus in kernel form, on
+-- small fixed structural causal models.  They follow the Rule 1
+-- verification in this paper.  They are not the general
+-- do-calculus.  The general form would need DAGs as types in
+-- cubical Agda, d-separation on graphs, and the
+-- graph-mutilation operations that the classical statements
+-- refer to.  That is a separate development, of much larger
+-- scope.
 --
--- The Rule 3 proofs above do not require any new postulates
--- beyond what FDist-Convex provides. They follow the same
--- pattern as Rule 1: derive the marginal-fuse lemma, then
--- collapse via constBind. The key structural feature being
--- exploited is that interventions on a variable that the
--- marginal in question does not depend on cannot affect
--- that marginal — exactly what Rule 3 in the classical
--- statement asserts under the appropriate graph-theoretic
--- side condition.
+-- The Rule 3 proofs above use no postulates beyond those of
+-- FDist-Convex.  They follow the Rule 1 pattern: derive the
+-- marginal-fuse lemma, then collapse with constBind.  The
+-- structural fact used is that an intervention on a variable
+-- cannot change a marginal that does not depend on that
+-- variable.  The classical Rule 3 asserts the same thing, under
+-- a graph-theoretic side condition on the DAG.
 -- ============================================================

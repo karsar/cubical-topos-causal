@@ -4,18 +4,20 @@
 -- Topos.CechCohomology — the general degree-1 Čech apparatus.
 --
 -- Topos.Cohomology computed H¹ for the fixed triangle.  Here the
--- same obstruction is a theorem for an ARBITRARY cover at the
--- pairwise level and ARBITRARY abelian coefficients: over any set of
--- observables and any abelian group, a 1-cochain with non-trivial
--- holonomy around a closed walk is not a coboundary, hence a
--- non-zero class in H¹.
+-- same obstruction is a theorem for an arbitrary cover at the
+-- pairwise level, with arbitrary abelian coefficients.  Over any
+-- set of observables and any abelian group, a 1-cochain with
+-- non-trivial holonomy around a closed walk is not a coboundary,
+-- so its class in H¹ is non-zero.
 --
--- This is the degree-1 (contextuality) fragment of Čech cohomology,
--- for covers whose contexts are pairs.  The full nerve of an
--- arbitrary cover and the higher cochain complex are left to future
--- work.  We recover the triangle as an instance and contrast it with
--- a square, which is NOT contextual --- its holonomy is trivial,
--- exactly because an even cycle of anti-correlations is satisfiable.
+-- Scope: this is the degree-1 fragment of Čech cohomology, the
+-- one that carries contextuality, and it covers only sites whose
+-- contexts are pairs.  The full nerve of an arbitrary cover and
+-- the higher cochain complex are left to future work.
+--
+-- Two instances close the module.  The triangle is contextual.
+-- The square has holonomy 0, because an even cycle of
+-- anti-correlations admits a global 2-colouring.
 -- ============================================================
 
 module Topos.CechCohomology where
@@ -28,7 +30,8 @@ open import Cubical.Data.Bool using (Bool; true; false; not; true≢false)
 open import Cubical.Relation.Nullary using (¬_)
 import Cubical.Data.Empty as ⊥
 
--- a lightweight abelian group (coefficients for the cochains)
+-- A lightweight abelian group.  It supplies the coefficients for
+-- the cochains.
 record AbGrp (ℓ : Level) : Type (ℓ-suc ℓ) where
   field
     G     : Type ℓ
@@ -45,8 +48,9 @@ record AbGrp (ℓ : Level) : Type (ℓ-suc ℓ) where
 module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   open AbGrp Grp
 
-  -- 0-cochains label observables; 1-cochains label ordered pairs
-  -- (the contexts).  δ⁰ is the coboundary: the realised correlation.
+  -- A 0-cochain labels the observables.  A 1-cochain labels the
+  -- ordered pairs, which are the contexts.  The coboundary δ⁰
+  -- sends a labelling to the correlation it realises.
   Cochain0 : Type (ℓ-max ℓv ℓ)
   Cochain0 = V → G
   Cochain1 : Type (ℓ-max ℓv ℓ)
@@ -55,8 +59,8 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   δ⁰ : Cochain0 → Cochain1
   δ⁰ f i j = f j · inv (f i)
 
-  -- holonomy of the closed walk v₀ ∷ vs: the sum of the cochain over
-  -- its consecutive edges.
+  -- Holonomy of the closed walk v₀ ∷ vs.  It is the sum of the
+  -- cochain over the consecutive edges of the walk.
   hol : Cochain1 → V → List V → G
   hol g v₀ []        = ε
   hol g v₀ (v₁ ∷ vs) = g v₀ v₁ · hol g v₁ vs
@@ -82,8 +86,8 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   hol-resp g h e v₀ []        = refl
   hol-resp g h e v₀ (v₁ ∷ vs) = cong₂ _·_ (e v₀ v₁) (hol-resp g h e v₁ vs)
 
-  -- THE TELESCOPE: a coboundary's holonomy along a walk is the
-  -- difference of its endpoints.
+  -- The telescope.  A coboundary's holonomy along a walk is the
+  -- difference of the walk's endpoints.
   hol-δ⁰ : (f : Cochain0) (v₀ : V) (vs : List V)
          → hol (δ⁰ f) v₀ vs ≡ (inv (f v₀) · f (lastV v₀ vs))
   hol-δ⁰ f v₀ []        = sym (invl (f v₀))
@@ -91,9 +95,10 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
       cong ((δ⁰ f v₀ v₁) ·_) (hol-δ⁰ f v₁ vs)
     ∙ cancel (f v₁) (inv (f v₀)) (f (lastV v₁ vs))
 
-  -- Directed edges of a cover: the ordered pairs actually measured
-  -- (the 1-cells of the nerve).  A coboundary realises g on these
-  -- edges only, as in the Abramsky-style Čech reading.
+  -- Directed edges of a cover are the ordered pairs that are
+  -- measured, that is the 1-cells of the nerve.  A coboundary
+  -- realises g on those edges only.  This follows the
+  -- Abramsky-style reading of Čech cohomology.
   Edge : Type ℓv
   Edge = V × V
 
@@ -107,13 +112,13 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   realises-on []             f g = Unit*
   realises-on ((i , j) ∷ es) f g = (δ⁰ f i j ≡ g i j) × realises-on es f g
 
-  -- g is a coboundary ON A GIVEN SET OF EDGES: some 0-cochain f has
-  -- δ⁰ f ≡ g on exactly those measured contexts.
+  -- g is a coboundary on a given set of edges when some 0-cochain
+  -- f has δ⁰ f ≡ g on exactly those measured contexts.
   is-coboundary : List Edge → Cochain1 → Type (ℓ-max ℓv ℓ)
   is-coboundary es g = Σ[ f ∈ Cochain0 ] realises-on es f g
 
-  -- restricted hol-resp: holonomy respects a coboundary equation
-  -- supplied only on the walk's own consecutive edges.
+  -- A restricted form of hol-resp.  Holonomy respects a coboundary
+  -- equation supplied only on the walk's own consecutive edges.
   hol-resp-walk : (g : Cochain1) (f : Cochain0) (v₀ : V) (vs : List V)
                 → realises-on (edges-of v₀ vs) f g
                 → hol g v₀ vs ≡ hol (δ⁰ f) v₀ vs
@@ -121,9 +126,10 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   hol-resp-walk g f v₀ (v₁ ∷ vs) (p , ps) =
     cong₂ _·_ (sym p) (hol-resp-walk g f v₁ vs ps)
 
-  -- A 1-cochain with non-trivial holonomy around a closed walk is not
-  -- a coboundary on that walk's edges --- a non-zero class in H¹.
-  -- (Any edge-realiser would give the walk holonomy ε, by the telescope.)
+  -- A 1-cochain with non-trivial holonomy around a closed walk is
+  -- not a coboundary on that walk's edges, so its class in H¹ is
+  -- non-zero.  By the telescope, any edge-realiser would give the
+  -- closed walk holonomy ε.
   holonomy-obstruction :
       (g : Cochain1) (v₀ : V) (vs : List V)
     → lastV v₀ vs ≡ v₀
@@ -170,8 +176,9 @@ Z₂ = record
   ; assoc = xr-assoc ; idl = λ _ → refl ; idr = xr-idr
   ; invl = xr-self ; invr = xr-self ; comm = xr-comm }
 
--- The triangle (Specker): three observables, every pair anti-
--- correlated.  Holonomy around A→B→C→A is 1 — it IS contextual.
+-- The triangle of Specker.  Three observables, every pair
+-- anti-correlated.  Holonomy around A→B→C→A is 1, so the family
+-- is contextual.
 data Tri : Type where tA tB tC : Tri
 
 gTri : Tri → Tri → Bool
@@ -180,17 +187,17 @@ gTri tB tC = true
 gTri tC tA = true
 gTri _  _  = false
 
--- No 0-cochain realises gTri on the triangle's three measured edges
--- tA→tB→tC→tA: such a realiser would give the closed walk holonomy ε,
--- but gTri's holonomy is 1.
+-- No 0-cochain realises gTri on the triangle's three measured
+-- edges tA→tB→tC→tA.  Such a realiser would give the closed walk
+-- holonomy ε, and gTri has holonomy 1.
 triangle-contextual :
   ¬ is-coboundary Z₂ (edges-of Z₂ tA (tB ∷ tC ∷ tA ∷ [])) gTri
 triangle-contextual =
   holonomy-obstruction Z₂ gTri tA (tB ∷ tC ∷ tA ∷ []) refl true≢false
 
--- The square: four observables in a 4-cycle, every edge anti-
--- correlated.  Holonomy is 0 (an even cycle), so the obstruction
--- does NOT fire --- and indeed the square is satisfiable.
+-- The square.  Four observables in a 4-cycle, every edge
+-- anti-correlated.  The cycle is even, so holonomy is 0 and the
+-- obstruction does not apply.  The square is satisfiable.
 data Quad : Type where q0 q1 q2 q3 : Quad
 
 gQuad : Quad → Quad → Bool
@@ -203,9 +210,9 @@ gQuad _  _  = false
 square-holonomy-trivial : hol Z₂ gQuad q0 (q1 ∷ q2 ∷ q3 ∷ q0 ∷ []) ≡ false
 square-holonomy-trivial = refl
 
--- The square is satisfiable: a global 2-colouring realises every edge
--- anti-correlation (endpoints differ), the global section the triangle
--- lacks (Topos.Contextuality.no-global).  So the holonomy invariant
+-- A global 2-colouring realises every edge anti-correlation,
+-- since the endpoints differ.  This is the global section that the
+-- triangle lacks (Topos.Contextuality.no-global).  So holonomy
 -- separates the contextual triangle from the satisfiable square.
 colour : Quad → Bool
 colour q0 = false
@@ -213,9 +220,10 @@ colour q1 = true
 colour q2 = false
 colour q3 = true
 
--- The square's cochain is a coboundary on its 4-cycle: δ⁰ colour ≡
--- gQuad on every edge.  So is-coboundary is inhabited, and
--- triangle-contextual is a negation of an attainable predicate.
+-- The square's cochain is a coboundary on its 4-cycle, because
+-- δ⁰ colour ≡ gQuad on every edge.  So is-coboundary is
+-- inhabited, and triangle-contextual negates a predicate that
+-- other data do satisfy.
 square-coboundary :
   is-coboundary Z₂ (edges-of Z₂ q0 (q1 ∷ q2 ∷ q3 ∷ q0 ∷ [])) gQuad
 square-coboundary = colour , (refl , refl , refl , refl , tt*)

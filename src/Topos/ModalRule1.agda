@@ -3,21 +3,24 @@
 -- ============================================================
 -- Topos.ModalRule1 — Stage 2 (c): a do-calculus rule made modal.
 --
--- Pearl Rule 1 (Topos.Rule1) says do(X := x₀) leaves the internal
--- Y-marginal invariant under structural independence.  Here we
--- INTERNALISE that conclusion as a truth value in Ω and show it is
--- ◯-modal — j-closed for EVERY Lawvere–Tierney topology j.
+-- Pearl Rule 1 (Topos.Rule1) says that do(X := x₀) leaves the
+-- internal Y-marginal invariant under structural independence.
+-- Here we internalise that conclusion as a truth value in Ω.  We
+-- then show the value is ◯-modal, that is, j-closed for every
+-- Lawvere–Tierney topology j.
 --
--- That is the j-do-calculus claim (translation.md:25, j = lex
--- modality ◯) made concrete: Rule 1 is valid in the internal logic
--- of every sheaf subtopos, so it survives sheafification /
--- localization to any modality.  Unlike do-j-stable (which is about
--- the INTERVENTION classifier), this is about a do-calculus RULE's
--- conclusion.  Scope caveat: the modality is applied only to ⊤ here,
--- since rule1-E collapses the truth value to ⊤ before j acts, so this
--- result carries no causal content on its own — it would typecheck
--- with the causal content deleted.  Topos.ContingentCI and
--- Topos.ModalCI supply the non-maximal case.
+-- This makes the j-do-calculus claim of translation.md:25
+-- concrete, with j the lex modality ◯.  Rule 1 is valid in the
+-- internal logic of every sheaf subtopos, so it survives
+-- sheafification and localization to any modality.  The result
+-- do-j-stable concerns the intervention classifier; this one
+-- concerns the conclusion of a do-calculus rule.
+--
+-- Scope caveat: the modality is applied only to ⊤ here.  rule1-E
+-- collapses the truth value to ⊤ before j acts.  So this result
+-- carries no causal content on its own, and it would still
+-- typecheck with the causal content deleted.  Topos.ContingentCI
+-- and Topos.ModalCI supply the non-maximal case.
 -- ============================================================
 
 module Topos.ModalRule1 where
@@ -45,8 +48,9 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   open PSh
 
   -- ----------------------------------------------------------
-  -- Embed a truth value into Ω: the sieve whose membership is the
-  -- constant prop P.  It is maximal exactly when P holds.
+  -- Embed a truth value into Ω.  prop→sieve c P is the sieve
+  -- whose membership condition is the constant proposition P.
+  -- It is the maximal sieve exactly when P holds.
   -- ----------------------------------------------------------
   prop→sieve : (c : Ob) → hProp ℓ → Sieve {C = C} c
   prop→sieve c P = (λ d f → P) , (λ d e k f p → p)
@@ -67,25 +71,27 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X Y : PSh C ℓ)
   open Precategory C
   open PSh
 
-  -- internalised Rule-1 conclusion at regime c, as a truth value
-  -- (FDist is a set, so the marginal equality is a proposition)
+  -- The Rule-1 conclusion at regime c, as a truth value.  FDist
+  -- is a set, so the marginal equality is a proposition.
   rule1-prop : (c : Ob) → hProp ℓ
   rule1-prop c =
     (mapF snd (joint-of (do-X (x₀ c) (m c))) ≡ mapF snd (joint-of (m c)))
     , trunc _ _
 
-  -- Rule 1 internalised as an element of Ω
+  -- Rule 1 internalised as an element of Ω.
   rule1-Ω : (c : Ob) → Sieve {C = C} c
   rule1-Ω c = prop→sieve {C = C} c (rule1-prop c)
 
-  -- it collapses to ⊤, because Rule 1 holds (rule1-E)
+  -- The truth value collapses to ⊤, because Rule 1 holds
+  -- (rule1-E).
   rule1-Ω-true : (c : Ob) → rule1-Ω c ≡ maximal {C = C} c
   rule1-Ω-true c =
     prop→sieve-true {C = C} c (rule1-prop c)
       (rule1-E {C = C} {X = X} {Y = Y} m ind x₀ c)
 
-  -- HEADLINE: internalised Rule 1 is ◯-modal (j-closed) for every
-  -- Lawvere–Tierney topology — j-do-calculus for Rule 1.
+  -- The internalised Rule 1 is ◯-modal, that is, j-closed for
+  -- every Lawvere–Tierney topology.  This is j-do-calculus for
+  -- Rule 1.
   modal-rule1 : (J : LawvereTierney {C = C}) (c : Ob)
               → is-j-closed J c (rule1-Ω c)
   modal-rule1 J c =

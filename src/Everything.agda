@@ -5,11 +5,16 @@ module Everything where
 
 -- Section 9: transportability / counterfactual transport
 
+open import Topos.AbstractionTiers
+open import Topos.BaseChange
+open import Topos.BaseChangeClassifier
 open import Topos.CIObject
 open import Topos.Cat
 open import Topos.CechCohomology
 open import Topos.Classicality
 open import Topos.Classifier
+open import Topos.CoarseClassicality
+open import Topos.CoarseSite
 open import Topos.Cohomology
 open import Topos.Contextuality
 open import Topos.ContingentCI
@@ -19,6 +24,7 @@ open import Topos.DoubleNegation
 open import Topos.Example
 open import Topos.Forcing
 open import Topos.Gluing
+open import Topos.HiddenRefinement
 open import Topos.InflationarityDerivable
 open import Topos.InflationarityIndependence
 open import Topos.InternalDist
@@ -27,6 +33,7 @@ open import Topos.InterventionLT
 open import Topos.InterventionModality
 open import Topos.InterventionSite
 open import Topos.LawvereTierney
+open import Topos.MergeAbstraction
 open import Topos.ModalCI
 open import Topos.ModalRule1
 open import Topos.ModalRules
@@ -40,6 +47,7 @@ open import Topos.Rule3
 open import Topos.SCM
 open import Topos.SCMNat
 open import Topos.ThreeSiteObstruction
+open import Topos.TiersConverse
 open import Transport.CounterfactualForcing
 open import Transport.CounterfactualProbe
 open import Transport.CounterfactualWeld

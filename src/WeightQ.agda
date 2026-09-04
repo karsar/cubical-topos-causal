@@ -4,32 +4,31 @@
 -- WeightQ: a concrete instantiation of FDist.agda's Weight
 -- module signature.
 --
--- This module discharges, as concrete theorems, the algebraic
--- postulates that FDist.agda assumes about the abstract type
--- Weight, by exhibiting a concrete construction of Weight as
--- the closed unit interval over a totally ordered field with
--- decidable order. The canonical instance is the rationals:
+-- This module discharges the algebraic postulates that
+-- FDist.agda assumes about the abstract type Weight.  It gives a
+-- concrete construction of Weight: the closed unit interval over
+-- a totally ordered field with decidable order.  The canonical
+-- instance is the rationals:
 --
 --    Weight ↦ ℚ in [0,1]
 --    +w     ↦ rational addition (with bound proof)
 --    *w     ↦ rational multiplication (closed in [0,1])
 --    1-w    ↦ rational complement (1 - x)
---    /w     ↦ rational division (with division-by-zero
---             returning 0; total but only correctness-relevant
---             on positive divisors, which is the only case
---             arising in FDist.agda's bayesW)
+--    /w     ↦ rational division, with division by zero
+--             returning 0.  The operation is total.  Its value
+--             matters only on positive divisors, and only that
+--             case arises in FDist.agda's bayesW.
 --    Pos    ↦ "the underlying value is strictly greater than 0"
 --
 -- Strategy: we abstract away from the specific representation
--- of ℚ and instead postulate the required algebraic interface
--- (a commutative ring with a propositional <-order, decidable
--- equality, and selected closure laws). The abstraction is
--- safe in the sense that the postulated interface is satisfied
--- by ℚ, which the cubical library's Cubical.Algebra.CommRing.
--- Instances.Rationals confirms is a commutative ring. The
--- additional ordering laws are postulated here at the abstract
--- level; in a fully developed cubical rational library each
--- of them would be provable.
+-- of ℚ.  We state instead the algebraic interface we need: a
+-- commutative ring with a propositional <-order, decidable
+-- equality, and selected closure laws.  The abstraction is safe
+-- because ℚ satisfies that interface.  The cubical library's
+-- Cubical.Algebra.CommRing.Instances.Rationals shows that ℚ is
+-- a commutative ring.  The ordering laws were once postulated
+-- here at the abstract level.  Each of them is provable for the
+-- rationals, and WeightQ-Field now supplies the proofs.
 --
 -- Scope of this module:
 --   * All algebraic axioms of the convex algebra of Weight
@@ -44,12 +43,12 @@
 --
 -- Out of scope (left as a path postulate on FDist):
 --   * mix-bayes-interchange itself, which is a path on FDist
---     between distinct expressions. Discharging this would
---     require either parameterizing FDist over the Weight
---     module signature or proving that the generalized
---     interchange path follows from the existing FDist axioms
---     plus the rational arithmetic identity --- a non-trivial
---     question about HIT-presented free convex algebras.
+--     between distinct expressions.  To discharge it one would
+--     have to parameterize FDist over the Weight module
+--     signature, or prove that the generalized interchange path
+--     follows from the existing FDist axioms plus the rational
+--     arithmetic identity.  That is a non-trivial question
+--     about HIT-presented free convex algebras.
 -- ============================================================
 
 module WeightQ where
@@ -65,30 +64,30 @@ open import Cubical.Relation.Nullary using (¬_)
 -- ============================================================
 -- The abstract rational interface.
 --
--- We postulate a totally ordered commutative ring with the
--- closure laws used by the convex-algebra structure. The
--- canonical instance is ℚ (the rationals), as provided by
--- Cubical.Data.Rationals and proved a commutative ring by
--- Cubical.Algebra.CommRing.Instances.Rationals.
+-- The convex-algebra structure needs a totally ordered
+-- commutative ring with certain closure laws.  The canonical
+-- instance is ℚ, the rationals, from Cubical.Data.Rationals.
+-- Cubical.Algebra.CommRing.Instances.Rationals proves that ℚ is
+-- a commutative ring.
 --
--- All postulates in this section are theorems of standard
--- rational arithmetic; they are postulated at this level to
--- keep the module self-contained and focused on the lift to
--- the Weight type.
+-- Every law in this interface is a theorem of standard rational
+-- arithmetic.  The block below imports the proofs, so this
+-- module can concentrate on the lift to the Weight type.
 -- ============================================================
 
 -- ============================================================
 -- The ordered field, discharged at ℚ.
 --
--- This was previously a `postulate` block declaring an abstract
--- ordered field ℝ with its ring/order/division axioms.  We now
--- import the concrete ℚ model from WeightQ-Discharge, which proves
--- every one of those axioms as a theorem about the cubical-library
--- rationals, with no postulates of its own.  Re-exported `public`
--- so every downstream module that opens WeightQ sees the same
--- names, now constructive; the whole closure typechecks under
--- --safe.  (To recover the old abstract development, swap this
--- import for the postulate block preserved in git history.)
+-- This was once a `postulate` block declaring an abstract
+-- ordered field ℝ with its ring, order, and division axioms.
+-- We now import the concrete ℚ model from WeightQ-Discharge.
+-- That module proves each of those axioms about the
+-- cubical-library rationals, and postulates nothing itself.
+-- The names are re-exported `public`, so every downstream module
+-- that opens WeightQ sees the same names, now constructive.  The
+-- whole closure typechecks under --safe.  To recover the old
+-- abstract development, replace this import by the postulate
+-- block kept in git history.
 -- ============================================================
 open import WeightQ-Field public using
   ( ℝ ; isSet-ℝ ; z0 ; z1 ; _+r_ ; _·r_ ; -r_ ; _≤r_ ; _<r_
@@ -125,8 +124,8 @@ WeightPath {mkW v₁ l₁ u₁} {mkW v₂ l₂ u₂} eqv i =
       (isProp→PathP (λ j → isProp-z0≤ {x = eqv j}) l₁ l₂ i)
       (isProp→PathP (λ j → isProp-x≤z1 {x = eqv j}) u₁ u₂ i)
 
--- Weight is a set: from isSet-ℝ + propositional bounds.
--- isSetWeight: derived from isSet-ℝ + propositionality of bounds via isSetΣ.
+-- Weight is a set.  isSet-ℝ and the propositional bounds give
+-- this through isSetΣ.
 isSetWeight : isSet Weight
 isSetWeight =
   isSetRetract from-Weight to-Weight retract-eq isSetWeight-Σ
@@ -181,20 +180,20 @@ mkW v₁ l₁ u₁ *w mkW v₂ l₂ u₂ =
 infixl 7 _*w_
 
 -- ============================================================
--- _+w_⟨_⟩: PARTIAL addition taking explicit bound proof.
+-- _+w_⟨_⟩: partial addition, taking an explicit bound proof.
 --
--- This is the SOUND replacement of an unsound total _+w_ that
--- previously required the false postulate +r-bound-convex
--- (which claims sums of [0,1]-bounded reals stay in [0,1]).
+-- This replaces an unsound total _+w_.  The old version needed
+-- the postulate +r-bound-convex, which claims that sums of
+-- [0,1]-bounded reals stay in [0,1].  That claim is false.
 --
--- The signature captures the contract that every use site
--- in the framework honors: when adding two weights in a
--- convex-combination context, the result is ≤ z1 by the
--- framework's invariants.
+-- The signature states the contract that every use site in the
+-- framework honors.  When two weights are added in a
+-- convex-combination context, the framework's invariants give
+-- a result ≤ z1.
 --
--- Bound-derivation helpers are provided below for the recurring
--- patterns: convex combinations, complement sums, weighted-idem
--- sums, and right-identity sums.
+-- Bound-derivation helpers for the recurring patterns are below:
+-- convex combinations, complement sums, weighted-idem sums, and
+-- right-identity sums.
 -- ============================================================
 _+w_⟨_⟩ : (a b : Weight) → ((val a +r val b) ≤r z1) → Weight
 (mkW v₁ l₁ u₁) +w (mkW v₂ l₂ u₂) ⟨ ub ⟩ =
@@ -206,7 +205,8 @@ _+w_⟨_⟩ : (a b : Weight) → ((val a +r val b) ≤r z1) → Weight
 
 infixl 6 _+w_⟨_⟩
 
--- Transitional alias — to be removed after the migration cascade.
+-- Transitional alias.  It will be removed after the migration
+-- cascade.
 _+wPf_⟨_⟩ : (a b : Weight) → ((val a +r val b) ≤r z1) → Weight
 a +wPf b ⟨ ub ⟩ = a +w b ⟨ ub ⟩
 
@@ -218,8 +218,9 @@ a +wPf b ⟨ ub ⟩ = a +w b ⟨ ub ⟩
            (≤r-+-mono x≤1 (≤r-refl (-r x))))
 
 -- 1-r-bound-u: from 0 ≤ x, derive 1-x ≤ 1.
--- Strategy: from 0 ≤ x, get (-x) ≤ z0 (by +-monotone with -x on left,
--- using -x + 0 = -x and -x + x = 0). Then z1 + (-x) ≤ z1 + z0 = z1.
+-- From 0 ≤ x we get (-x) ≤ z0, by +-monotonicity with -x on the
+-- left, using -x + 0 = -x and -x + x = 0.  Then
+-- z1 + (-x) ≤ z1 + z0 = z1.
 1-r-bound-u : ∀ {x : ℝ} → z0 ≤r x → (1-r x) ≤r z1
 1-r-bound-u {x} 0≤x =
   let
@@ -242,12 +243,12 @@ a +wPf b ⟨ ub ⟩ = a +w b ⟨ ub ⟩
 -- ============================================================
 -- Total division on Weight: defensive trivial fallback.
 --
--- Returns w0 unconditionally. The active framework's actual
--- division reasoning routes through _/wPf_⟨_,_⟩ with explicit
--- preconditions; nothing in the active framework depends on
--- _/w_ producing an "honest" quotient.
+-- It returns w0 for every input.  The division reasoning of the
+-- active framework goes through _/wPf_⟨_,_⟩, which takes
+-- explicit preconditions.  Nothing in the active framework needs
+-- _/w_ to return a correct quotient.
 --
--- This eliminates the /r-bound-{l,u}-defensive postulates entirely.
+-- This removes the /r-bound-{l,u}-defensive postulates.
 -- ============================================================
 
 _/w_ : Weight → Weight → Weight
@@ -257,15 +258,15 @@ infixl 7 _/w_
 
 -- ============================================================
 -- The algebraic identities, lifted from ℝ to Weight via
--- WeightPath. These are bona fide theorems at the Weight
--- level; the ℝ-level facts they use are ring laws.
+-- WeightPath.  They are theorems at the Weight level.  The
+-- ℝ-level facts they use are ring laws.
 -- ============================================================
 
--- The +w-* lemmas now take an explicit upper-bound argument because
--- _+w_⟨_⟩ is a partial operator. The bound for the LHS is given;
--- the bound for the RHS is reconstructed via subst on the value
--- equality (using isProp-x≤z1 implicitly through the value-only
--- WeightPath construction).
+-- The +w-* lemmas take an explicit upper-bound argument, because
+-- _+w_⟨_⟩ is a partial operator.  The caller supplies the bound
+-- for the left-hand side.  The bound for the right-hand side is
+-- rebuilt by subst on the value equality.  That subst uses
+-- isProp-x≤z1, through the value-only WeightPath construction.
 +w-comm : ∀ p q (ub-pq : (val p +r val q) ≤r z1)
                 (ub-qp : (val q +r val p) ≤r z1)
         → p +w q ⟨ ub-pq ⟩ ≡ q +w p ⟨ ub-qp ⟩
@@ -288,19 +289,21 @@ infixl 7 _/w_
 *w-0 : ∀ p → p *w w0 ≡ w0
 *w-0 p = WeightPath (·r-AnnihR (val p))
 
--- +w-0 needs the bound (val p +r val w0) ≤r z1, which follows from val p ≤ z1.
+-- +w-0 needs the bound (val p +r val w0) ≤r z1.  It follows
+-- from val p ≤ z1.
 +w-IdR-bound : ∀ p → (val p +r val w0) ≤r z1
 +w-IdR-bound p = subst (_≤r z1) (sym (+r-IdR (val p))) (ub p)
 
 +w-0 : ∀ p → p +w w0 ⟨ +w-IdR-bound p ⟩ ≡ p
 +w-0 p = WeightPath (+r-IdR (val p))
 
--- Two further ring helpers needed for the remaining derivations.
--- Both are standard ring facts (negation distributes over +r,
--- and double negation is the identity); derived from existing axioms.
+-- Two more ring helpers for the remaining derivations.  Both are
+-- standard ring facts: negation distributes over +r, and double
+-- negation is the identity.  Both come from the existing axioms.
 
 -- +r-cancel-l: derived from +r-inv, +r-assoc, +r-comm, +r-IdR.
--- (a + b ≡ a + c) → b ≡ c by left-multiplying both sides by (-a).
+-- (a + b ≡ a + c) → b ≡ c, by adding (-a) on the left of both
+-- sides.
 +r-cancel-l-ℝ : ∀ a b c → a +r b ≡ a +r c → b ≡ c
 +r-cancel-l-ℝ a b c eq =
   sym chain ∙ cong ((-r a) +r_) eq ∙ chain'
@@ -314,22 +317,26 @@ infixl 7 _/w_
     chain' : (-r a) +r (a +r c) ≡ c
     chain' = +r-assoc (-r a) a c ∙ cong (_+r c) -a+a≡0 ∙ z0+x≡x c
 
--- -r-z0: -z0 ≡ z0. From z0 + (-z0) ≡ z0 (by +r-inv) and z0 + z0 ≡ z0 (by +r-IdR):
--- both sides equal, so -z0 ≡ z0 by +r-cancel-l.
+-- -r-z0: -z0 ≡ z0.  We have z0 + (-z0) ≡ z0 by +r-inv, and
+-- z0 + z0 ≡ z0 by +r-IdR.  The two are equal, so -z0 ≡ z0 by
+-- +r-cancel-l.
 -r-z0 : (-r z0) ≡ z0
 -r-z0 =
   +r-cancel-l-ℝ z0 (-r z0) z0 (+r-inv z0 ∙ sym (+r-IdR z0))
 
--- -r-invol: -(-x) ≡ x. From (-x) + (-(-x)) ≡ z0 (+r-inv) and (-x) + x ≡ z0 (+r-inv after comm):
--- both equal, so by +r-cancel-l, -(-x) ≡ x.
+-- -r-invol: -(-x) ≡ x.  We have (-x) + (-(-x)) ≡ z0 by +r-inv,
+-- and (-x) + x ≡ z0 by +r-inv after +r-comm.  The two are equal,
+-- so -(-x) ≡ x by +r-cancel-l.
 -r-invol : ∀ x → (-r (-r x)) ≡ x
 -r-invol x =
   +r-cancel-l-ℝ (-r x) (-r (-r x)) x
     (+r-inv (-r x) ∙ sym (+r-comm (-r x) x ∙ +r-inv x))
 
--- -r-distrib: -(a+b) ≡ -a + -b. We show (a+b) + (-a + -b) ≡ z0, then by uniqueness of additive
--- inverse (via +r-cancel-l): -(a+b) ≡ -a + -b.
--- Proof of (a+b) + (-a + -b) ≡ z0: rearrange via +-comm/assoc to (a + -a) + (b + -b) = z0 + z0 = z0.
+-- -r-distrib: -(a+b) ≡ -a + -b.  We show
+-- (a+b) + (-a + -b) ≡ z0.  The additive inverse is unique, by
+-- +r-cancel-l, so -(a+b) ≡ -a + -b.
+-- For (a+b) + (-a + -b) ≡ z0: rearrange with +r-comm and
+-- +r-assoc to (a + -a) + (b + -b) = z0 + z0 = z0.
 -r-distrib : ∀ a b → (-r (a +r b)) ≡ (-r a) +r (-r b)
 -r-distrib a b =
   +r-cancel-l-ℝ (a +r b) (-r (a +r b)) ((-r a) +r (-r b))
@@ -418,16 +425,18 @@ compl-bound p = subst (_≤r z1) (sym (+r-compl-ℝ (val p))) (≤r-refl z1)
 compl : ∀ p → p +w (1-w p) ⟨ compl-bound p ⟩ ≡ w1
 compl p = WeightPath (+r-compl-ℝ (val p))
 
--- weighted-idem-bound: the bound for (p · x) + ((1-p) · x) reduces to val x ≤ z1.
+-- weighted-idem-bound: the bound for (p · x) + ((1-p) · x)
+-- reduces to val x ≤ z1.
 weighted-idem-bound : ∀ p x → (val (p *w x) +r val ((1-w p) *w x)) ≤r z1
 weighted-idem-bound p x =
   subst (_≤r z1) (sym (weighted-idem-ℝ (val p) (val x))) (ub x)
 
--- mix-bound: convex combination (p · a) + ((1-p) · b) is bounded by 1.
--- Proof: bound by p · 1 + (1-p) · 1 = p + (1-p) = 1 via ≤r-+-mono and
--- ≤r-·-mono. (Defined here — earlier than its narrative position — so
--- it can serve as the canonical bound for `weighted-idem` and downstream
--- HIT path-coherence in 𝔼.)
+-- mix-bound: the convex combination (p · a) + ((1-p) · b) is
+-- bounded by 1.  Bound it by p · 1 + (1-p) · 1 = p + (1-p) = 1,
+-- using ≤r-+-mono and ≤r-·-mono.  It is defined here, ahead of
+-- its narrative position.  `weighted-idem` and the HIT
+-- path-coherence in 𝔼 both take it as their canonical bound, and
+-- both come later.
 mix-bound : ∀ p a b → (val (p *w a) +r val ((1-w p) *w b)) ≤r z1
 mix-bound p a b =
   -- (p·a) + ((1-p)·b) ≤ (p·z1) + ((1-p)·z1) = p + (1-p) = z1.
@@ -444,18 +453,21 @@ mix-bound p a b =
     compl-eq : (val p +r val (1-w p)) ≡ z1
     compl-eq = +r-compl-ℝ (val p)
 
--- Use mix-bound p x x on the LHS so path-coherence with `mix p x x`'s
--- 𝔼 reduction is definitional. weighted-idem-bound and mix-bound are
--- propositionally equal but not definitionally; prefer mix-bound here.
+-- Use mix-bound p x x on the left-hand side.  Path-coherence
+-- with the 𝔼 reduction of `mix p x x` is then definitional.
+-- weighted-idem-bound and mix-bound are propositionally equal,
+-- but not definitionally equal, so mix-bound is the one to use
+-- here.
 weighted-idem : ∀ p x → (p *w x) +w ((1-w p) *w x) ⟨ mix-bound p x x ⟩ ≡ x
 weighted-idem p x = WeightPath (weighted-idem-ℝ (val p) (val x))
 
 *w-assoc : ∀ a b c → (a *w b) *w c ≡ a *w (b *w c)
 *w-assoc a b c = WeightPath (sym (·r-assoc (val a) (val b) (val c)))
 
--- *w-distrib-+w: a *w (b +w c) ≡ (a *w b) +w (a *w c). Both sides need
--- bound proofs for the +w. The LHS bound is given; the RHS bound follows
--- by the same distributivity ·r-distR applied in reverse.
+-- *w-distrib-+w: a *w (b +w c) ≡ (a *w b) +w (a *w c).  Both
+-- sides need bound proofs for the +w.  The left-hand bound is
+-- given.  The right-hand bound follows from the same
+-- distributivity ·r-distR, applied in reverse.
 *w-distrib-+w-bound-r : ∀ a b c
   → (val b +r val c) ≤r z1
   → (val (a *w b) +r val (a *w c)) ≤r z1
@@ -500,11 +512,11 @@ weighted-idem p x = WeightPath (weighted-idem-ℝ (val p) (val x))
 ·r-swap-12 : ∀ a b c → (a ·r b) ·r c ≡ (b ·r a) ·r c
 ·r-swap-12 a b c = cong (_·r c) (·r-comm a b)
 
--- Interchange identity at the ℝ level: derived from
--- distributivity, the medial law for +r, ·r-assoc, and
--- ·r-comm. The proof distributes the four ·r-distR
--- applications to get a sum of four monomials, then
--- reassociates to match the RHS structure.
+-- Interchange identity at the ℝ level.  It is derived from
+-- distributivity, the medial law for +r, ·r-assoc, and ·r-comm.
+-- The proof applies ·r-distR four times to get a sum of four
+-- monomials.  It then reassociates to match the structure of the
+-- right-hand side.
 --
 --   (p ·r ((q ·r a) +r ((1-r q) ·r c))) +r ((1-r p) ·r ((q ·r b) +r ((1-r q) ·r d)))
 --     = ((p ·r (q ·r a)) +r (p ·r ((1-r q) ·r c)))
@@ -519,7 +531,8 @@ weighted-idem p x = WeightPath (weighted-idem-ℝ (val p) (val x))
   → (p ·r ((q ·r a) +r ((1-r q) ·r c))) +r ((1-r p) ·r ((q ·r b) +r ((1-r q) ·r d)))
   ≡ (q ·r ((p ·r a) +r ((1-r p) ·r b))) +r ((1-r q) ·r ((p ·r c) +r ((1-r p) ·r d)))
 ·r-interchange-eq p q a b c d =
-  -- Step 1: distribute p over the inner sum, and (1-r p) over the inner sum.
+  -- Step 1: distribute p over the inner sum, and likewise
+  -- (1-r p) over the inner sum.
   cong (_+r ((1-r p) ·r ((q ·r b) +r ((1-r q) ·r d))))
        (·r-distR p (q ·r a) ((1-r q) ·r c))
   ∙ cong (((p ·r (q ·r a)) +r (p ·r ((1-r q) ·r c))) +r_)
@@ -590,8 +603,8 @@ weighted-idem p x = WeightPath (weighted-idem-ℝ (val p) (val x))
   ∙ cong (x +r_) (·r-AnnihL y)
   ∙ +r-IdR x
 
--- (mix-bound is defined earlier, before weighted-idem, so it's available
---  there as the canonical convex-combination bound.)
+-- (mix-bound is defined earlier, before weighted-idem, so it is
+--  available there as the canonical convex-combination bound.)
 
 -- commute bound: bound for ((1-w p) · y) + ((1-w (1-w p)) · x).
 commute-bound : ∀ p x y → (val ((1-w p) *w y) +r val ((1-w (1-w p)) *w x)) ≤r z1
@@ -599,11 +612,12 @@ commute-bound p x y =
   subst (_≤r z1) (·r-commute-eq (val p) (val x) (val y))
         (mix-bound p x y)
 
--- Use mix-bound (1-w p) y x on the RHS so that 𝔼's HIT path-coherence
--- can match commuteProof's endpoint definitionally with the bound it
--- computes for (mix (1-w p) y x). The two bounds are propositionally
--- equal but not definitionally; choosing mix-bound here lets `𝔼 (mix-comm …)`
--- typecheck without isProp-→PathP coercion.
+-- Use mix-bound (1-w p) y x on the right-hand side.  Then the
+-- HIT path-coherence of 𝔼 matches commuteProof's endpoint
+-- definitionally with the bound it computes for
+-- (mix (1-w p) y x).  The two bounds are propositionally equal,
+-- but not definitionally equal.  With mix-bound here,
+-- `𝔼 (mix-comm …)` typechecks without an isProp-→PathP coercion.
 commuteProof : ∀ (p : Weight) (x y : Weight)
   → (p *w x) +w ((1-w p) *w y) ⟨ mix-bound p x y ⟩
   ≡ ((1-w p) *w y) +w ((1-w (1-w p)) *w x) ⟨ mix-bound (1-w p) y x ⟩
@@ -643,12 +657,13 @@ interchangeProof : ∀ (p q : Weight) (a b c d : Weight)
 interchangeProof p q a b c d =
   WeightPath (·r-interchange-eq (val p) (val q) (val a) (val b) (val c) (val d))
 
--- s-of weight helper. The bound for p + (1-p)·q reduces via convex
--- combination intuition: p + (1-p)·q = p·1 + (1-p)·q ≤ 1.
+-- s-of weight helper.  The bound for p + (1-p)·q is a convex
+-- combination bound: p + (1-p)·q = p·1 + (1-p)·q ≤ 1.
 s-of-bound : ∀ p q → (val p +r val ((1-w p) *w q)) ≤r z1
 s-of-bound p q =
   -- val p ≡ val p ·r z1 = val (p *w w1) (computed).
-  -- mix-bound p w1 q has type ((val p ·r z1) +r ((1-r val p) ·r val q)) ≤r z1.
+  -- mix-bound p w1 q has type
+  -- ((val p ·r z1) +r ((1-r val p) ·r val q)) ≤r z1.
   -- We rewrite (val p ·r z1) to val p via ·r-IdR.
   subst (λ z → (z +r val ((1-w p) *w q)) ≤r z1) (·r-IdR (val p))
         (mix-bound p w1 q)
@@ -656,10 +671,11 @@ s-of-bound p q =
 s-of : Weight → Weight → Weight
 s-of p q = p +w ((1-w p) *w q) ⟨ s-of-bound p q ⟩
 
--- (r-of and bayesW are dead in this module — the active framework
--- defines its own r-of via normalize in WeightQ-Convex.agda. They've
--- been deleted along with the dependent assocProof / s·r≡p-lem /
--- s·1-r-eq-lem / 1-w-s-eq-lem helpers, which are also unused.)
+-- (r-of and bayesW are dead in this module.  The active
+-- framework defines its own r-of via normalize in
+-- WeightQ-Convex.agda.  They have been deleted, together with
+-- the dependent assocProof / s·r≡p-lem / s·1-r-eq-lem /
+-- 1-w-s-eq-lem helpers, which are also unused.)
 
 -- ============================================================
 -- Positivity predicate and its closure laws
@@ -683,8 +699,8 @@ pos-*w pp pq = <r-·-pos pp pq
 
 -- ============================================================
 -- Discharge of FDist's order/cancellation axioms as theorems.
--- Each FDist postulate becomes a Weight-level theorem here,
--- closing the soundness chain.
+-- Each FDist postulate becomes a Weight-level theorem here, so
+-- the soundness chain has no assumed step left.
 -- ============================================================
 
 -- ¬Pos-w0: w0 is not positive (irreflexivity of <r at z0).
@@ -692,12 +708,12 @@ pos-*w pp pq = <r-·-pos pp pq
 ¬Pos-w0 pw0 = <r-irrefl z0 pw0
 
 -- ============================================================
--- _/w_pf: PARTIAL division taking explicit preconditions.
+-- _/w_pf: partial division, taking explicit preconditions.
 --
--- This is the partial division the framework uses. The value is
--- honest ℚ division (WeightQ-Discharge-Division), and the bound
--- proofs are derived from the Pos and ≤ precondition arguments;
--- nothing here is postulated.
+-- The framework uses this partial division.  The value is
+-- actual ℚ division (WeightQ-Discharge-Division).  The bound
+-- proofs come from the Pos and ≤ precondition arguments.
+-- Nothing here is postulated.
 -- ============================================================
 _/wPf_⟨_,_⟩ : (a b : Weight) → Pos b → (val a ≤r val b) → Weight
 (mkW v₁ l₁ _) /wPf (mkW v₂ _ _) ⟨ pb , le ⟩ =
@@ -705,20 +721,22 @@ _/wPf_⟨_,_⟩ : (a b : Weight) → Pos b → (val a ≤r val b) → Weight
       (/r-pos-bound-l v₁ v₂ l₁ pb)
       (/r-pos-bound-u v₁ v₂ le pb)
 
--- Bridge lemma /w-≡-/wPf was here; removed because the new _/w_ is
--- a defensive total stub and the bridge no longer holds. The active
--- framework uses _/wPf_⟨_,_⟩ directly with explicit preconditions.
+-- Bridge lemma /w-≡-/wPf was here.  It was removed: the new _/w_
+-- is a defensive total stub, so the bridge no longer holds.  The
+-- active framework uses _/wPf_⟨_,_⟩ directly, with explicit
+-- preconditions.
 
 -- w0≢w1: w0 and w1 are distinct.
--- If w0 ≡ w1, then val w0 ≡ val w1, i.e., z0 ≡ z1. Substituting
--- into z0<z1 gives z0<z0, impossible by <r-irrefl.
+-- If w0 ≡ w1 then val w0 ≡ val w1, that is z0 ≡ z1.  Substituting
+-- into z0<z1 gives z0<z0, which <r-irrefl rules out.
 w0≢w1 : ¬ (w0 ≡ w1)
 w0≢w1 w0≡w1 = <r-irrefl z0 (subst (z0 <r_) (sym (cong val w0≡w1)) z0<z1)
 
--- wHalf: a strictly interior weight (½).  It is the concrete witness
--- that an interior confounding strength exists, so the do≠see theorem
--- (Topos.DoSeeDistinct) is not vacuous.  Both Pos wHalf and
--- Pos (1-w wHalf) hold, from the strict bounds z0 < ½ < z1.
+-- wHalf: a strictly interior weight (½).  It is the concrete
+-- witness that an interior confounding strength exists, so the
+-- do≠see theorem (Topos.DoSeeDistinct) is not vacuous.  Pos
+-- wHalf and Pos (1-w wHalf) both hold, from the strict bounds
+-- z0 < ½ < z1.
 wHalf : Weight
 wHalf = mkW zHalf (<r-implies-≤r z0<zHalf) (<r-implies-≤r zHalf<z1)
 
@@ -728,15 +746,17 @@ Pos-wHalf = z0<zHalf
 Pos-1-wHalf : Pos (1-w wHalf)
 Pos-1-wHalf = <r-z1→pos-1-r zHalf<z1
 
--- wHalf ≢ w1: the interior weight is not the top point (its complement
--- is positive).  This is the scalar gap that separates do from see.
+-- wHalf ≢ w1: the interior weight is not the top point, because
+-- its complement is positive.  The do≠see proof uses this
+-- inequality of scalars.
 wHalf≢w1 : ¬ (wHalf ≡ w1)
 wHalf≢w1 h = ¬Pos-w0 (subst Pos (cong 1-w_ h ∙ 1-w-1) Pos-1-wHalf)
 
--- +w-cancel-l: derived from +r-cancel-l-ℝ (which is itself
--- derived from the abstract ring axioms).
--- From a+w b ≡ a+w c, lift to val: val a +r val b ≡ val a +r val c.
--- Apply +r-cancel-l-ℝ: val b ≡ val c. Lift to b ≡ c via WeightPath.
+-- +w-cancel-l: derived from +r-cancel-l-ℝ, which is itself
+-- derived from the ring axioms.
+-- From a +w b ≡ a +w c, lift to val:
+-- val a +r val b ≡ val a +r val c.  Apply +r-cancel-l-ℝ to get
+-- val b ≡ val c.  Lift to b ≡ c by WeightPath.
 +w-cancel-l : ∀ a b c
               (ub-ab : (val a +r val b) ≤r z1)
               (ub-ac : (val a +r val c) ≤r z1)
@@ -750,21 +770,22 @@ wHalf≢w1 h = ¬Pos-w0 (subst Pos (cong 1-w_ h ∙ 1-w-1) Pos-1-wHalf)
 +w-eq-w0-l a b _ eq = WeightPath (+r-eq-z0-l (val a) (val b) (lb a) (lb b) (cong val eq))
 
 -- pos-*w-factor-l: from Pos (p ·w q), derive Pos p.
--- In our model, Pos x = z0 <r val x. We have val (p ·w q) = val p ·r val q.
--- The strict positivity 0 < val p · val q with val p, val q ∈ [0,1] forces val p > 0:
--- if val p = 0, then val p · val q = 0, contradicting Pos.
--- We prove this via discrimination ≡z1-or-<z1 (used to get strict info).
--- Direct: from Pos (p·q), case-split on whether val p = z0 or z0 < val p.
--- We use the fact that z0 ≤ val p (lb p) and discrimination at z0.
--- Cleaner: contrapositive via ≡z1-or-<z1 isn't directly applicable; use
--- a different route via the ordered field structure.
--- Below: we use the ℝ-level lemma <r-·-pos-factor-l (proved in
--- WeightQ-Discharge) and lift it via lb p.
+-- In this model Pos x = z0 <r val x, and
+-- val (p ·w q) = val p ·r val q.  So the hypothesis is
+-- 0 < val p · val q, with val p and val q in [0,1].  That forces
+-- val p > 0.  If val p = 0 then val p · val q = 0, which
+-- contradicts the hypothesis.  A case split on val p ≡ z0 versus
+-- z0 <r val p, using z0 ≤ val p (lb p), gives the same argument.
+-- The contrapositive through ≡z1-or-<z1 does not apply here.
+-- The route is the ordered-field structure instead.
+-- The proof below uses the ℝ-level lemma <r-·-pos-factor-l
+-- (proved in WeightQ-Discharge) and lifts it with lb p.
 pos-*w-factor-l : ∀ {p q : Weight} → Pos (p *w q) → Pos p
 pos-*w-factor-l {p} {q} pp·q = <r-·-pos-factor-l (lb p) pp·q
 
--- weight-trichotomy: every weight is ≡ w1 or has positive complement.
--- Apply ≡z1-or-<z1 to val p (which is in [z0, z1]).
+-- weight-trichotomy: every weight is ≡ w1, or has a positive
+-- complement.  Apply ≡z1-or-<z1 to val p, which lies in
+-- [z0, z1].
 weight-trichotomy : ∀ p → (p ≡ w1) ⊎ Pos (1-w p)
 weight-trichotomy p with ≡z1-or-<z1 (val p) (lb p) (ub p)
 ... | inl val-p≡z1 = inl (WeightPath val-p≡z1)
@@ -781,38 +802,41 @@ weight-trichotomy p with ≡z1-or-<z1 (val p) (lb p) (ub p)
             → ((x /wPf y ⟨ py , le ⟩) *w y) ≡ x
 /wPf-*w-pos y py x le = WeightPath (/r-·r-pos py (val x))
 
--- *w-/w-pos and /w-*w-pos were here; removed because they make claims
--- about the total _/w_ that are false when _/w_ is the defensive stub.
--- Use *w-/wPf-pos and /wPf-*w-pos (above) for the partial form.
+-- *w-/w-pos and /w-*w-pos were here.  They were removed: they
+-- make claims about the total _/w_ that are false when _/w_ is
+-- the defensive stub.  Use *w-/wPf-pos and /wPf-*w-pos above for
+-- the partial form.
 
 -- ============================================================
--- bayesW was here (dead code). The active framework defines its
--- own bayesW in FDist-Convex.agda taking an explicit Pos witness.
+-- bayesW was here (dead code).  The active framework defines its
+-- own bayesW in FDist-Convex.agda, taking an explicit Pos
+-- witness.
 -- ============================================================
 
 -- ============================================================
--- The Weight-level convex algebra (the structural identities, the
--- bayesW division identities, and the unit-interval closure laws)
--- is proved here, not postulated: each is lifted via WeightPath
--- from an ℝ-level identity, and ℝ is the concrete cubical-library
--- ℚ (WeightQ-Field, with positivity-tracked division in
--- WeightQ-Discharge-Division).  The FDist path constructor
--- mix-bayes-interchange lives in the FDist higher inductive type
--- (FDist-Convex), not here.  This module contains no postulate.
+-- The Weight-level convex algebra is proved here, not
+-- postulated.  It covers the structural identities, the bayesW
+-- division identities, and the unit-interval closure laws.  Each
+-- one is lifted via WeightPath from an ℝ-level identity.  Here ℝ
+-- is the concrete cubical-library ℚ (WeightQ-Field, with
+-- positivity-tracked division in WeightQ-Discharge-Division).
+-- The FDist path constructor mix-bayes-interchange belongs to
+-- the FDist higher inductive type in FDist-Convex, so it is
+-- outside this module.  This module contains no postulate.
 -- ============================================================
 
 -- ============================================================
 -- assocProof derivation.
 --
--- The skew-associativity polynomial identity at the Weight level.
--- Derived from:
+-- The skew-associativity polynomial identity at the Weight
+-- level.  It is derived from:
 --   - s·r≡p             (requires Pos (s-of p q))
 --   - s·1-r-eq          (requires Pos (s-of p q))
 --   - 1-w-s-eq          (unconditional)
 --   - weight-trichotomy-zero, +w-eq-w0-{l,r}
--- The Pos case expands both sides via *w-distrib-+w + *w-assoc and
--- substitutes the three identities. The s ≡ w0 case forces both
--- p ≡ q ≡ w0, so both sides reduce to wc.
+-- In the Pos case both sides expand by *w-distrib-+w and
+-- *w-assoc, and the three identities are substituted.  In the
+-- s ≡ w0 case p ≡ q ≡ w0, so both sides reduce to wc.
 -- ============================================================
 
 -- Helper: weight-trichotomy-zero.
@@ -834,10 +858,10 @@ weight-trichotomy-zero p with weight-trichotomy (1-w p)
 -- Lemma s·r≡p: when Pos (s-of p q), s-of p q · r-of p q ≡ p.
 
 -- ============================================================
--- s·r≡p-lem, s·1-r-eq-lem, 1-w-s-eq-lem, assocProof were here
--- (dead code in the active framework). They depended on the now-
--- deleted r-of and *w-/w-pos / /w-*w-pos. Since the active
--- convex framework derives mix-associativity directly via
--- mix-w-assoc-pos in FDist-Convex.agda, these helpers are not
--- needed and have been removed.
+-- s·r≡p-lem, s·1-r-eq-lem, 1-w-s-eq-lem, and assocProof were
+-- here.  They are dead code in the active framework.  They
+-- depended on the deleted r-of and on *w-/w-pos / /w-*w-pos.
+-- The active convex framework derives mix-associativity directly
+-- via mix-w-assoc-pos in FDist-Convex.agda, so these helpers are
+-- not needed.  They have been removed.
 -- ============================================================

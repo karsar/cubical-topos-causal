@@ -1,28 +1,30 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionLT — the intervention coverage as a genuine
+-- Topos.InterventionLT — the intervention coverage as a
 -- Lawvere-Tierney topology on Ω.
 --
 -- Topos.InterventionModality computes a closure operator `jS` at
--- the single object `obs` of the intervention poset, and shows it
--- is discriminating there.  That is not enough to reach any of the
--- modal theorems: `do-j-stable`, `modal-rule1`--`modal-rule3`, the
--- reflector of Topos.Modality and the transport results are all
--- quantified over `J : LawvereTierney`, and `jS` is a bare
--- endofunction on the sieves over one object, not a map Ω ⇒ Ω.
--- Until now the record had exactly two inhabitants, `trivialLT`
--- (vacuous) and `¬¬LT` (the Boolean localisation), so the general
--- theory did not apply to the one coverage doing causal work.
+-- the single object `obs` of the intervention poset, and shows
+-- that `jS` separates truth values there.  That is not enough to
+-- reach the modal theorems.  `do-j-stable`, `modal-rule1` to
+-- `modal-rule3`, the reflector of Topos.Modality and the
+-- transport results are all quantified over `J : LawvereTierney`.
+-- `jS` is an endofunction on the sieves over one object, so it is
+-- not yet a map Ω ⇒ Ω.  Before this module the record had two
+-- inhabitants: `trivialLT`, which is vacuous, and `¬¬LT`, the
+-- Boolean localisation.  Neither of them is the intervention
+-- coverage, so the general theory did not apply to it.
 --
 -- This module supplies the missing instance.  The closure extends
--- to the whole poset by the identity at `do0` and `do1`, whose
--- only arrow in is the identity, and the four requirements then
--- hold: naturality and idempotence are refl, truth-preservation
--- and meet-preservation need one reshuffle each at `obs`.
+-- to the whole poset by taking the identity at `do0` and `do1`.
+-- The only arrow into each of those is the identity.  The four
+-- requirements then hold.  Naturality and idempotence are refl.
+-- Truth-preservation and meet-preservation each need one
+-- reshuffle of the components at `obs`.
 --
--- With `interventionLT` in hand every modal theorem instantiates
--- at the intervention coverage.
+-- With `interventionLT` available, every modal theorem
+-- instantiates at the intervention coverage.
 -- ============================================================
 
 module Topos.InterventionLT where
@@ -45,9 +47,10 @@ open Precategory Iv
 open LawvereTierney
 
 -- ------------------------------------------------------------
--- The closure, everywhere.  At obs it is the coverage closure; at
--- each intervention it is the identity, the only arrow in being
--- the identity, so nothing there is covered by anything smaller.
+-- The closure, at every object.  At obs it is the coverage
+-- closure.  At each intervention it is the identity.  The only
+-- arrow into an intervention is the identity, so nothing there is
+-- covered by a smaller family.
 -- ------------------------------------------------------------
 jopI : (c : IObj) → Sieve {C = Iv} c → Sieve {C = Iv} c
 jopI obs S = jS S
@@ -55,8 +58,8 @@ jopI do0 S = S
 jopI do1 S = S
 
 -- ------------------------------------------------------------
--- Naturality: jopI commutes with restriction, so it is a map of
--- presheaves Ω ⇒ Ω and not merely a family of operations.
+-- Naturality.  jopI commutes with restriction, so it is a map of
+-- presheaves Ω ⇒ Ω rather than a family of separate operations.
 -- ------------------------------------------------------------
 jnatI : IsNat {C = Iv} (Ω {C = Iv}) (Ω {C = Iv}) jopI
 jnatI obs obs idₒ S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → goO d g)
@@ -98,8 +101,8 @@ j-⊤I do0 = refl
 j-⊤I do1 = refl
 
 -- ------------------------------------------------------------
--- Idempotence: closing twice at obs asks for the same two
--- memberships, so it is already an equality of terms.
+-- Idempotence.  Closing twice at obs asks for the same two
+-- memberships, so the two sides are already equal as terms.
 -- ------------------------------------------------------------
 j-idemI : (c : IObj) (S : Sieve {C = Iv} c) → jopI c (jopI c S) ≡ jopI c S
 j-idemI obs S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → go d g)
@@ -113,8 +116,8 @@ j-idemI do0 S = refl
 j-idemI do1 S = refl
 
 -- ------------------------------------------------------------
--- Meets: at obs both sides ask for the same four memberships, in
--- a different order.
+-- Meets.  At obs both sides ask for the same four memberships,
+-- in a different order.
 -- ------------------------------------------------------------
 j-∧I : (c : IObj) (S T : Sieve {C = Iv} c)
      → jopI c (_∧S_ {C = Iv} S T) ≡ _∧S_ {C = Iv} (jopI c S) (jopI c T)
@@ -131,7 +134,7 @@ j-∧I do0 S T = refl
 j-∧I do1 S T = refl
 
 -- ------------------------------------------------------------
--- The instance the record was waiting for.
+-- The LawvereTierney instance.
 -- ------------------------------------------------------------
 interventionLT : LawvereTierney {C = Iv}
 interventionLT = record
@@ -143,13 +146,13 @@ interventionLT = record
   }
 
 -- ------------------------------------------------------------
--- The instance is not vacuous, and it selects.
+-- The instance is not vacuous, and it separates truth values.
 --
--- `trivialLT` fixes everything and `¬¬LT` is the identity on the
--- two-regime site of Topos.ContingentCI, so neither witnesses a
--- modality that moves a truth value for a causal reason.  This one
--- does: it fixes the claim holding under one intervention and
--- sends the claim holding under both up to ⊤.
+-- `trivialLT` fixes every truth value.  `¬¬LT` is the identity on
+-- the two-regime site of Topos.ContingentCI.  So neither of them
+-- moves a truth value for a causal reason.  `interventionLT`
+-- fixes the claim that holds under one intervention, and sends
+-- the claim that holds under both up to ⊤.
 -- ------------------------------------------------------------
 open import Cubical.Relation.Nullary using (¬_)
 open import Cubical.Data.Empty as E using (⊥)
@@ -159,17 +162,17 @@ open import Topos.InterventionModality
 -- ------------------------------------------------------------
 -- Which truth values the modality fixes.
 --
--- The two facts above are instances of one characterisation, and
--- it is the descent condition for the two-chart cover: a truth
+-- The two facts above are instances of one characterisation.  It
+-- is the descent condition for the two-chart cover.  A truth
 -- value at obs is j-closed exactly when holding under both
 -- interventions forces it to hold observationally.  The converse
--- implication is free, being downward closure of the sieve, so the
--- content is entirely in that direction.
+-- implication is downward closure of the sieve, so it holds for
+-- every sieve, and all the content sits in the stated direction.
 --
--- Causally: the claims this modality fixes are exactly the ones
--- that already descend along the cover, and the claims it moves
--- are exactly those that hold under every intervention without
--- holding observationally --- which it sends to ⊤.
+-- Causal reading.  The modality fixes exactly the claims that
+-- already descend along the cover.  It moves exactly the claims
+-- that hold under every intervention but not observationally, and
+-- it sends those to ⊤.
 -- ------------------------------------------------------------
 
 -- "holding under both interventions forces holding observationally"
@@ -184,27 +187,26 @@ descends→closed : (S : Sieve {C = Iv} obs)
                 → Descends S → is-j-closed {C = Iv} interventionLT obs S
 descends→closed S h = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → go d g)
   where
-    -- the reverse implication is downward closure: a sieve holding
-    -- at the identity holds along every arrow into obs
+    -- The reverse implication is downward closure.  A sieve that
+    -- holds at the identity holds along every arrow into obs.
     go : (d : IObj) (g : IHom d obs)
        → fst (jopI obs S) d g ≡ fst S d g
     go obs idₒ = ⇔toPath h (λ r → snd S obs do0 e0 idₒ r , snd S obs do1 e1 idₒ r)
     go do0 e0  = refl
     go do1 e1  = refl
 
--- Both facts are instances of the characterisation above, which is
--- the sense in which it explains them rather than accompanying them.
+-- Both facts below are instances of the characterisation above.
 
--- a claim holding under only one intervention already descends
--- vacuously, its second conjunct being empty
+-- A claim holding under only one intervention descends
+-- vacuously, because its second conjunct is empty.
 ci-one-descends : Descends ci-one
 ci-one-descends pq = snd pq
 
 ci-one-closed : is-j-closed {C = Iv} interventionLT obs ci-one
 ci-one-closed = descends→closed ci-one ci-one-descends
 
--- a claim holding under both does not descend: it holds at each
--- intervention and fails observationally
+-- A claim holding under both does not descend.  It holds at each
+-- intervention and fails observationally.
 ci-both-not-descends : ¬ (Descends ci-both)
 ci-both-not-descends h = h (tt* , tt*)
 
@@ -214,23 +216,25 @@ ci-both-not-closed p = ci-both-not-descends (closed→descends ci-both p)
 -- ------------------------------------------------------------
 -- The modality is OPEN.
 --
--- Everything above verifies the Lawvere-Tierney axioms by hand.  It
--- is better to say which topology this is, and it is one of the
--- well-understood kind: the OPEN modality of a subterminal.
+-- The proofs above verify the Lawvere-Tierney axioms one at a
+-- time.  Naming the topology explains them better.  It is the
+-- OPEN modality of a subterminal.  An open modality is the
+-- Heyting implication out of a fixed subterminal object.
 --
--- Subterminals of a presheaf topos on a poset are the down-closed
--- sets of objects.  Take the one picking out the interventional
--- contexts --- `ci-both` at `obs`, and everything at each
--- intervention, both being minimal --- and form the Heyting
--- implication out of it.  That is exactly the closure computed
+-- On a poset, the subterminals of the presheaf topos are the
+-- down-closed sets of objects.  Take the subterminal that picks
+-- out the interventional contexts: `ci-both` at `obs`, and
+-- everything at each intervention, both of these being minimal.
+-- The Heyting implication out of it is the closure computed
 -- above.
 --
--- Two things follow at no cost.  The four axioms are instances of
--- the standard facts about open modalities rather than four
--- separate computations.  And an open subtopos has a complementary
--- CLOSED one, here supported on the single object `obs`, so the
--- site splits into an interventional part and an observational
--- part; ¬¬ admits no such splitting, being dense.
+-- Two consequences.  The four axioms become instances of the
+-- standard facts about open modalities, so they need not be four
+-- separate computations.  And an open subtopos has a
+-- complementary CLOSED one, here supported on the single object
+-- `obs`, so the site splits into an interventional part and an
+-- observational part.  ¬¬ is dense, so it admits no such
+-- splitting.
 -- ------------------------------------------------------------
 
 -- the subterminal picking out the interventional contexts
@@ -292,18 +296,19 @@ open-is-intervention do1 S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f 
     go do1 id₁ = ⇔toPath (λ h → h do1 id₁ tt*) back
 
 -- ------------------------------------------------------------
--- What a j-stable truth value IS.
+-- What a j-stable truth value is.
 --
--- Being open pins down the sheaves, not just the criterion.  The
--- open subtopos here is carried by the two interventions, which are
--- discrete, so a j-closed truth value at `obs` should be nothing but
--- a pair of truth values, one per intervention.  It is: the
--- observational membership of a closed sieve is forced to be the
--- conjunction of the two interventional ones, and every pair arises.
+-- Openness determines the sheaves as well as the criterion.  The
+-- open subtopos here is carried by the two interventions, and
+-- they are discrete.  So a j-closed truth value at `obs` should
+-- amount to a pair of truth values, one per intervention.  It
+-- does.  The observational membership of a closed sieve is forced
+-- to be the conjunction of the two interventional ones, and every
+-- pair arises this way.
 --
--- Causally, this is the sharpest statement the site supports.  A
--- j-stable claim carries no observational content of its own; it is
--- exactly what its behaviour under the two interventions says, and
+-- Causal reading.  This is the strongest statement the site
+-- supports.  A j-stable claim has no observational content beyond
+-- what its behaviour under the two interventions says, and
 -- `Descends` is the criterion for having no more.
 -- ------------------------------------------------------------
 
@@ -330,12 +335,12 @@ fromPair-closed P Q = descends→closed (fromPair P Q) (λ pq → pq)
 toPair : Sieve {C = Iv} obs → hProp ℓ-zero × hProp ℓ-zero
 toPair S = fst S do0 e0 , fst S do1 e1
 
--- every pair is realised, on the nose
+-- every pair is realised; the proof is refl
 toPair-fromPair : (P Q : hProp ℓ-zero) → toPair (fromPair P Q) ≡ (P , Q)
 toPair-fromPair P Q = refl
 
--- and a closed sieve is recovered from its pair: the observational
--- membership was never independent data
+-- A closed sieve is recovered from its pair.  Its observational
+-- membership is not independent data.
 fromPair-toPair : (S : Sieve {C = Iv} obs)
                 → is-j-closed {C = Iv} interventionLT obs S
                 → fromPair (fst S do0 e0) (fst S do1 e1) ≡ S

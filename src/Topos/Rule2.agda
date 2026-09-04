@@ -4,22 +4,30 @@
 -- Topos.Rule2 — internal Pearl Rule 2 (action/observation
 -- exchange) on the confounded model, lifting RuleDoCalc/Rule2.
 --
--- On a confounded internal SCM with a structural CI witness
--- (X ⫫ Z in the prior), the internal intervention do(X := x₀)
--- and the internal conditioning agree on the downstream
--- (Z,Y)- and Y-marginals, at every regime — by lifting the
--- verified core theorem Rule2.rule2-marginal-* pointwise.
+-- A confounded SCM has a joint prior pXZ on (X,Z) and a kernel
+-- kY that depends on both X and Z.  A structural CI witness is a
+-- proof that X ⫫ Z in that prior.  Given one, the internal
+-- intervention do(X := x₀) and the internal conditioning agree
+-- on the downstream (Z,Y)- and Y-marginals, at every regime.
+-- The proof applies the verified core theorems
+-- Rule2.rule2-marginal-ZY and rule2-marginal-Y at each regime.
 --
--- Levels (each strictly stronger):
---  * pointwise rule2-{ZY,Y}-E (regime-wise);
---  * rule2-{Y,ZY}-section (internal-morphism, naturality hypothesised);
---  * SCM-conf-E-nat + margY-conf-nat: the Y-marginal of a NATURAL
---    confounded SCM is DERIVED natural (confounded analogue of
---    Topos.SCMNat.marg-nat), via the fuse marginal-Y ≡ pXZ >>= (kY ∘ ⟨fst,snd⟩);
---  * do-conf-nat: do-X-conf PRESERVES naturality;
---  * rule2-Y-section-derived: FULLY-DERIVED internal Rule 2 (no naturality
---    hypotheses) — LHS naturality from margY-conf-nat, RHS naturality
---    transported along the pointwise rule2, equality by Nat≡.
+-- Levels, each stronger than the one before it:
+--  * rule2-{ZY,Y}-E: the pointwise form, one regime at a time;
+--  * rule2-{Y,ZY}-section: an equality of internal morphisms,
+--    with naturality assumed;
+--  * SCM-conf-E-nat and margY-conf-nat: the Y-marginal of a
+--    natural confounded SCM is itself natural.  This level proves
+--    that; the level above assumes it.  It is the confounded
+--    analogue of Topos.SCMNat.marg-nat.
+--    The proof goes through the fusion
+--    marginal-Y ≡ pXZ >>= (kY ∘ ⟨fst,snd⟩);
+--  * do-conf-nat: do-X-conf preserves naturality;
+--  * rule2-Y-section-derived: internal Rule 2 with no naturality
+--    hypothesis.  Naturality of the left side comes from
+--    margY-conf-nat.  Naturality of the right side is
+--    transported along the pointwise rule2.  Nat≡ gives the
+--    equality.
 -- ============================================================
 
 module Topos.Rule2 where
@@ -38,8 +46,9 @@ open import Topos.Cat
 open import Topos.PSh
 open import Topos.InternalDist
 
--- The Y-marginal of a confounded SCM fuses: the triple-nested joint
--- collapses (mapF-∘ then mapF-id) to a prior-kernel convolution.
+-- The Y-marginal of a confounded SCM has a shorter form.  The
+-- triple-nested joint collapses to a bind of the prior with the
+-- kernel, by mapF-∘ and then mapF-id.
 margY-conf-fuse : ∀ {ℓX ℓZ ℓY} {X : Type ℓX} {Z : Type ℓZ} {Y : Type ℓY}
   (m : SCM-conf X Z Y)
   → marginal-Y m ≡ (pXZ m >>= λ p → kY m (fst p) (snd p))
@@ -54,22 +63,25 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
   open Precategory C
   open PSh
 
-  -- internal confounded SCM (bare regime-indexed family)
+  -- An internal confounded SCM: one SCM-conf per regime, with no
+  -- naturality condition.
   SCM-conf-E : ∀ {ℓX ℓZ ℓY} → PSh C ℓX → PSh C ℓZ → PSh C ℓY → Type _
   SCM-conf-E X Z Y = (c : Ob) → SCM-conf (F₀ X c) (F₀ Z c) (F₀ Y c)
 
   module _ {ℓX ℓZ ℓY} {X : PSh C ℓX} {Z : PSh C ℓZ} {Y : PSh C ℓY} where
 
-    -- internal structural CI witness: regime-wise X ⫫ Z in the prior
+    -- The internal structural CI witness: X ⫫ Z in the prior, at
+    -- every regime.
     X-indep-Z-E : SCM-conf-E X Z Y → Type _
     X-indep-Z-E m = (c : Ob) → X-indep-Z (m c)
 
-    -- internal intervention do(X := x₀), regime-wise kernel surgery
+    -- The internal intervention do(X := x₀), applied at each regime.
     do-X-conf-E : ((c : Ob) → F₀ X c) → SCM-conf-E X Z Y → SCM-conf-E X Z Y
     do-X-conf-E x₀ m = λ c → do-X-conf (x₀ c) (m c)
 
-    -- pointwise internal Rule 2: intervention = conditioning on the
-    -- (Z,Y)- and Y-marginals, under the structural CI witness
+    -- Internal Rule 2, one regime at a time.  Under the structural
+    -- CI witness, intervention agrees with conditioning on the
+    -- (Z,Y)- and Y-marginals.
     rule2-ZY-E : (m : SCM-conf-E X Z Y) (ind : X-indep-Z-E m)
                  (x₀ : (c : Ob) → F₀ X c) (c : Ob)
                → marginal-ZY (do-X-conf (x₀ c) (m c))
@@ -83,12 +95,13 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     rule2-Y-E m ind x₀ c = rule2-marginal-Y (m c) (ind c) (x₀ c)
 
     -- ------------------------------------------------------------
-    -- Section upgrade (the rule1-E-nat-level form): given that the
-    -- intervened and conditioned downstream marginals are natural
-    -- (witnesses ndo, nm — the confounded-model analogue of
-    -- Topos.SCMNat.marg-nat, derivable from natural pXZ/kY/witness),
-    -- internal Rule 2 is an EQUALITY OF INTERNAL MORPHISMS, via Nat≡
-    -- of the pointwise rule2.
+    -- The Section form, at the level of rule1-E-nat.  Assume the
+    -- intervened and the conditioned downstream marginals are
+    -- natural; the witnesses ndo and nm carry that assumption.
+    -- They are the confounded analogue of Topos.SCMNat.marg-nat,
+    -- and are derivable from a natural pXZ, a natural kY and the
+    -- CI witness.  Under them, Nat≡ turns the pointwise rule2 into
+    -- an equality of internal morphisms.
     -- ------------------------------------------------------------
     rule2-Y-section :
         (m : SCM-conf-E X Z Y) (ind : X-indep-Z-E m) (x₀ : (c : Ob) → F₀ X c)
@@ -113,8 +126,9 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
         (λ c _ → rule2-marginal-ZY (m c) (ind c) (x₀ c))
 
 -- ============================================================
--- Natural confounded internal SCM, and the DERIVED Y-marginal
--- naturality (confounded analogue of Topos.SCMNat.marg-nat).
+-- The natural confounded internal SCM, and the derived
+-- naturality of its Y-marginal.  This is the confounded
+-- analogue of Topos.SCMNat.marg-nat.
 -- ============================================================
 
 module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
@@ -137,7 +151,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     toFamC : SCM-conf-E-nat X Z Y → (c : Ob) → SCM-conf (F₀ X c) (F₀ Z c) (F₀ Y c)
     toFamC M c = record { pXZ = pXZs M c ; kY = kYs M c }
 
-    -- DERIVED: the confounded Y-marginal is natural
+    -- Derived: the confounded Y-marginal is natural.
     margY-conf-nat : (M : SCM-conf-E-nat X Z Y) (x y : Ob) (f : Hom x y)
       → marginal-Y (toFamC M x) ≡ mapF (F₁ Y f) (marginal-Y (toFamC M y))
     margY-conf-nat M x y f =
@@ -149,16 +163,18 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ∙ sym (mapF-bindR (F₁ Y f) (pXZs M y) (λ p → kYs M y (fst p) (snd p)))
       ∙ cong (mapF (F₁ Y f)) (sym (margY-conf-fuse (toFamC M y)))
 
-    -- the confounded Y-marginal as a genuine internal global element
+    -- The confounded Y-marginal as an internal global element.
     marginalY-conf-Section : SCM-conf-E-nat X Z Y → Section {C = C} (Dist_E Y)
     marginalY-conf-Section M =
       (λ c _ → marginal-Y (toFamC M c)) ,
       (λ x y f _ → margY-conf-nat M x y f)
 
-    -- do-X-conf PRESERVES naturality: intervening by a regime-coherent
-    -- value x₀ : 𝟙 ⇒ X sends a natural confounded SCM to a natural one.
-    -- The prior-naturality proof routes both sides through the common
-    -- middle term  mapF (λ q → (x₀ x , F₁ Z f (snd q))) (pXZs M y)  via mapF-∘.
+    -- do-X-conf preserves naturality.  Intervening by a
+    -- regime-coherent value x₀ : 𝟙 ⇒ X sends a natural confounded
+    -- SCM to a natural one.  The proof of prior naturality takes
+    -- both sides to the common middle term
+    --   mapF (λ q → (x₀ x , F₁ Z f (snd q))) (pXZs M y)
+    -- by mapF-∘.
     do-conf-nat : Section {C = C} X → SCM-conf-E-nat X Z Y → SCM-conf-E-nat X Z Y
     do-conf-nat x₀ M = record
       { pXZs = λ c → mapF (fst x₀ c tt ,_) (mapF snd (pXZs M c))
@@ -176,9 +192,11 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       ; kY-nat = kY-nat M
       }
 
-    -- FULLY-DERIVED internal Rule 2 (Y-marginal): NO naturality hypotheses.
-    -- LHS naturality from margY-conf-nat (do-conf-nat is natural); RHS
-    -- naturality transported along the pointwise rule2; equality by Nat≡.
+    -- Internal Rule 2 for the Y-marginal, with no naturality
+    -- hypothesis.  Naturality of the left side comes from
+    -- margY-conf-nat, since do-conf-nat is natural.  Naturality of
+    -- the right side is transported along the pointwise rule2.
+    -- Nat≡ gives the equality.
     rule2-Y-section-derived :
         (M : SCM-conf-E-nat X Z Y)
         (ind : (c : Ob) → X-indep-Z (toFamC M c))

@@ -3,76 +3,79 @@
 -- Topos.ThreeSiteObstruction
 --
 -- Three sites, overlapping variables, pairwise consistent, and no
--- global dataset. On counts, so it survives noise.
+-- global dataset. The statement is about counts, so it tolerates
+-- noise.
 --
 -- WHY THIS EXISTS
 -- ===============
 -- `Topos.Contextuality` in the companion development proves the
--- possibilistic version: Specker's triangle, three contexts,
--- pairwise consistent, no global section, with `Topos.Cohomology`
--- computing the non-zero class in H¹. That obstruction needs PERFECT
--- anti-correlation on every pair, which no dataset exhibits, so it
--- says nothing about data.
+-- possibilistic version. Specker's triangle has three contexts, is
+-- pairwise consistent, and has no global section, and
+-- `Topos.Cohomology` computes its non-zero class in H¹. That
+-- obstruction assumes perfect anti-correlation on every pair. Count
+-- data never has that, so the argument does not apply to data.
 --
--- This is the noise-tolerant version, and it is the one that could be
--- used. Three sites each measure two of three binary attributes and
--- report a COUNT TABLE. The tables agree on every shared margin, so
--- every pairwise consistency check a practitioner would run passes.
--- No global dataset has those pairwise tables, and the reason is an
--- inequality rather than a parity argument, so it degrades
--- gracefully: the tables here disagree 18 times in 20 rather than 20
--- in 20.
+-- The version here tolerates noise. Three sites each measure two of
+-- three binary attributes and report a count table. The tables agree
+-- on every shared margin, so every pairwise consistency check a
+-- practitioner would run passes. No global dataset has those pairwise
+-- tables. The reason is a counting identity, not a parity argument,
+-- so the conclusion still holds away from the extreme: the tables
+-- here disagree 18 times in 20, and not 20 in 20.
 --
 -- THE ARGUMENT
 -- ============
 -- In any global table over three binary attributes, each of the eight
--- cells has 0 or 2 disagreeing PAIRS, never 1 or 3, because an odd
--- cycle of disequalities is unsatisfiable. Summing over cells,
+-- cells has 0 or 2 disagreeing pairs, and never 1 or 3, because an
+-- odd cycle of disequalities is unsatisfiable. Summing over cells,
 --
 --     dis(A,B) + dis(B,C) + dis(C,A) + 2 * (both-agree cells)
 --       = 2 * total
 --
 -- exactly. The observed tables give 18 + 18 + 18 = 54 with total 20,
--- and 54 + something = 40 has no solution.
+-- and 54 + 2k = 40 has no solution in the naturals.
 --
 -- WHERE THIS BELONGS
 -- ==================
--- It was written in the follow-up development and moved here, because
--- it continues THIS paper's obstruction rather than that paper's
--- thesis about typed preconditions. `Topos.Contextuality` and
--- `Topos.Cohomology` are its immediate neighbours and it upgrades
--- them from a possibilistic statement to one that survives noise.
+-- It was written in the follow-up development and moved here. It
+-- belongs to this paper's obstruction thread, and not to the
+-- follow-up paper's thesis about typed preconditions.
+-- `Topos.Contextuality` and `Topos.Cohomology` are its immediate
+-- neighbours, and it upgrades their possibilistic statement to one
+-- that tolerates noise.
 --
 -- The identity in Section 2 is a sixteen-term commutative
--- rearrangement, which `Cubical.Tactics.NatSolver` discharges in one
--- line and which is a page of error-prone steps by hand.
+-- rearrangement. `Cubical.Tactics.NatSolver` discharges it in one
+-- line. By hand it takes a page of error-prone steps.
 --
--- WHAT THIS IS AND IS NOT
--- =======================
--- It IS a machine-checked demonstration that pairwise consistency is
--- strictly weaker than global consistency for count data over
--- overlapping variable sets, that the gap survives noise, and that
--- every margin check passes on data having no global model.
+-- SCOPE AND LIMITS
+-- ================
+-- The module is a machine-checked demonstration of three things.
+-- Pairwise consistency is strictly weaker than global consistency
+-- for count data over overlapping variable sets. The gap holds away
+-- from the noiseless extreme. Every margin check passes on data that
+-- has no global model.
 --
--- Both halves are checked, which took Sections 4 to 9. Sections 1 to 3
--- constrain a global table by four numbers and refute it; on their own
--- they leave the load-bearing half asserted, since the refutation is
--- worth something only if compatible site tables carrying those
--- numbers exist. Section 6 checks the compatibility and Section 8
--- reaches the contradiction from the tables rather than from the four
+-- Both halves are checked, in Sections 4 to 9. Sections 1 to 3
+-- constrain a global table by four numbers and refute it. On their
+-- own they leave the load-bearing half asserted, because the
+-- refutation matters only if compatible site tables carry those
+-- numbers. Section 6 checks the compatibility, and Section 8 reaches
+-- the contradiction from the tables rather than from the four
 -- numbers.
 --
 -- Section 10 is the control. A refutation looks the same whether the
 -- notion is unsatisfiable at these numbers or was mis-stated so that
--- nothing could inhabit it, so a realisable family is exhibited
+-- nothing could inhabit it. So a realisable family is exhibited
 -- against a witness.
 --
--- It is NOT a method. Deciding global consistency in general is
--- linear feasibility; dropping the remainder from the identity below
--- leaves one facet of that polytope, singled out because this example
--- violates it. `Topos.CechCohomology` is the general direction.
+-- The module is not a method. Deciding global consistency in general
+-- is linear feasibility. Dropping the remainder from the identity
+-- below leaves one facet of that polytope, singled out because this
+-- example violates it. `Topos.CechCohomology` is the general
+-- direction.
 --
--- Zero postulates, zero holes.
+-- The module has no postulates and no holes.
 -- ============================================================
 
 module Topos.ThreeSiteObstruction where
@@ -117,9 +120,10 @@ allAgree g = aTTT g + aFFF g
 -- ============================================================
 -- Section 2: the Bell-Boole identity, with its remainder written out.
 --
--- Stated as an equation rather than an inequality, which is the
--- stronger statement and needs no order: the three disagreement counts
--- plus twice the all-agree cells is exactly twice the total.
+-- The identity is stated as an equation. An equation is stronger
+-- than the usual inequality form and needs no order relation on ℕ.
+-- The three disagreement counts plus twice the all-agree cells equal
+-- twice the total.
 -- ============================================================
 
 bell : (g : Global)
@@ -166,10 +170,9 @@ no-global g o = no-solution (allAgree g) step
 -- Section 4: the site tables themselves.
 --
 -- Sections 1-3 constrain a global table by four numbers. That leaves
--- the interesting half on trust: the numbers are worth something only
--- if three compatible site tables actually carry them. So here are the
--- tables, and here is their compatibility, checked rather than
--- asserted.
+-- one half on trust: the numbers matter only if three compatible site
+-- tables carry them. This section gives the tables, and Section 6
+-- checks their compatibility.
 --
 -- A site sees two of the three attributes and reports a 2x2 count
 -- table. `sDis` counts the units on which its two attributes differ.
@@ -198,10 +201,10 @@ sndF t = tTF t + tFF t
 -- ============================================================
 -- Section 5: what the three sites report.
 --
--- Site AB measures (A,B), site BC measures (B,C), site CA measures
--- (C,A), so consecutive sites share exactly one attribute and the
--- three overlaps close a cycle. Each reports 20 units of which 18
--- disagree.
+-- Site AB measures (A,B), site BC measures (B,C), and site CA
+-- measures (C,A). Consecutive sites share exactly one attribute, so
+-- the three overlaps close a cycle. Each site reports 20 units, of
+-- which 18 disagree.
 -- ============================================================
 
 tableAB tableBC tableCA : Table
@@ -231,11 +234,11 @@ totalCA-20 = refl
 -- ============================================================
 -- Section 6: the family is compatible.
 --
--- Two sites overlap in one attribute, and agreement means their
--- margins on it match. AB and BC share B, which is AB's second and
--- BC's first; BC and CA share C; CA and AB share A. Ten against ten
--- everywhere, so every pairwise consistency check a practitioner would
--- run passes -- and each of these is a check, not a remark.
+-- Two sites overlap in one attribute. They agree when their margins
+-- on it match. AB and BC share B, which is AB's second attribute and
+-- BC's first. BC and CA share C. CA and AB share A. Every margin is
+-- ten against ten, so every pairwise consistency check a practitioner
+-- would run passes. Each equation below is machine-checked.
 -- ============================================================
 
 -- AB and BC agree on B
@@ -292,12 +295,11 @@ sTotal-margAB : (g : Global) → sTotal (margAB g) ≡ total g
 sTotal-margAB (global a b c d e f h i) = solveℕ!
 
 -- ============================================================
--- Section 8: the theorem the paragraph actually states.
+-- Section 8: no global table marginalises to the three tables.
 --
--- No global table marginalises to the three reported tables. This is
--- Section 3's contradiction reached from the tables rather than from
--- four numbers taken on faith, so `Observed` is now derived and not
--- assumed.
+-- This is Section 3's contradiction, reached from the tables instead
+-- of from four assumed numbers. `Observed` becomes a consequence of
+-- the tables.
 -- ============================================================
 
 record Marginalises (g : Global) : Set where
@@ -322,10 +324,11 @@ no-global-table g m = no-global g (marginalises→observed g m)
 -- ============================================================
 -- Section 9: the two halves together.
 --
--- Compatible (Section 6) and unrealisable (Section 8). Pairwise
--- consistency is therefore strictly weaker than global consistency for
--- count data over overlapping variable sets, and it stays weaker at 18
--- in 20 rather than only at 20 in 20.
+-- The family is compatible (Section 6) and has no global table
+-- (Section 8). So pairwise consistency is strictly weaker than global
+-- consistency for count data over overlapping variable sets. The gap
+-- is present at 18 disagreements in 20, and not only at the noiseless
+-- 20 in 20.
 -- ============================================================
 
 pairwise-consistent-and-globally-impossible :
@@ -340,18 +343,18 @@ pairwise-consistent-and-globally-impossible =
   no-global-table
 
 -- ============================================================
--- Section 10: the control, without which Section 8 proves nothing.
+-- Section 10: the control for Section 8.
 --
--- `no-global-table` refutes `Marginalises`, and a refutation looks the
--- same whether the notion is genuinely unsatisfiable at these numbers
--- or unsatisfiable because it was mis-stated and nothing could ever
--- inhabit it. So: a family that IS realisable, satisfying the same
+-- `no-global-table` refutes `Marginalises`. A refutation looks the
+-- same whether the notion is unsatisfiable at these numbers or was
+-- mis-stated so that nothing could inhabit it. This section rules out
+-- the second case: a family that is realisable and satisfies the same
 -- record against a witness.
 --
--- Twenty units, ten agreeing on all three attributes and ten
--- disagreeing on none. Compatible by the same margin checks, and this
--- time a global table marginalises to it. Section 8's emptiness is
--- therefore about the numbers 18 and 20 and not about the definitions.
+-- The control has twenty units. Ten agree on all three attributes and
+-- ten disagree on none. It passes the same margin checks, and a
+-- global table marginalises to it. So Section 8's emptiness comes
+-- from the numbers 18 and 20 and not from the definitions.
 -- ============================================================
 
 agreeTable : Table
@@ -365,7 +368,7 @@ control-compat-B : (sndT agreeTable ≡ fstT agreeTable)
                  × (sndF agreeTable ≡ fstF agreeTable)
 control-compat-B = refl , refl
 
--- and unlike Section 8, this family has a global table
+-- this family, unlike Section 8's, has a global table
 control-AB : margAB witness ≡ agreeTable
 control-AB = refl
 

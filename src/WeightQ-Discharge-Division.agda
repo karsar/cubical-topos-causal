@@ -3,12 +3,18 @@
 -- ============================================================
 -- WeightQ-Discharge-Division.agda
 --
--- STATUS: COMPLETE.
+-- Honest division on ℚ, with positive-denominator semantics.
+-- "Honest" means the operation returns the real quotient, not a
+-- placeholder value.  It returns z0 when the denominator is z0,
+-- and the actual quotient otherwise.
 --
--- Honest ℚ division wired into WeightQ-Discharge.agda. The
--- ·r-/r-pos and /r-·r-pos round-trip identities are derived
--- as theorems (not postulates), closing what was previously
--- the "Category D'" gap.
+-- The module is wired into WeightQ-Discharge.agda.  The
+-- round-trip identities ·r-/r-pos and /r-·r-pos are derived here
+-- as theorems, not postulated.  This closes the soundness gap
+-- listed as Category D' in SOUNDNESS.md.  It replaces the
+-- trivial _/r_ stub with a real division operation.  The inverse
+-- construction works directly on the SetQuotient representation
+-- of Cubical.Data.Rationals.
 --
 -- Contents (all proved, zero postulates):
 --   - inv-pair, inv-helper           — integer-pair-level inverse
@@ -21,20 +27,6 @@
 --   - ·r-/r-pos-derived,             — round-trip identities for
 --     /r-·r-pos-derived                Pos divisor
 --   - honest/r-{lb,ub}               — honest division bounds
--- ============================================================
-
--- ============================================================
-
--- WeightQ-Discharge-Division.agda
---
--- Honest division on ℚ with positive-denominator semantics.
--- Returns z0 when the denominator is z0, the actual quotient
--- otherwise.
---
--- Closes the soundness gap from Category D' in SOUNDNESS.md
--- by replacing the trivial _/r_ stub with a real division
--- operation. The inverse construction is direct on the
--- SetQuotient representation of Cubical.Data.Rationals.
 -- ============================================================
 
 module WeightQ-Discharge-Division where
@@ -56,10 +48,13 @@ open import Cubical.Relation.Nullary using (¬_)
 -- Inverse construction.
 --
 -- For a non-zero rational [a / b]:
---   - If a = pos (suc n), the inverse is [ pos (ℕ₊₁→ℕ b) / 1+ n ]
---   - If a = negsuc n, the inverse is [ negsuc (ℕ₊₁→ℕ b - 1) / 1+ n ],
---     but more cleanly: [ - pos (ℕ₊₁→ℕ b) / 1+ n ]
---   - If a = pos 0, the input is zero, contradicting the hypothesis.
+--   - If a = pos (suc n), the inverse is
+--     [ pos (ℕ₊₁→ℕ b) / 1+ n ].
+--   - If a = negsuc n, the inverse is
+--     [ negsuc (ℕ₊₁→ℕ b - 1) / 1+ n ], which is written more
+--     simply as [ - pos (ℕ₊₁→ℕ b) / 1+ n ].
+--   - If a = pos 0, the input is zero, which the hypothesis
+--     excludes.
 -- ============================================================
 
 -- Convert ℕ₊₁ to a positive ℕ.
@@ -76,7 +71,7 @@ open import Cubical.Relation.Nullary using (¬_)
 
 -- Helpers for the integer level.
 private
-  -- For b : ℕ₊₁, ℕ₊₁→ℤ b is positive (i.e., not pos 0).
+  -- For b : ℕ₊₁, ℕ₊₁→ℤ b is positive, so it is not pos 0.
   ℕ₊₁→ℤ-pos : ∀ (b : ℕ₊₁) → Σ[ n ∈ ℕ ] Q.ℕ₊₁→ℤ b ≡ pos (suc n)
   ℕ₊₁→ℤ-pos (1+ n) = n , refl
 
@@ -108,7 +103,7 @@ inv-helper x ¬p = [ inv-pair x ¬p .fst / inv-pair x ¬p .snd ]
 
 -- Helper: for any pos (suc n) and b : ℕ₊₁,
 --   [ pos (suc n) · ℕ₊₁→ℤ b / b ·₊₁ (1+ n) ] ≡ 1.
--- This follows from [ x / x ] ≡ 1 specialized.
+-- It is the special case [ x / x ] ≡ 1.
 
 -- The positive case: [ pos (suc n) / b ] · [ ℕ₊₁→ℤ b / 1+ n ] ≡ 1.
 inv·-helper-pos : ∀ n (b : ℕ₊₁)
@@ -143,7 +138,10 @@ inv·-helper-pos n (1+ m) =
       pos 1 ℤ.· Q.ℕ₊₁→ℤ ((1+ m) ·₊₁ (1+ n)) ∎
 
 -- The negsuc case: [ negsuc n / b ] · [ - ℕ₊₁→ℤ b / 1+ n ] ≡ 1.
--- Key: negsuc n · (- pos m) = - (negsuc n · pos m) = - (- (pos(suc n) · pos m)) = pos(suc n) · pos m.
+-- The signs cancel:
+--   negsuc n · (- pos m) = - (negsuc n · pos m)
+--                        = - (- (pos(suc n) · pos m))
+--                        = pos(suc n) · pos m.
 inv·-helper-negsuc : ∀ n (b : ℕ₊₁)
                    → [ negsuc n / b ] QP.· [ ℤ.- Q.ℕ₊₁→ℤ b / 1+ n ] ≡ [ pos 1 / 1 ]
 inv·-helper-negsuc n (1+ m) =
@@ -193,8 +191,8 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
 -- ============================================================
 -- Direct definition of _/r_ as a binary SetQuot.rec2.
 --
--- Defined as: x /r y = if y ≡ 0 then 0 else x · y⁻¹.
--- For non-zero y, this gives the honest quotient.
+-- x /r y = if y ≡ 0 then 0 else x · y⁻¹.
+-- For non-zero y this is the honest quotient.
 -- ============================================================
 
 -- Decision: is the integer pair zero?
@@ -206,48 +204,49 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
 ℤ×ℕ₊₁-zero? (negsuc n , _) = inr λ p → ℤP.negsucNotpos n 0 p
 
 -- ============================================================
--- The Strategy: rather than fighting with SetQuot.elimProp's
--- dependent function type, we define _/r_ via SetQuot.rec2
--- using inv-pair on the second argument paired with a defensive
--- fallback for the zero case.
+-- The strategy.  SetQuot.elimProp has a dependent function
+-- type, which is awkward here.  We define _/r_ by SetQuot.rec2
+-- instead, using inv-pair on the second argument together with a
+-- defensive fallback for the zero case.
 --
--- Specifically, define a function inv-pair-default that
--- always returns a pair, with the convention that the pair
--- (pos 0, 1) "represents" z0 in the zero case:
+-- So we define inv-pair-default, which always returns a pair.
+-- The convention is that the pair (pos 0, 1) represents z0 in
+-- the zero case:
 -- ============================================================
 
 -- ============================================================
--- Strategy: define _/r_ on representatives, with a total
--- definition that returns (pos 0, 1) when denominator is zero,
--- and the honest quotient otherwise. The key insight: "(c, d)
--- has c ≡ 0" is preserved by the equivalence relation, so this
--- definition is well-defined modulo ~.
+-- Strategy: define _/r_ on representatives.  The definition is
+-- total.  It returns (pos 0, 1) when the denominator is zero,
+-- and the honest quotient otherwise.  The equivalence relation
+-- preserves the property "(c, d) has c ≡ 0", so the definition
+-- is well defined modulo ~.
 --
 -- Concretely, /r-rep (a, b) (c, d) returns:
 --   - (pos 0, 1) if c = pos 0
 --   - else: a · inv(c, d) at the integer-pair level
 --
--- This is well-defined on each side modulo ~ because:
+-- It is well defined on each side modulo ~:
 --   - Side 1: if (a, b) ~ (a', b'), then a · ℕ₊₁→ℤ d = a' · ?...
 --     For multiplication by a fixed (c, d), this is the standard
 --     check in the multiplication construction (·CancelL/R).
---   - Side 2: if (c, d) ~ (c', d'), then c ≡ 0 ↔ c' ≡ 0 (preserved).
---     If both zero: result is (pos 0, 1) ~ (pos 0, 1). ✓
---     If both non-zero: result is (a · ℕ₊₁→ℤ d , b ·₊₁ |c|+) on
---     each side; the ~ check requires sign machinery.
+--   - Side 2: if (c, d) ~ (c', d'), then c ≡ 0 holds exactly
+--     when c' ≡ 0 holds.
+--     If both are zero, the result is (pos 0, 1) ~ (pos 0, 1). ✓
+--     If both are non-zero, the result is
+--     (a · ℕ₊₁→ℤ d , b ·₊₁ |c|+) on each side, and the ~ check
+--     needs the sign machinery.
 -- ============================================================
 
--- "(a, b) ~ (c, d) → (a ≡ 0 ↔ c ≡ 0)" — proved via cancellation.
--- This is the well-definedness of "is-zero" under ~.
+-- "(a, b) ~ (c, d) → (a ≡ 0 ↔ c ≡ 0)", proved by cancellation.
+-- This is well-definedness of "is-zero" under ~.
 ~-preserves-zero-l : ∀ ((a , b) (c , d) : ℤ × ℕ₊₁)
                    → (a ℤ.· Q.ℕ₊₁→ℤ d ≡ c ℤ.· Q.ℕ₊₁→ℤ b)
                    → a ≡ pos 0 → c ≡ pos 0
 ~-preserves-zero-l (a , 1+ b) (c , 1+ d) eq a≡0 = c≡0
   where
     -- From eq: a · pos(suc d) ≡ c · pos(suc b).
-    -- a ≡ 0, so LHS ≡ 0 · pos(suc d) ≡ 0.
-    -- So c · pos(suc b) ≡ 0; by integer multiplication (no zero divisors),
-    -- c ≡ 0.
+    -- a ≡ 0, so the left side is 0 · pos(suc d) ≡ 0.
+    -- So c · pos(suc b) ≡ 0.  ℤ has no zero divisors, so c ≡ 0.
     -- eq : a · pos(suc d) ≡ c · pos(suc b)
     -- so c · pos(suc b) ≡ a · pos(suc d) ≡ 0 · pos(suc d) ≡ 0
     c·b≡0 : c ℤ.· pos (suc b) ≡ pos 0
@@ -260,14 +259,15 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
     c≡0 = ℤ-no-zero-div c (pos (suc b)) (λ p → ℕ.snotz (ℤP.injPos p)) c·b≡0
       where
         open import Cubical.Data.Nat using (snotz)
-        -- ℤ has no zero divisors (proved below via integer cancellation).
-        -- Standard: a · b ≡ 0 → a ≡ 0 ⊎ b ≡ 0. With b ≢ 0, conclude a ≡ 0.
-        -- Use the integer cancellation lemma.
+        -- ℤ has no zero divisors.  This is proved below, by
+        -- integer cancellation: a · b ≡ 0 → a ≡ 0 ⊎ b ≡ 0, and
+        -- with b ≢ 0 this gives a ≡ 0.
         ℤ-no-zero-div : (a b : ℤ) → ¬ (b ≡ pos 0) → a ℤ.· b ≡ pos 0 → a ≡ pos 0
         ℤ-no-zero-div a b b≢0 a·b≡0 = ℤP.·rCancel b a (pos 0)
                                       (a·b≡0 ∙ sym (ℤP.·AnnihilL b)) b≢0
 
--- Symmetric: ~ preserves "is-zero" on the right side too.
+-- The symmetric statement: ~ also preserves "is-zero" on the
+-- right side.
 ~-preserves-zero-r : ∀ ((a , b) (c , d) : ℤ × ℕ₊₁)
                    → (a ℤ.· Q.ℕ₊₁→ℤ d ≡ c ℤ.· Q.ℕ₊₁→ℤ b)
                    → c ≡ pos 0 → a ≡ pos 0
@@ -277,12 +277,12 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
 -- ============================================================
 -- Total inverse on ℚ.
 --
--- For non-zero q, returns the multiplicative inverse.
--- For q = 0, returns 0 (defensive).
+-- For non-zero q it returns the multiplicative inverse.
+-- For q = 0 it returns 0, as a defensive default.
 --
--- Well-defined because "is-zero" is preserved by ~ (via
--- ~-preserves-zero-{l,r}), and on non-zero pairs the inverse
--- on representatives respects ~ (proved via inv-pair-resp-~).
+-- It is well defined for two reasons.  ~ preserves "is-zero", by
+-- ~-preserves-zero-{l,r}.  And on non-zero pairs the inverse on
+-- representatives respects ~, by inv-pair-resp-~.
 -- ============================================================
 
 -- Inverse on representatives, defensive total version:
@@ -302,8 +302,8 @@ inv-rep (negsuc n , b) = ℤ.- Q.ℕ₊₁→ℤ b , 1+ n
 --   - if c = pos (suc n):  (a · ℕ₊₁→ℤ d, b ·₊₁ (1+ n))
 --   - if c = negsuc n:     (a · (- ℕ₊₁→ℤ d), b ·₊₁ (1+ n))
 --
--- This is just multiplication by the inverse, computed in
--- closed form based on the sign case of c.
+-- This is multiplication by the inverse, written in closed form
+-- for each sign case of c.
 -- ============================================================
 
 /r-rep : ℤ × ℕ₊₁ → ℤ × ℕ₊₁ → ℤ × ℕ₊₁
@@ -315,8 +315,9 @@ inv-rep (negsuc n , b) = ℤ.- Q.ℕ₊₁→ℤ b , 1+ n
 -- ℚ as a CommRing.
 --
 -- Cubical/Algebra/CommRing/Instances/Rationals.agda provides
--- this for QuoQ ℚ, not for standard Cubical.Data.Rationals.ℚ.
--- We build it locally here to access inverseUniqueness.
+-- this for QuoQ ℚ.  It does not provide it for the standard
+-- Cubical.Data.Rationals.ℚ.  We build it locally here, to get
+-- access to inverseUniqueness.
 -- ============================================================
 
 open import Cubical.Algebra.CommRing using (CommRing; makeCommRing; CommRingStr)
@@ -344,11 +345,13 @@ private
 -- ============================================================
 -- ℚ-hasInverse: every non-zero ℚ has a multiplicative inverse.
 --
--- Mirrors the QuoQ-side hasInverseℚ in Cubical/Algebra/Field/
--- Instances/Rationals.agda, but for the standard Cubical.Data.Rationals.ℚ.
+-- This mirrors the QuoQ-side hasInverseℚ in
+-- Cubical/Algebra/Field/Instances/Rationals.agda, for the
+-- standard Cubical.Data.Rationals.ℚ.
 -- ============================================================
 
--- "x represents the zero rational" — provable when first coord is pos 0.
+-- "x represents the zero rational".  It is provable when the
+-- first coordinate is pos 0.
 zero-rep→ℚ-zero : ∀ (x : ℤ × ℕ₊₁) → x .fst ≡ pos 0 → [ x .fst / x .snd ] ≡ ℚ-0
 zero-rep→ℚ-zero (a , b) a≡0 = SetQuot.eq/ _ _ pf
   where
@@ -396,12 +399,12 @@ honest/r x y with discreteℚ y ℚ-0
 -- ·r-/r-pos: y ≢ 0 → (x · y) /r y ≡ x
 -- /r-·r-pos: y ≢ 0 → (x /r y) · y ≡ x
 --
--- These are the keys that, when used with Pos y → y ≢ 0,
--- discharge the ·r-/r-pos / /r-·r-pos postulates of
+-- Combined with Pos y → y ≢ 0, these two identities discharge
+-- the ·r-/r-pos and /r-·r-pos postulates of
 -- WeightQ-Discharge.agda.
 -- ============================================================
 
--- Helper: y · y⁻¹ ≡ 1.  
+-- Helper: y · y⁻¹ ≡ 1.
 -- y⁻¹ is the projection from ℚ-hasInverse.
 y·y⁻¹≡1 : (y : ℚ) (y≢0 : ¬ y ≡ ℚ-0) → y QP.· ℚ-hasInverse y y≢0 .fst ≡ ℚ-1
 y·y⁻¹≡1 y y≢0 = ℚ-hasInverse y y≢0 .snd
@@ -429,9 +432,9 @@ y·y⁻¹≡1 y y≢0 = ℚ-hasInverse y y≢0 .snd
 -- ============================================================
 -- Bridge: Pos y → y ≢ 0.
 --
--- "Pos y" at the WeightQ-Discharge level is z0 <r y, which
--- we instantiate to QO._<_ z0 y. From z0 < y, we cannot have
--- y ≡ z0 (since < is irreflexive).
+-- "Pos y" at the WeightQ-Discharge level is z0 <r y, which we
+-- instantiate to QO._<_ z0 y.  From z0 < y we cannot have
+-- y ≡ z0, because < is irreflexive.
 -- ============================================================
 
 open import Cubical.Data.Rationals.Order as QO using (_<_)
@@ -440,9 +443,10 @@ pos→non-zero : ∀ {y : ℚ} → ℚ-0 < y → ¬ y ≡ ℚ-0
 pos→non-zero {y} 0<y y≡0 = QO.isIrrefl< ℚ-0 (subst (ℚ-0 <_) y≡0 0<y)
 
 -- ============================================================
--- The discharged identities:  (x · y) /r y ≡ x and (x /r y) · y ≡ x
--- for any y with z0 < y. These are EXACTLY the postulates
--- ·r-/r-pos and /r-·r-pos in WeightQ-Discharge.agda.
+-- The discharged identities: (x · y) /r y ≡ x and
+-- (x /r y) · y ≡ x, for any y with z0 < y.  These are the
+-- postulates ·r-/r-pos and /r-·r-pos of
+-- WeightQ-Discharge.agda.
 -- ============================================================
 
 ·r-/r-pos-derived : ∀ {y : ℚ} → ℚ-0 < y → ∀ x → honest/r (x QP.· y) y ≡ x
@@ -452,13 +456,13 @@ pos→non-zero {y} 0<y y≡0 = QO.isIrrefl< ℚ-0 (subst (ℚ-0 <_) y≡0 0<y)
 /r-·r-pos-derived {y} 0<y x = /r-·-non-zero x y (pos→non-zero 0<y)
 
 -- ============================================================
--- Bounds on honest division: when honest/r x y = x · y⁻¹,
--- we can prove 0 ≤ x/y and x/y ≤ 1 from preconditions.
--- These eliminate the /r-bound-defensive postulates.
+-- Bounds on honest division.  When honest/r x y = x · y⁻¹, the
+-- preconditions give 0 ≤ x/y and x/y ≤ 1.  These bounds replace
+-- the /r-bound-defensive postulates.
 -- ============================================================
 
--- 0 < y⁻¹ when 0 < y. Strategy: 0 · y = 0 < 1 = y⁻¹ · y, so by
--- <-·o-cancel with 0 < y, we get 0 < y⁻¹.
+-- 0 < y⁻¹ when 0 < y.  We have 0 · y = 0 < 1 = y⁻¹ · y, so
+-- <-·o-cancel with 0 < y gives 0 < y⁻¹.
 0<y⁻¹ : (y : ℚ) (y≢0 : ¬ y ≡ ℚ-0) → ℚ-0 < y → ℚ-0 < ℚ-hasInverse y y≢0 .fst
 0<y⁻¹ y y≢0 0<y = QO.<-·o-cancel ℚ-0 (ℚ-hasInverse y y≢0 .fst) y 0<y step
   where
@@ -473,7 +477,8 @@ pos→non-zero {y} 0<y y≡0 = QO.isIrrefl< ℚ-0 (subst (ℚ-0 <_) y≡0 0<y)
     0<1 : ℚ-0 < ℚ-1
     0<1 = (0 , refl)
 
-    -- Need: ℚ-0 · y < y⁻¹ · y. LHS = 0 by ·AnnihilL; RHS = 1.
+    -- We need ℚ-0 · y < y⁻¹ · y.  The left side is 0, by
+    -- ·AnnihilL, and the right side is 1.
     step : ℚ-0 QP.· y < ℚ-hasInverse y y≢0 .fst QP.· y
     step = subst2 _<_ (sym (QP.·AnnihilL y)) (sym y⁻¹·y≡1) 0<1
 

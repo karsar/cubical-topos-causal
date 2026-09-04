@@ -3,25 +3,28 @@
 -- ============================================================
 -- Topos.InflationarityIndependence — a counter-model showing that
 -- the three Lawvere-Tierney equations, taken pointwise on an
--- arbitrary Heyting algebra, do NOT by themselves entail
+-- arbitrary Heyting algebra, do not by themselves entail
 -- inflationarity (S ≤ j S).
 --
--- For a Lawvere-Tierney topology proper — a NATURAL morphism
--- j : Ω ⇒ Ω — inflationarity is derivable, not assumed: naturality
--- together with j ⊤ = ⊤ force it (Topos.InflationarityDerivable).
--- Naturality is what does the work; this module isolates that by
--- dropping it.  On the bare three-element Heyting chain ⊥ < a < ⊤,
--- with the operator j that fixes ⊥ and ⊤ but sends a ↦ ⊥, the three
--- equations
+-- For a Lawvere-Tierney topology proper, that is for a natural
+-- morphism j : Ω ⇒ Ω, inflationarity is derivable rather than
+-- assumed.  Naturality together with j ⊤ = ⊤ force it
+-- (Topos.InflationarityDerivable).  Naturality is the hypothesis
+-- that does the work, and this module isolates it by dropping it.
+--
+-- The counter-model is the bare three-element Heyting chain
+-- ⊥ < a < ⊤.  The operator j fixes ⊥ and ⊤ and sends a ↦ ⊥.  The
+-- three equations
 --     j ⊤ = ⊤                  (preserves truth)
 --     j (x ∧ y) = j x ∧ j y    (preserves meets)
 --     j (j x) = j x            (idempotent)
--- all hold, yet j collapses `a` strictly below itself: it is not
--- inflationary and not a closure operator.  The chain is a Heyting
--- algebra but not a subobject classifier, and without the naturality
--- a topos Ω supplies, the three equations alone leave inflationarity
--- underdetermined.  (The double-negation topology in
--- Topos.DoubleNegation, a topology proper, is inflationary.)
+-- all hold.  Still j sends `a` strictly below itself, so j is not
+-- inflationary and is not a closure operator.  The chain is a
+-- Heyting algebra, but it is not a subobject classifier.  Without
+-- the naturality that a topos Ω supplies, the three equations
+-- leave inflationarity underdetermined.  The double-negation
+-- topology in Topos.DoubleNegation is a topology proper, and it
+-- is inflationary.
 -- ============================================================
 
 module Topos.InflationarityIndependence where
@@ -34,7 +37,7 @@ open import Cubical.Relation.Nullary using (¬_)
 data Three : Type where
   ⊥₃ a₃ ⊤₃ : Three
 
--- Meet (minimum on the chain).
+-- Meet, the minimum on the chain.
 _∧₃_ : Three → Three → Three
 ⊥₃ ∧₃ _  = ⊥₃
 a₃ ∧₃ ⊥₃ = ⊥₃
@@ -46,7 +49,7 @@ a₃ ∧₃ ⊤₃ = a₃
 _≤₃_ : Three → Three → Type
 x ≤₃ y = (x ∧₃ y) ≡ x
 
--- The candidate "topology": fixes ⊥ and ⊤, collapses a to ⊥.
+-- The candidate "topology".  It fixes ⊥ and ⊤ and sends a to ⊥.
 j₃ : Three → Three
 j₃ ⊥₃ = ⊥₃
 j₃ a₃ = ⊥₃
@@ -60,7 +63,8 @@ j₃ ⊤₃ = ⊤₃
 j-⊤₃ : j₃ ⊤₃ ≡ ⊤₃
 j-⊤₃ = refl
 
--- (2) preserves meets — all nine constructor combinations compute.
+-- (2) preserves meets.  All nine constructor combinations
+-- compute by refl.
 j-∧₃ : (x y : Three) → j₃ (x ∧₃ y) ≡ (j₃ x ∧₃ j₃ y)
 j-∧₃ ⊥₃ ⊥₃ = refl
 j-∧₃ ⊥₃ a₃ = refl
@@ -79,7 +83,7 @@ j-idem₃ a₃ = refl
 j-idem₃ ⊤₃ = refl
 
 -- ----------------------------------------------------------
--- …yet j₃ is NOT inflationary.
+-- j₃ is not inflationary.
 -- ----------------------------------------------------------
 
 -- a ≢ ⊥, by a Boolean separator.
@@ -91,8 +95,8 @@ sep ⊤₃ = true
 a₃≢⊥₃ : ¬ (a₃ ≡ ⊥₃)
 a₃≢⊥₃ p = true≢false (cong sep p)
 
--- Inflationarity would force a ≤ j a = a ≤ ⊥, i.e. a ∧ ⊥ ≡ a,
--- i.e. ⊥ ≡ a — impossible.
+-- Inflationarity would force a ≤ j a, that is a ≤ ⊥.  That means
+-- a ∧ ⊥ ≡ a, hence ⊥ ≡ a, which is false.
 not-inflationary : ¬ ((x : Three) → x ≤₃ j₃ x)
 not-inflationary infl = a₃≢⊥₃ (sym (infl a₃))
 

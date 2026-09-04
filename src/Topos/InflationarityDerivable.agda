@@ -3,14 +3,16 @@
 -- ============================================================
 -- Topos.InflationarityDerivable
 --
--- The inflationarity law  S ≤ j S  is DERIVABLE from naturality
--- (jnat) together with truth-preservation (j-⊤).  So `LawvereTierney`
--- needs no `j-infl` field: a Lawvere–Tierney topology (a *natural*
--- morphism j : Ω ⇒ Ω) is automatically inflationary.
+-- The inflationarity law  S ≤ j S  follows from naturality (jnat)
+-- together with truth-preservation (j-⊤).  So `LawvereTierney`
+-- needs no `j-infl` field.  A Lawvere–Tierney topology is a
+-- natural morphism j : Ω ⇒ Ω, and every such morphism is
+-- inflationary.
 --
--- Argument: for f ∈ S, the pullback  S · f = ⊤  (sieves are
--- downward closed); by naturality  j S · f = j (S · f) = j ⊤ = ⊤,
--- and a sieve equal to ⊤ contains every arrow, so f ∈ j S.
+-- The argument.  Take f ∈ S.  Sieves are downward closed, so the
+-- pullback  S · f  is the maximal sieve ⊤.  Naturality then gives
+-- j S · f = j (S · f) = j ⊤ = ⊤.  A sieve equal to ⊤ contains
+-- every arrow, so f ∈ j S.
 -- ============================================================
 
 module Topos.InflationarityDerivable where
@@ -41,8 +43,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     subst (λ g → fst (fst (jop J c S) d g)) (⋆-idL f)
       (maximal→mem {C = C} (pull {C = C} f (jop J c S)) pf-max d idn)
     where
-      -- pull f S = ⊤  (f ∈ S, sieves closed under precomposition):
-      -- every g ⋆ f lies in S, directly from S's own closure.
+      -- pull f S = ⊤.  f ∈ S, and sieves are closed under
+      -- precomposition, so every g ⋆ f lies in S.
       pullS-max : pull {C = C} f S ≡ maximal {C = C} d
       pullS-max =
         Sieve≡ {C = C} (pull {C = C} f S) (maximal {C = C} d)
@@ -50,7 +52,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
             ⇔toPath {P = fst S e (g ⋆ f)} {Q = Unit* , isPropUnit*}
               (λ _ → tt*)
               (λ _ → snd S d e g f hf))
-      -- pull f (j S) = j (pull f S) = j ⊤ = ⊤
+      -- pull f (j S) = j (pull f S) = j ⊤ = ⊤.
       pf-max : pull {C = C} f (jop J c S) ≡ maximal {C = C} d
       pf-max =
         sym (jnat J d c f S)

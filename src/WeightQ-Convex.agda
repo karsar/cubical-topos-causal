@@ -5,20 +5,20 @@
 --
 -- Discharge layer for FDist-Convex.agda's algebra postulates.
 --
--- This module provides concrete definitions of the convex-algebra
--- operations (mix-w, ≤w, normalize) on top of WeightQ.agda's
--- Weight type (which is itself ℝ ∩ [0,1] for an abstract ordered
--- field ℝ; canonical instance ℚ in WeightQ-Discharge.agda). All
--- the convex-algebra axioms postulated by FDist-Convex.agda are
--- proved here as theorems.
+-- This module defines the convex-algebra operations mix-w, ≤w,
+-- and normalize on top of the Weight type of WeightQ.agda.
+-- Weight is ℝ ∩ [0,1] for an ordered field ℝ, and the canonical
+-- instance of ℝ is ℚ, built in WeightQ-Discharge.agda.  Every
+-- convex-algebra axiom that FDist-Convex.agda postulates is
+-- proved here as a theorem.
 --
 -- Specifically:
 --   * mix-w p a b := (p *w a) +w ((1-w p) *w b)        (derived)
 --   * x ≤w y      := val x ≤r val y                    (derived)
 --   * normalize num den _ _ := num /w den              (derived)
 --
--- All FDist-Convex.agda's algebra axioms become theorems, lifted
--- from ℝ-level ring identities via WeightPath.
+-- Each axiom is lifted from an ℝ-level ring identity through
+-- WeightPath.
 -- ============================================================
 
 module WeightQ-Convex where
@@ -28,8 +28,8 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
 open import Cubical.Relation.Nullary using (¬_)
 open import Cubical.Data.Empty as Empty using (⊥)
 
--- Re-export everything from WeightQ that we want to make available
--- as part of the convex-framing interface.
+-- Re-export the names from WeightQ that belong to the
+-- convex-framing interface.
 open import WeightQ public
   using ( Weight ; w0 ; w1 ; isSetWeight ; _*w_ ; _+w_⟨_⟩ ; 1-w_
         ; *w-comm ; *w-assoc ; *w-1 ; *w-0
@@ -44,8 +44,8 @@ open import WeightQ public
         ; mix-bound ; +w-IdR-bound ; compl-bound ; weighted-idem-bound
         )
 
--- We need a few WeightQ-internal items not exported by the using-list
--- above; pull them in privately.
+-- A few WeightQ-internal items are not in the using-list above.
+-- We pull them in privately.
 open import WeightQ
   using ( val ; lb ; ub ; mkW ; WeightPath
         ; ℝ ; z0 ; z1 ; _+r_ ; _·r_ ; -r_ ; _≤r_ ; _<r_ ; 1-r ; _/r_
@@ -63,8 +63,8 @@ open import WeightQ
 -- ============================================================
 
 -- Convex combination, derived from _+w_⟨_⟩ and *w.
--- The bound (val (p *w a) +r val ((1-w p) *w b)) ≤r z1 holds
--- by mix-bound (a convex combination is bounded by 1).
+-- The bound (val (p *w a) +r val ((1-w p) *w b)) ≤r z1 holds by
+-- mix-bound, since a convex combination is bounded by 1.
 mix-w : Weight → Weight → Weight → Weight
 mix-w p a b = (p *w a) +w ((1-w p) *w b) ⟨ mix-bound p a b ⟩
 
@@ -76,19 +76,21 @@ infix 4 _≤w_
 isProp-≤w : ∀ {x y} → isProp (x ≤w y)
 isProp-≤w = isProp-≤r
 
--- Normalize: PARTIAL operator using _/wPf with both preconditions
--- explicit. This is the migration target for safe Bayesian-style
--- division. Currently uses the same trivial _/r_ stub internally
--- as _/w_; the value-level correctness depends on the same
--- postulates (·r-/r-pos, /r-·r-pos in WeightQ-Discharge) and is
--- thus subject to the same DEEPER issue documented in SOUNDNESS.md
--- regarding the structural inconsistency of those postulates with
--- the trivial _/r_ stub.
+-- Normalize: a partial operator built from _/wPf, with both
+-- preconditions explicit.  It is the migration target for safe
+-- Bayesian-style division.
 --
--- The signature improvement is real (preconditions are now explicit
--- and obligations cannot be silently violated at the call site),
--- but full soundness requires an honest ℚ division, which is the
--- next planned step.
+-- A caveat recorded with this operator.  normalize uses the same
+-- trivial _/r_ stub internally as _/w_.  Its value-level
+-- correctness therefore rests on the same postulates, ·r-/r-pos
+-- and /r-·r-pos in WeightQ-Discharge.  It has the same deeper
+-- problem that SOUNDNESS.md records.  Those postulates are
+-- structurally inconsistent with a trivial _/r_ stub.
+--
+-- The signature helps even so.  The preconditions are explicit,
+-- so a call site cannot violate the obligations silently.  Full
+-- soundness needs a real ℚ division, which is the next planned
+-- step.
 normalize : (num den : Weight) → Pos den → num ≤w den → Weight
 normalize num den pd le = num /wPf den ⟨ pd , le ⟩
   where open import WeightQ using (_/wPf_⟨_,_⟩)
@@ -98,7 +100,7 @@ normalize num den pd le = num /wPf den ⟨ pd , le ⟩
 -- ============================================================
 
 -- mix-w-comm: mix-w p a b ≡ mix-w (1-w p) b a.
--- Lifted directly to ℝ-level via WeightPath:
+-- Lifted to the ℝ level through WeightPath:
 --   val LHS = (val p · val a) + (val (1-p) · val b)
 --   val RHS = (val (1-p) · val b) + (val (1-(1-p)) · val a)
 -- Equal by +r-comm + 1-w-invol.
@@ -113,8 +115,8 @@ mix-w-idem : ∀ p a → mix-w p a a ≡ a
 mix-w-idem p a = WeightPath (weighted-idem-ℝ (val p) (val a))
 
 -- mix-w-bdy0: mix-w w0 a b ≡ b.
--- Lifted to ℝ-level via WeightPath. The ℝ-level fact is:
---   (z0 · val a) + (val (1-w w0) · val b) ≡ val b
+-- Lifted to the ℝ level through WeightPath.  The ℝ-level fact is
+--   (z0 · val a) + (val (1-w w0) · val b) ≡ val b,
 -- proved by ·r-bdy0-eq.
 mix-w-bdy0 : ∀ a b → mix-w w0 a b ≡ b
 mix-w-bdy0 a b =
@@ -122,18 +124,20 @@ mix-w-bdy0 a b =
   where
     open import WeightQ using (·r-bdy0-eq)
 
--- mix-w-bdy1 derivable from mix-w-comm + mix-w-bdy0 + 1-w-1.
+-- mix-w-bdy1 follows from mix-w-comm, mix-w-bdy0, and 1-w-1.
 mix-w-bdy1 : ∀ a b → mix-w w1 a b ≡ a
 mix-w-bdy1 a b =
   mix-w-comm w1 a b
   ∙ cong (λ q → mix-w q b a) 1-w-1
   ∙ mix-w-bdy0 b a
 
--- mix-w-interchange: this is exactly the ·r-interchange-eq lemma
--- already proven in WeightQ.agda, lifted to Weight via WeightPath.
--- Note: the arg order in ·r-interchange-eq matches mix-w's pattern after
--- swapping b ↔ c (because LHS of mix-w-interchange has (q a b)(q c d) but
--- ·r-interchange-eq's LHS has p·((q·_₁)+(1-q)·_₃) + (1-p)·((q·_₂)+(1-q)·_₄)).
+-- mix-w-interchange is the ·r-interchange-eq lemma of
+-- WeightQ.agda, lifted to Weight through WeightPath.
+-- The argument order in ·r-interchange-eq matches the mix-w
+-- pattern only after b and c are swapped.  The left side of
+-- mix-w-interchange has (q a b)(q c d), while the left side of
+-- ·r-interchange-eq has
+-- p·((q·_₁)+(1-q)·_₃) + (1-p)·((q·_₂)+(1-q)·_₄).
 mix-w-interchange : ∀ p q a b c d
   → mix-w p (mix-w q a b) (mix-w q c d)
   ≡ mix-w q (mix-w p a c) (mix-w p b d)
@@ -146,9 +150,9 @@ mix-w-interchange p q a b c d =
 
 -- *w-distrib-mix-w: a *w (mix-w p x y) ≡ mix-w p (a *w x) (a *w y).
 -- = a · (p·x + (1-p)·y)
--- Lifted to ℝ via WeightPath. The ℝ-level identity is just
+-- Lifted to ℝ through WeightPath.  The ℝ-level identity is
 -- ·r-distR (val a) (val p ·r val x) (val (1-w p) ·r val y),
--- followed by ·r-assoc/·r-comm rearrangements.
+-- followed by ·r-assoc and ·r-comm rearrangements.
 *w-distrib-mix-w : ∀ a p x y → a *w (mix-w p x y) ≡ mix-w p (a *w x) (a *w y)
 *w-distrib-mix-w a p x y = WeightPath
   (·r-distR (val a) (val p ·r val x) (val (1-w p) ·r val y)
@@ -170,7 +174,8 @@ mix-w-interchange p q a b c d =
 --     = p·1 - p·a + (1-p)·1 - (1-p)·b      [·r-distR + 1-r-def]
 --     = (p + (1-p))·1 - p·a - (1-p)·b
 --     = 1 - p·a - (1-p)·b
--- Equal. We do this at the ℝ level with a focused lemma.
+-- The two sides agree.  We prove this at the ℝ level, with a
+-- lemma for the purpose.
   --     = 1 + (-(p·x) + -((1-p)·y))                [weighted-idem on first part]
   --     = 1 - (p·x + (1-p)·y)                      [-r-distrib]
   --     = 1-r (p·x + (1-p)·y)                      [1-r-def]
@@ -188,7 +193,8 @@ mix-w-interchange p q a b c d =
   ∙ +r-comm z0 (-r (a ·r b))
   ∙ +r-IdR (-r (a ·r b))
 
--- a ·r (1-r b) ≡ a +r (-r (a ·r b)) — useful for skew-associativity.
+-- a ·r (1-r b) ≡ a +r (-r (a ·r b)).  Used for
+-- skew-associativity.
 ·r-1-r : ∀ a b → a ·r (1-r b) ≡ a +r (-r (a ·r b))
 ·r-1-r a b =
   cong (a ·r_) (1-r-def b)
@@ -250,9 +256,10 @@ w0≤w-all x = lb x
 all-≤w-w1 : ∀ x → x ≤w w1
 all-≤w-w1 x = ub x
 
--- ≤w-antisym derived from ≤r-antisym (which is part of WeightQ.agda's
--- abstract ordered-field interface and discharged in WeightQ-Discharge.agda
--- for ℚ via the cubical library's QO.isAntisym≤).
+-- ≤w-antisym is derived from ≤r-antisym.  ≤r-antisym belongs to
+-- the ordered-field interface of WeightQ.agda, and
+-- WeightQ-Discharge.agda proves it for ℚ from the cubical
+-- library's QO.isAntisym≤.
 ≤w-antisym : ∀ {x y} → x ≤w y → y ≤w x → x ≡ y
 ≤w-antisym {x} {y} le1 le2 = WeightPath (≤r-antisym le1 le2)
 
@@ -260,8 +267,8 @@ all-≤w-w1 x = ub x
 -- Section 5: monotonicity of mix-w.
 -- ============================================================
 
--- mix-w-mono: mix-w is monotone in both arguments (with same weight).
--- Follows from ≤r-+-mono and ≤r-·-mono.
+-- mix-w-mono: mix-w is monotone in both arguments, at a fixed
+-- weight.  It follows from ≤r-+-mono and ≤r-·-mono.
 mix-w-mono : ∀ p {a b c d} → a ≤w c → b ≤w d → mix-w p a b ≤w mix-w p c d
 mix-w-mono p {a} {b} {c} {d} ac bd =
   ≤r-+-mono
@@ -269,7 +276,7 @@ mix-w-mono p {a} {b} {c} {d} ac bd =
     (≤r-·-mono (lb (1-w p)) (lb b) (≤r-refl (val (1-w p))) bd)
 
 -- mix-w-right-w0: mix-w p a w0 ≡ p *w a.
--- Lifted to ℝ via WeightPath:
+-- Lifted to ℝ through WeightPath:
 --   (val p · val a) +r (val (1-w p) · z0) ≡ val p · val a
 -- by ·r-AnnihR + +r-IdR.
 mix-w-right-w0 : ∀ p a → mix-w p a w0 ≡ p *w a
@@ -280,9 +287,9 @@ mix-w-right-w0 p a = WeightPath
 -- p-≤w-mix-w-w1: p ≤w mix-w p w1 q.
 -- val(mix-w p w1 q) = (val p · z1) +r (val(1-w p) · val q)
 --                   = val p +r (val(1-w p) · val q)         [·r-IdR]
--- Want: val p ≤r val p +r [val(1-w p) · val q].
--- Since val(1-w p) ≥ z0 and val q ≥ z0, their product ≥ z0.
--- Adding ≥ z0 to val p doesn't decrease.
+-- We want val p ≤r val p +r [val(1-w p) · val q].
+-- val(1-w p) ≥ z0 and val q ≥ z0, so their product is ≥ z0.
+-- Adding a quantity ≥ z0 to val p does not decrease it.
 private
   -- z0 ≤r (a · b) when z0 ≤r a and z0 ≤r b.
   ·r-non-neg : ∀ {a b} → z0 ≤r a → z0 ≤r b → z0 ≤r (a ·r b)
@@ -292,9 +299,9 @@ private
 
 p-≤w-mix-w-w1 : ∀ p q → p ≤w (mix-w p w1 q)
 p-≤w-mix-w-w1 p q =
-  -- We rewrite val(mix-w p w1 q) to (val p +r (val(1-w p) · val q)),
-  -- then apply ≤r-+-mono with refl on val p and z0 ≤r (val(1-w p) · val q),
-  -- after rewriting val p ≡ val p +r z0.
+  -- Rewrite val(mix-w p w1 q) to (val p +r (val(1-w p) · val q)).
+  -- Rewrite val p to val p +r z0.  Then apply ≤r-+-mono, with
+  -- refl on val p and z0 ≤r (val(1-w p) · val q).
   subst (val p ≤r_)
         (sym (cong (_+r (val (1-w p) ·r val q)) (·r-IdR (val p))))
         bigger
@@ -314,15 +321,15 @@ p-≤w-mix-w-w1 p q =
 -- Section 6: positivity.
 -- ============================================================
 
--- Note: pos-w1, pos-+w-l, pos-*w, pos-*w-factor-l, ¬Pos-w0,
--- weight-trichotomy, w0≢w1 are all from WeightQ already.
+-- pos-w1, pos-+w-l, pos-*w, pos-*w-factor-l, ¬Pos-w0,
+-- weight-trichotomy, and w0≢w1 all come from WeightQ.
 
 -- ============================================================
 -- Section 7: normalize laws.
 -- ============================================================
 
 -- normalize-*w: normalize (a *w b) b pb le ≡ a.
--- Uses partial division round-trip directly via *w-/wPf-pos.
+-- It uses the partial-division round trip *w-/wPf-pos.
 open import WeightQ using (_/wPf_⟨_,_⟩; *w-/wPf-pos; /wPf-*w-pos)
 
 normalize-*w : ∀ a b (pb : Pos b) (le : (a *w b) ≤w b)
@@ -344,21 +351,22 @@ normalize-*w-back num den pd le = /wPf-*w-pos den pd num le
 --   r-of p q ps = p /w (s-of p q)       (the renormalized inner weight)
 --   ps : Pos (s-of p q)
 --
--- Proof at ℝ level. Set s = val(s-of p q), r = val(r-of p q ps),
---   p_v = val p, etc. Then:
+-- Proof at the ℝ level.  Set s = val(s-of p q),
+-- r = val(r-of p q ps), p_v = val p, and so on.  Then:
 --   * s_v = p_v + (1-p_v)·q_v               [from s-of definition + ·r-IdR]
 --   * r_v = p_v / s_v                        [from r-of definition]
 --   * s_v · r_v ≡ p_v                        [/r-·r-pos at positive s_v]
 --   * s_v · (1-r_v) ≡ (1-p_v) · q_v          [from above + arithmetic]
 --   * 1 - s_v ≡ (1-p_v) · (1-q_v)            [from arithmetic]
--- Both LHS and RHS expand to the same sum p·a + (1-p)q·b + (1-p)(1-q)·c.
+-- Both sides expand to the same sum,
+-- p·a + (1-p)q·b + (1-p)(1-q)·c.
 -- ============================================================
 
 -- s-of and r-of at the Weight level (used here).
 s-of : Weight → Weight → Weight
 s-of p q = mix-w p w1 q
 
--- p ≤w s-of p q (already proven as p-≤w-mix-w-w1 above; renamed here).
+-- p ≤w s-of p q.  This is p-≤w-mix-w-w1 above, renamed here.
 p-≤w-s-of : ∀ p q → p ≤w (s-of p q)
 p-≤w-s-of = p-≤w-mix-w-w1
 
@@ -366,7 +374,8 @@ p-≤w-s-of = p-≤w-mix-w-w1
 r-of : ∀ p q → Pos (s-of p q) → Weight
 r-of p q ps = normalize p (s-of p q) ps (p-≤w-s-of p q)
 
--- Helper: val (s-of p q) reduces to (val p) +r ((1-r (val p)) ·r val q).
+-- Helper: val (s-of p q) reduces to
+-- (val p) +r ((1-r (val p)) ·r val q).
 val-s-of : ∀ p q → val (s-of p q) ≡ (val p) +r ((1-r (val p)) ·r val q)
 val-s-of p q = cong (_+r ((1-r (val p)) ·r val q)) (·r-IdR (val p))
 
@@ -384,7 +393,8 @@ sof-rof p q ps =
   where
     open import WeightQ using (/r-·r-pos)
 
--- Lemma B: val(s-of p q) · (1 - val(r-of p q ps))) ≡ (1 - val p) · val q.
+-- Lemma B: val(s-of p q) · (1 - val(r-of p q ps)))
+--        ≡ (1 - val p) · val q.
 -- Derivation:
 --   s · (1 - r) = s + (-(s·r)) = s + (-p)         [·r-1-r, then sof-rof]
 --               = (p + (1-p)·q) + (-p)            [val-s-of]
@@ -421,8 +431,8 @@ sof-1-rof p q ps =
   ∙ sym (·r-distR (1-r (val p)) z1 (-r val q))
   ∙ cong ((1-r (val p)) ·r_) (sym (1-r-def (val q)))
 
--- Now the main proof: skew-associativity at ℝ level.
--- Goal: val(LHS) ≡ val(RHS) where:
+-- The main proof: skew-associativity at the ℝ level.
+-- Goal: val(LHS) ≡ val(RHS), where
 --   LHS = mix-w p a (mix-w q b c)   = p·a + (1-p)·(q·b + (1-q)·c)
 --   RHS = mix-w s (mix-w r a b) c    = s·(r·a + (1-r)·b) + (1-s)·c
 -- Both expand to: p·a + (1-p)q·b + (1-p)(1-q)·c.
@@ -442,8 +452,8 @@ mix-w-assoc-pos-ℝ p q ps a b c =
   ∙ cong (λ z → (val p ·r val a) +r ((((1-r (val p)) ·r val q) ·r val b) +r z))
          (·r-assoc (1-r (val p)) (1-r (val q)) (val c))
   -- Now: (p·a) +r ((((1-p)·q)·b) +r (((1-p)·(1-q))·c))
-  -- This is the "expanded form" ε.
-  -- Now show RHS reduces to the same ε.
+  -- Call this expanded form ε.
+  -- It remains to reduce the RHS to the same ε.
   ∙ sym rhs-eq-ε
   where
     s = val (s-of p q)
@@ -481,17 +491,18 @@ mix-w-assoc-pos p q ps a b c = WeightPath (mix-w-assoc-pos-ℝ p q ps a b c)
 -- ============================================================
 -- Section 9b: mix-w-eq-w0/w1 helpers.
 --
--- If mix-w p X Y ≡ w0 (or w1), and one factor is positive, the
--- corresponding component is forced to w0 (or w1). These follow
--- from the additive structure +w (which is hidden from FDist-Convex
--- but accessible internally here).
+-- Suppose mix-w p X Y ≡ w0, or ≡ w1, and one factor is positive.
+-- Then the matching component is w0, respectively w1.  These
+-- lemmas use the additive operator +w.  FDist-Convex does not
+-- import +w, so they are proved here instead.
 -- ============================================================
 
 open import WeightQ using (+w-eq-w0-l)
 
 -- *w-cancel-l: from p *w x ≡ p *w y with Pos p, conclude x ≡ y.
--- MIGRATED to use partial division _/wPf_⟨_,_⟩ via *w-/wPf-pos.
--- The precondition val (x *w p) ≤r val p follows from val x ≤r z1 (ub x).
+-- It was migrated to the partial division _/wPf_⟨_,_⟩, through
+-- *w-/wPf-pos.  The precondition val (x *w p) ≤r val p follows
+-- from val x ≤r z1, which is ub x.
 *w-cancel-l-WC : ∀ {p} → Pos p → ∀ x y → p *w x ≡ p *w y → x ≡ y
 *w-cancel-l-WC {p} pp x y eq =
   sym (*w-/wPf-pos p pp x x*p≤p)
@@ -513,8 +524,9 @@ open import WeightQ using (+w-eq-w0-l)
     y*p≤p = subst (λ z → (val y ·r val p) ≤r z) (·r-IdL (val p))
                   (≤r-·-mono (lb y) (lb p) (ub y) (≤r-refl (val p)))
 
-    -- The middle congruence: equate two partial divisions across a path
-    -- in the value (induced by x*p≡y*p) and a Prop-valued path in the precondition.
+    -- The middle congruence equates two partial divisions.  It
+    -- uses a path in the value, induced by x*p≡y*p, and a
+    -- Prop-valued path in the precondition.
     x*p≡y*p : x *w p ≡ y *w p
     x*p≡y*p = *w-comm x p ∙ eq ∙ *w-comm p y
 
@@ -524,27 +536,29 @@ open import WeightQ using (+w-eq-w0-l)
         prec-path : PathP (λ i → val (x*p≡y*p i) ≤r val p) x*p≤p y*p≤p
         prec-path = isProp→PathP (λ _ → isProp-≤r) x*p≤p y*p≤p
 
--- (w0-/w-p was previously a private helper proving w0 /w p ≡ w0 for Pos p,
--- using *w-/w-pos and /w-*w-pos. After the partial-division migration,
--- *w-cancel-l-WC no longer depends on the total-/w identities, and this
--- helper has no remaining users. Removed.)
+-- (w0-/w-p was a private helper.  It proved w0 /w p ≡ w0 for
+-- Pos p, using *w-/w-pos and /w-*w-pos.  After the
+-- partial-division migration, *w-cancel-l-WC no longer uses the
+-- total-/w identities, so the helper has no users.  It was
+-- removed.)
 
 -- pos-*w-eq-w0: if Pos p and p *w x ≡ w0, then x ≡ w0.
 pos-*w-eq-w0-helper : ∀ {p} → Pos p → ∀ x → p *w x ≡ w0 → x ≡ w0
 pos-*w-eq-w0-helper {p} pp x p·x≡w0 =
   *w-cancel-l-WC pp x w0 (p·x≡w0 ∙ sym (*w-0 p))
 
--- mix-w-eq-w0-pos-l: from mix-w p X Y ≡ w0 and Pos p, conclude X ≡ w0.
--- The bound argument to +w-eq-w0-l is mix-bound p X Y, since
--- mix-w p X Y is built using exactly that bound proof.
+-- mix-w-eq-w0-pos-l: from mix-w p X Y ≡ w0 and Pos p, conclude
+-- X ≡ w0.  The bound argument to +w-eq-w0-l is mix-bound p X Y,
+-- because mix-w p X Y is built with that same bound proof.
 mix-w-eq-w0-pos-l : ∀ {p X Y} → Pos p → mix-w p X Y ≡ w0 → X ≡ w0
 mix-w-eq-w0-pos-l {p} {X} {Y} pp eq =
   pos-*w-eq-w0-helper pp X (+w-eq-w0-l (p *w X) ((1-w p) *w Y) (mix-bound p X Y) eq)
 
--- mix-w-eq-w0-pos-r: from mix-w p X Y ≡ w0 and Pos (1-w p), conclude Y ≡ w0.
--- Drops to ℝ-level: val (mix-w p X Y) ≡ z0 and a sum of non-negatives is
--- zero iff each is zero — so val ((1-w p) *w Y) ≡ z0, hence Y ≡ w0 by
--- pos-*w-eq-w0-helper.
+-- mix-w-eq-w0-pos-r: from mix-w p X Y ≡ w0 and Pos (1-w p),
+-- conclude Y ≡ w0.  The proof drops to the ℝ level.  There
+-- val (mix-w p X Y) ≡ z0, and a sum of non-negatives is zero
+-- exactly when each summand is zero.  So val ((1-w p) *w Y) ≡ z0,
+-- and Y ≡ w0 by pos-*w-eq-w0-helper.
 mix-w-eq-w0-pos-r : ∀ {p X Y} → Pos (1-w p) → mix-w p X Y ≡ w0 → Y ≡ w0
 mix-w-eq-w0-pos-r {p} {X} {Y} pp eq =
   pos-*w-eq-w0-helper {p = 1-w p} pp Y
@@ -555,10 +569,11 @@ mix-w-eq-w0-pos-r {p} {X} {Y} pp eq =
   where
     open import WeightQ using (+r-eq-z0-l)
 
--- mix-w-eq-w1-pos-l: from mix-w p X Y ≡ w1 and Pos p, conclude X ≡ w1.
--- Proof via complement: 1-w (mix-w p X Y) ≡ w0, then 1-w-mix-w gives
--- mix-w p (1-w X) (1-w Y) ≡ w0. By mix-w-eq-w0-pos-l, 1-w X ≡ w0.
--- By 1-w-invol: X ≡ w1.
+-- mix-w-eq-w1-pos-l: from mix-w p X Y ≡ w1 and Pos p, conclude
+-- X ≡ w1.  The proof goes through the complement.
+-- 1-w (mix-w p X Y) ≡ w0, and 1-w-mix-w turns this into
+-- mix-w p (1-w X) (1-w Y) ≡ w0.  Then mix-w-eq-w0-pos-l gives
+-- 1-w X ≡ w0, and 1-w-invol gives X ≡ w1.
 mix-w-eq-w1-pos-l : ∀ {p X Y} → Pos p → mix-w p X Y ≡ w1 → X ≡ w1
 mix-w-eq-w1-pos-l {p} {X} {Y} pp eq =
   sym (1-w-invol X)
@@ -577,24 +592,24 @@ mix-w-eq-w1-pos-r {p} {X} {Y} pp eq =
 -- ============================================================
 -- Section 10: Bayesian-complement and renorm-rebase as theorems.
 --
--- These are abstract versions parameterized over an arbitrary b
--- with the property b *w Z ≡ p *w t₁ (where Z = mix-w p t₁ t₂).
--- In FDist-Convex.agda, b is instantiated to bayesW p t₁ t₂ pTM,
--- and the hypothesis is supplied by bayesW-*w-Z (which is itself
--- normalize-*w-back).
+-- These are abstract versions.  They take an arbitrary b with
+-- b *w Z ≡ p *w t₁, where Z = mix-w p t₁ t₂.  In
+-- FDist-Convex.agda, b is bayesW p t₁ t₂ pTM, and the hypothesis
+-- comes from bayesW-*w-Z, which is itself normalize-*w-back.
 -- ============================================================
 
--- bayesW-complement-abstract: from b·Z ≡ p·t₁, derive (1-b)·Z ≡ (1-p)·t₂
--- where Z = mix-w p t₁ t₂.
+-- bayesW-complement-abstract: from b·Z ≡ p·t₁, derive
+-- (1-b)·Z ≡ (1-p)·t₂, where Z = mix-w p t₁ t₂.
 --
--- Proof: weighted-idem says (b·Z) +w ((1-b)·Z) ≡ Z.
+-- weighted-idem says (b·Z) +w ((1-b)·Z) ≡ Z.
 -- By definition of mix-w, Z ≡ (p·t₁) +w ((1-p)·t₂).
 -- So (b·Z) +w ((1-b)·Z) ≡ (p·t₁) +w ((1-p)·t₂).
 -- Substituting b·Z ≡ p·t₁ on the LHS:
 --   (p·t₁) +w ((1-b)·Z) ≡ (p·t₁) +w ((1-p)·t₂).
 -- By +w-cancel-l: (1-b)·Z ≡ (1-p)·t₂.
--- The proof drops to ℝ-level via WeightPath and uses +r-cancel-l-ℝ
--- to cancel (val p · val t₁) from both sides. The chain at ℝ level:
+-- The proof drops to the ℝ level through WeightPath.  It uses
+-- +r-cancel-l-ℝ to cancel (val p · val t₁) from both sides.  The
+-- chain at the ℝ level:
 --   (val p · val t₁) + val ((1-w b)·Z)
 --     = val (b·Z) + val ((1-w b)·Z)         [from sym (cong val b·Z≡p·t₁)]
 --     = val Z                                [weighted-idem-ℝ at val b, val Z]
@@ -608,11 +623,13 @@ bayesW-complement-abstract b p t₁ t₂ b·Z≡p·t₁ = WeightPath
     (cong (_+r val ((1-w b) *w (mix-w p t₁ t₂))) (sym (cong val b·Z≡p·t₁))
      ∙ weighted-idem-ℝ (val b) (val (mix-w p t₁ t₂))))
 
--- renorm-rebase-abstract: from b·Z ≡ p·t₁ and (1-b)·Z ≡ (1-p)·t₂, derive
+-- renorm-rebase-abstract: from b·Z ≡ p·t₁ and
+-- (1-b)·Z ≡ (1-p)·t₂, derive
 -- mix-w b X Y *w Z ≡ mix-w p (t₁·X) (t₂·Y).
 --
--- Proof at Weight level. Z = mix-w p t₁ t₂ on RHS context, but the proof
--- only uses b·Z ≡ p·t₁ and (1-b)·Z ≡ (1-p)·t₂.
+-- Proof at the Weight level.  On the right-hand side
+-- Z = mix-w p t₁ t₂, but the proof uses only b·Z ≡ p·t₁ and
+-- (1-b)·Z ≡ (1-p)·t₂.
 -- mix-w b X Y *w Z = ((b·X) +w ((1-b)·Y)) *w Z              [defn of mix-w; refl]
 --                 = (Z·(b·X)) +w (Z·((1-b)·Y))              [via *w-comm, *w-distrib-+w, *w-comm again]
 --                 = ((Z·b)·X) +w ((Z·(1-b))·Y)              [*w-assoc]
@@ -620,7 +637,8 @@ bayesW-complement-abstract b p t₁ t₂ b·Z≡p·t₁ = WeightPath
 --                 = ((p·t₁)·X) +w (((1-p)·t₂)·Y)            [substitute hypotheses]
 --                 = (p·(t₁·X)) +w ((1-p)·(t₂·Y))            [*w-assoc]
 --                 = mix-w p (t₁·X) (t₂·Y)                    [defn of mix-w; refl]
--- Lifted to ℝ-level via WeightPath. The val-chain (with Z = mix-w p t₁ t₂):
+-- Lifted to the ℝ level through WeightPath.  The val-chain, with
+-- Z = mix-w p t₁ t₂:
 --   val (mix-w b X Y *w Z)
 --     = val (mix-w b X Y) ·r val Z                [defn of *w]
 --     = ((val b · val X) + (val (1-w b) · val Y)) · val Z   [defn of mix-w]

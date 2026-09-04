@@ -1,30 +1,31 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.DoSeeDistinct — the do-operator is not conditioning.
+-- Topos.DoSeeDistinct — intervening differs from conditioning.
 --
--- DoClassifier exhibited χ : X ⇒ Ω, the characteristic map of the
--- value-fixing subobject {x₀} ↪ X.  At the level of Ω, the event
--- {X = x₀} is the same object whether it arises by INTERVENTION
--- (do(X := x₀), graph surgery) or by OBSERVATION (conditioning on
--- X = x₀): χ cannot, and does not, tell the two apart.  The causal
--- content of the do-operator therefore has to be a kernel-level
--- theorem — which is what this module supplies, and which χ then
--- names inside Ω.
+-- DoClassifier gave χ : X ⇒ Ω, the characteristic map of the
+-- value-fixing subobject {x₀} ↪ X.  At the level of Ω the event
+-- {X = x₀} is the same object under intervention, do(X := x₀) by
+-- graph surgery, and under observation, conditioning on X = x₀.
+-- So χ does not separate the two.  The causal content of the
+-- do-operator has to be a theorem about the kernels.  This
+-- module proves that theorem, and χ names its subject inside Ω.
 --
--- We model a CONFOUNDER  U → X , U → Y  (a pure common cause, no
--- direct X → Y edge).  The do-operator is graph surgery: do(X := x₀)
--- severs U → X and pins X to x₀, leaving U and the Y-mechanism
--- untouched.  On a perfectly-correlating confounder we prove:
+-- The model is a confounder  U → X , U → Y.  Here U is a common
+-- cause and there is no direct X → Y edge.  The do-operator is
+-- graph surgery: do(X := x₀) severs U → X and pins X to x₀, and
+-- leaves U and the Y-mechanism untouched.  On a perfectly
+-- correlating confounder the module proves:
 --
 --     P(Y = ⊤ ∣ do(X := ⊤))  =  p            (the prior on the common cause)
 --     P(Y = ⊤ ∣      X = ⊤)  =  1            (observing X reveals U)
 --
--- and these differ for every interior strength p ≠ 1.  The interior
--- weight ½ (WeightQ.wHalf) inhabits the hypothesis, so the theorem
--- is not vacuous.  The observational conditional is the Bayes ratio
--- P(X=⊤,Y=⊤) / P(X=⊤), formed with the development's own partial
--- division — the definition of conditional probability, not a stand-in.
+-- These differ for every interior strength p ≠ 1.  The interior
+-- weight ½ (WeightQ.wHalf) inhabits the hypotheses, so the
+-- theorem is not vacuous.  The observational conditional is the
+-- Bayes ratio P(X=⊤,Y=⊤) / P(X=⊤), formed with the development's
+-- own partial division.  That ratio is the definition of
+-- conditional probability.
 -- ============================================================
 
 module Topos.DoSeeDistinct where
@@ -47,7 +48,7 @@ record Confounded {ℓu ℓx ℓy} (U : Type ℓu) (X : Type ℓx) (Y : Type ℓ
   field
     pU : FDist U
     kX : U → FDist X
-    kY : U → FDist Y     -- Y depends on U, NOT on X: a pure confounder
+    kY : U → FDist Y     -- Y depends on U and not on X: a confounder
 
 open Confounded
 
@@ -57,13 +58,14 @@ module _ {ℓu ℓx ℓy} {U : Type ℓu} {X : Type ℓx} {Y : Type ℓy} where
   obs-joint : Confounded U X Y → FDist (X × Y)
   obs-joint m = pU m >>= λ u → kX m u >>= λ x → mapF (x ,_) (kY m u)
 
-  -- do(X := x₀): sever U → X, fix X to x₀; U and kY are untouched.
+  -- do(X := x₀) severs U → X and fixes X to x₀.  U and kY are
+  -- untouched.
   do-joint : X → Confounded U X Y → FDist (X × Y)
   do-joint x₀ m = pU m >>= λ u → mapF (x₀ ,_) (kY m u)
 
-  -- the interventional Y-marginal.  It does not mention x₀: under the
-  -- surgery Y is independent of the value forced on X (there is no
-  -- X → Y edge).  This is the do-side invariance that observation lacks.
+  -- The interventional Y-marginal.  It does not mention x₀.  Under
+  -- the surgery Y is independent of the value forced on X, because
+  -- there is no X → Y edge.  Observation has no such invariance.
   do-Y-marginal : X → Confounded U X Y → FDist Y
   do-Y-marginal x₀ m = pU m >>= kY m
 
@@ -71,17 +73,17 @@ module _ {ℓu ℓx ℓy} {U : Type ℓu} {X : Type ℓx} {Y : Type ℓy} where
     → do-Y-marginal x₀ m ≡ do-Y-marginal x₁ m
   do-Y-marginal-invariant x₀ x₁ m = refl
 
-  -- do-Y-marginal really is the Y-marginal of the intervened joint:
-  -- mapF snd of do-joint reduces, by the monad laws, to pU >>= kY.
+  -- do-Y-marginal is the Y-marginal of the intervened joint.  By
+  -- the monad laws, mapF snd of do-joint reduces to pU >>= kY.
   do-Y-marginal-is-joint : (x₀ : X) (m : Confounded U X Y)
     → mapF snd (do-joint x₀ m) ≡ do-Y-marginal x₀ m
   do-Y-marginal-is-joint x₀ m =
       >>=-assoc (pU m) (λ u → mapF (x₀ ,_) (kY m u)) (λ a → pure (snd a))
     ∙ cong (pU m >>=_) (funExt λ u → mapF-snd-pair x₀ (kY m u))
 
-  -- hence the Y-marginal of the intervened joint does not depend on x₀:
-  -- the do-side invariance, now stated of the joint's marginal, not of
-  -- a standalone definition.
+  -- So the Y-marginal of the intervened joint does not depend on
+  -- x₀.  The invariance is now stated of the joint's marginal, and
+  -- no longer of a standalone definition.
   do-joint-Y-invariant : (x₀ x₁ : X) (m : Confounded U X Y)
     → mapF snd (do-joint x₀ m) ≡ mapF snd (do-joint x₁ m)
   do-joint-Y-invariant x₀ x₁ m =
@@ -89,9 +91,10 @@ module _ {ℓu ℓx ℓy} {U : Type ℓu} {X : Type ℓx} {Y : Type ℓy} where
     ∙ do-Y-marginal-invariant x₀ x₁ m
     ∙ sym (do-Y-marginal-is-joint x₁ m)
 
-  -- Bridge to the classifier: under do(X := x₀) the X-marginal is the
-  -- point mass at x₀ — deterministically the value that DoClassifier's
-  -- χ classifies as ⊤.  So χ is the Ω-name of what the surgery forces.
+  -- Bridge to the classifier.  Under do(X := x₀) the X-marginal is
+  -- the point mass at x₀, which is the value that DoClassifier's χ
+  -- classifies as ⊤.  So χ is the Ω-name of what the surgery
+  -- forces.
   do-fixes-X : (x₀ : X) (m : Confounded U X Y)
     → mapF fst (do-joint x₀ m) ≡ pure x₀
   do-fixes-X x₀ m =
@@ -103,7 +106,7 @@ module _ {ℓu ℓx ℓy} {U : Type ℓu} {X : Type ℓx} {Y : Type ℓy} where
 
 -- ============================================================
 -- Event indicators.  The probability of an event is the
--- expectation of its {0,1}-valued indicator (𝔼 · indicator).
+-- expectation 𝔼 of its {0,1}-valued indicator.
 -- ============================================================
 
 ind11 : Bool × Bool → Weight        -- indicator of {X = ⊤ ∧ Y = ⊤}
@@ -120,8 +123,9 @@ indYtrue (_ , true)  = w1
 indYtrue (_ , false) = w0
 
 -- ============================================================
--- The perfectly-correlating binary confounder, for an interior
--- prior p on the common cause (0 < p < 1):  U ~ (p : ⊤), X = U, Y = U.
+-- The perfectly correlating binary confounder, for an interior
+-- prior p on the common cause, so 0 < p < 1.  Here U ~ (p : ⊤),
+-- X = U and Y = U.
 -- ============================================================
 
 module DoSee (p : Weight) (pp : Pos p) (p≢1 : ¬ (p ≡ w1)) where
@@ -130,7 +134,7 @@ module DoSee (p : Weight) (pp : Pos p) (p≢1 : ¬ (p ≡ w1)) where
   bc = record { pU = mix p (pure true) (pure false)
               ; kX = pure ; kY = pure }
 
-  -- read-out of a two-point expectation:  mix-w p w1 w0 ≡ p.
+  -- read-out of a two-point expectation:  mix-w p w1 w0 ≡ p
   readout : mix-w p w1 w0 ≡ p
   readout = mix-w-right-w0 p w1 ∙ *w-1 p
 
@@ -173,7 +177,7 @@ module DoSee (p : Weight) (pp : Pos p) (p≢1 : ¬ (p ≡ w1)) where
   condProb : Weight
   condProb = N /wPf D ⟨ posD , leND ⟩
 
-  -- observing X = ⊤ forces Y = ⊤: the conditional is the point mass 1.
+  -- Observing X = ⊤ forces Y = ⊤, so the conditional is 1.
   condProb≡w1 : condProb ≡ w1
   condProb≡w1 = WeightPath
     ( cong (_/r val D) valN≡valD
@@ -181,16 +185,16 @@ module DoSee (p : Weight) (pp : Pos p) (p≢1 : ¬ (p ≡ w1)) where
     ∙ ·r-/r-pos posD z1 )
 
   -- ----------------------------------------------------------
-  -- The theorem: intervening differs from observing.  do gives the
-  -- prior p; see gives 1; and p ≠ 1.
+  -- The theorem.  Intervening differs from observing.  The do-side
+  -- value is the prior p, the observational value is 1, and p ≠ 1.
   -- ----------------------------------------------------------
 
   do≢see : ¬ (𝔼 (do-joint true bc) indYtrue ≡ condProb)
   do≢see e = p≢1 (sym Pr-Y-do ∙ e ∙ condProb≡w1)
 
 -- ============================================================
--- Non-vacuity: the interior strength ½ inhabits the hypotheses,
--- so a confounded model on which do ≠ see exists.
+-- Non-vacuity.  The interior strength ½ inhabits the hypotheses,
+-- so a confounded model with do ≠ see exists.
 -- ============================================================
 
 module Half = DoSee wHalf Pos-wHalf wHalf≢w1

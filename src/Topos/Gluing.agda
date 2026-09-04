@@ -2,23 +2,24 @@
 
 -- ============================================================
 -- Topos.Gluing — the third Mahadevan pillar: sheaf gluing of
--- independent mechanisms, made rigorous.
+-- independent mechanisms, as a pullback.
 --
--- Mahadevan's TCM paper (arXiv:2508.08295, §6) PROMISES that
+-- Mahadevan's TCM paper (arXiv:2508.08295, §6) states that
 -- "local functions can be collated together to yield a unique
--- global function" via sheaf theory, but states it only as prose
--- — no theorem, and the Grothendieck-topology vocabulary it
--- introduces is never instantiated.  In a presheaf topos the
--- collation is in fact a LIMIT, computed pointwise; no topology or
--- sheafification is needed.
+-- global function" by sheaf theory.  It states this in prose and
+-- proves no theorem, and it does not instantiate the
+-- Grothendieck-topology vocabulary it introduces.  In a presheaf
+-- topos the collation is a limit, computed pointwise.  No
+-- topology and no sheafification are needed.
 --
--- Here we give the limit form precisely: the PULLBACK of two
--- mechanisms p : X ⇒ Z, q : Y ⇒ Z — local data on X and on Y that
--- AGREE on the shared overlap Z — together with its universal
--- property: any cone (two mechanisms agreeing on Z) factors
--- through a UNIQUE global mechanism into the pullback.  This is the
--- "agree on overlap ⟹ unique glued section" content of gluing,
--- holding in the bare presheaf topos.
+-- This module gives that limit.  Take two mechanisms
+-- p : X ⇒ Z and q : Y ⇒ Z.  This is local data on X and on Y
+-- that agrees on the shared overlap Z.  Their pullback exists,
+-- and it has the universal property: any cone, that is any two
+-- mechanisms agreeing on Z, factors through a unique global
+-- mechanism into the pullback.  That is the content of gluing,
+-- "agree on overlap ⟹ unique glued section", and it holds in
+-- the bare presheaf topos.
 -- ============================================================
 
 module Topos.Gluing where
@@ -74,16 +75,16 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     π₂ : Nat Pullback Y
     π₂ = (λ c w → snd (fst w)) , (λ x y f w → refl)
 
-    -- the pullback square commutes: p ∘ π₁ = q ∘ π₂ (pointwise),
-    -- which is exactly the stored agreement witness.
+    -- The pullback square commutes pointwise: p ∘ π₁ = q ∘ π₂.
+    -- The proof is the stored agreement witness.
     square : (c : Ob) (w : PB₀ c)
            → fst p c (fst π₁ c w) ≡ fst q c (fst π₂ c w)
     square c w = snd w
 
     -- ----------------------------------------------------------
     -- Universal property.  A cone over (p,q) is a context A with
-    -- two mechanisms a : A ⇒ X, b : A ⇒ Y agreeing on Z.  It
-    -- collates to a UNIQUE global mechanism A ⇒ Pullback.
+    -- two mechanisms a : A ⇒ X and b : A ⇒ Y that agree on Z.
+    -- It collates to a unique global mechanism A ⇒ Pullback.
     -- ----------------------------------------------------------
     module _ {ℓA} {A : PSh C ℓA} (a : Nat A X) (b : Nat A Y)
              (comm : (c : Ob) (z : F₀ A c)
@@ -104,7 +105,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
       glue-π₂ : (c : Ob) (z : F₀ A c) → fst π₂ c (fst glue c z) ≡ fst b c z
       glue-π₂ c z = refl
 
-      -- uniqueness: any mechanism whose projections are a and b IS glue
+      -- uniqueness: a mechanism whose projections are a and b
+      -- equals glue
       glue-uniq : (u : Nat A Pullback)
                 → ((c : Ob) (z : F₀ A c) → fst π₁ c (fst u c z) ≡ fst a c z)
                 → ((c : Ob) (z : F₀ A c) → fst π₂ c (fst u c z) ≡ fst b c z)

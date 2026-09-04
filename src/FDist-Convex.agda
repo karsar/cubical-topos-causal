@@ -18,11 +18,12 @@ open import Cubical.Data.Empty as Empty using () renaming (rec to ⊥-rec)
 -- DESIGN PRINCIPLE
 -- ================
 -- The original FDist.agda exposes _+w_ : Weight → Weight → Weight
--- as a TOTAL operation, but its actual usage is restricted to
--- convex-combination patterns (p·a + (1-p)·b) where the sum
--- stays in [0,1]. This restriction was metatheoretic.
+-- as a total operation.  Every use of it is a convex-combination
+-- pattern (p·a + (1-p)·b), where the sum stays in [0,1].  That
+-- restriction was a metatheoretic side condition, outside the
+-- types.
 --
--- This file replaces the unrestricted _+w_ with a CONSTRAINED
+-- This file replaces the unrestricted _+w_ with a constrained
 -- convex-combination primitive
 --
 --     mix-w : (p a b : Weight) → Weight
@@ -34,33 +35,36 @@ open import Cubical.Data.Empty as Empty using () renaming (rec to ⊥-rec)
 --     normalize : (num den : Weight) → Pos den → num ≤w den → Weight
 --                 ≡ num / den       [interpretation]
 --
--- Multiplication _*w_ is kept as a primitive (sound: p · q ∈ [0,1]
--- when p, q ∈ [0,1]). Addition _+w_ is NOT exposed.
+-- Multiplication _*w_ stays a primitive.  It is sound, because
+-- p · q ∈ [0,1] whenever p, q ∈ [0,1].  Addition _+w_ is not
+-- exposed.
 --
--- SOUNDNESS GAINS
--- ===============
---   * The two WeightQ.agda contracts disappear.
---   * +w-cancel-l vs saturation tension dissolves.
---   * Type-level bound enforcement is structural, not metatheoretic.
---   * Convex algebra axioms map directly to Stone (1949) and
+-- CONSEQUENCES FOR SOUNDNESS
+-- ==========================
+--   * The two WeightQ.agda contracts are no longer needed.
+--   * The conflict between +w-cancel-l and saturation does not
+--     arise, since no unrestricted sum is available.
+--   * The [0,1] bound is enforced by the types, so no
+--     metatheoretic side condition is required.
+--   * The convex-algebra axioms match Stone (1949) and
 --     Świrszcz (1974).
 -- ============================================================
 
 -- ============================================================
 -- Section 1: Weight interface, imported from WeightQ-Convex.agda.
 --
--- Previously, this section postulated the Weight type and its
--- algebraic axioms abstractly. We now import them from
--- WeightQ-Convex.agda, which derives them as theorems from the
--- WeightQ.agda model (Weight ≃ ℝ ∩ [0,1] for an abstract ordered
--- field ℝ; canonical instance ℚ in WeightQ-Discharge.agda).
+-- This section once postulated the Weight type and its algebraic
+-- axioms.  We now import them from WeightQ-Convex.agda, which
+-- derives them as theorems from the WeightQ.agda model.  In that
+-- model Weight ≃ ℝ ∩ [0,1] for an ordered field ℝ, and the
+-- canonical instance of ℝ is ℚ, built in WeightQ-Discharge.agda.
 --
--- The development is now self-contained: every Weight-level
--- axiom previously postulated here is a theorem of the WeightQ
--- model layer.
+-- The development is self-contained.  Every Weight-level axiom
+-- once postulated here is a theorem of the WeightQ model layer.
 -- ============================================================
 
--- Ordered-field primitives needed for the mix-w-bayes-interchange-eq derivation.
+-- Ordered-field primitives used by the
+-- mix-w-bayes-interchange-eq derivation.
 open import WeightQ
   using ( val ; mkW ; WeightPath
         ; _+r_ ; _·r_ ; 1-r
@@ -100,9 +104,9 @@ open import WeightQ-Convex public
 -- ============================================================
 -- Section 3: Skew-associativity (Stone 1949), positive case only.
 --
--- mix-w-assoc-pos is now derived as a theorem in WeightQ-Convex.agda
--- (lifted from a ℝ-level proof using sof-rof, sof-1-rof, 1-w-s-of).
--- It is imported above.
+-- mix-w-assoc-pos is derived as a theorem in
+-- WeightQ-Convex.agda.  It is lifted from an ℝ-level proof that
+-- uses sof-rof, sof-1-rof, and 1-w-s-of.  It is imported above.
 -- ============================================================
 
 -- ============================================================
@@ -111,7 +115,8 @@ open import WeightQ-Convex public
 
 -- mix-w-bdy1 already exported from WeightQ-Convex.
 
--- pos-*w-factor-l derived later (after weight-trichotomy-zero is in scope).
+-- pos-*w-factor-l is derived later, once weight-trichotomy-zero
+-- is in scope.
 
 -- weight-trichotomy-zero: every weight is positive or zero.
 weight-trichotomy-zero : ∀ p → Pos p ⊎ (p ≡ w0)
@@ -125,9 +130,10 @@ pos-w1 with weight-trichotomy w0
 ... | inl w0≡w1 = ⊥-rec (w0≢w1 w0≡w1)
 ... | inr Pos-1-w0 = subst Pos 1-w-0 Pos-1-w0
 
--- pos-*w-factor-l derived from weight-trichotomy-zero + ¬Pos-w0:
--- Suppose Pos (p *w q). Either Pos p (done) or p ≡ w0. In the
--- latter case p *w q ≡ w0 *w q ≡ q *w w0 ≡ w0, contradicting ¬Pos-w0.
+-- pos-*w-factor-l, derived from weight-trichotomy-zero and
+-- ¬Pos-w0.  Suppose Pos (p *w q).  Then either Pos p, which is
+-- the goal, or p ≡ w0.  In the second case
+-- p *w q ≡ w0 *w q ≡ q *w w0 ≡ w0, which contradicts ¬Pos-w0.
 pos-*w-factor-l : ∀ {p q} → Pos (p *w q) → Pos p
 pos-*w-factor-l {p} {q} pp with weight-trichotomy-zero p
 ... | inl pos-p = pos-p
@@ -140,7 +146,8 @@ pos-*w-factor-l {p} {q} pp with weight-trichotomy-zero p
 pos-*w-factor-r : ∀ {p q} → Pos (p *w q) → Pos q
 pos-*w-factor-r {p} {q} pp = pos-*w-factor-l {q} {p} (subst Pos (*w-comm p q) pp)
 
--- Helper: normalize is well-defined modulo isProp on the ≤w proof.
+-- Helper: normalize does not depend on the ≤w proof, because
+-- ≤w is propositional.
 normalize-cong : ∀ z₁ z₂ p (pp : Pos p)
               → (le₁ : z₁ ≤w p) (le₂ : z₂ ≤w p)
               → (z-eq : z₁ ≡ z₂)
@@ -216,13 +223,14 @@ bayesW-num-≤-den p wA wB =
 bayesW : ∀ p wA wB → Pos (mix-w p wA wB) → Weight
 bayesW p wA wB pZ = normalize (p *w wA) (mix-w p wA wB) pZ (bayesW-num-≤-den p wA wB)
 
--- bayesW round-trip identities (moved earlier so mix-w-bayes-interchange-eq
--- below can reference them). The derivations are unchanged from the
--- original location (Section 16, now removed); these two lemmas only
--- depend on bayesW + the WeightQ-Convex helpers normalize-*w-back and
+-- bayesW round-trip identities.  They were moved up so that
+-- mix-w-bayes-interchange-eq below can refer to them.  The
+-- derivations are the same as in their original place, the
+-- removed Section 16.  The two lemmas use only bayesW and the
+-- WeightQ-Convex helpers normalize-*w-back and
 -- bayesW-complement-abstract.
 
--- bayesW *w Z = p *w t₁ (direct from normalize-*w-back).
+-- bayesW *w Z = p *w t₁, direct from normalize-*w-back.
 bayesW-*w-Z : ∀ p t₁ t₂ (pTM : Pos (mix-w p t₁ t₂))
             → bayesW p t₁ t₂ pTM *w (mix-w p t₁ t₂) ≡ p *w t₁
 bayesW-*w-Z p t₁ t₂ pTM = normalize-*w-back (p *w t₁) (mix-w p t₁ t₂) pTM
@@ -251,15 +259,17 @@ data FDist {ℓ} (A : Type ℓ) : Type ℓ where
     → mix p a (mix q b c) ≡ mix (s-of p q) (mix (r-of p q ps) a b) c
   mix-interchange : ∀ p q a b c d
     → mix p (mix q a b) (mix q c d) ≡ mix q (mix p a c) (mix p b d)
-  -- The generalized Bayesian interchange: rearranges a 4-leaf mix tree
-  -- with DISTINCT inner weights related by Bayes' formula. The standard
-  -- mix-interchange above is the degenerate special case q₁ ≡ q₂.
-  -- This is the structurally additional axiom needed for full Bayesian
-  -- conditioning at the HIT level (paper's central observation).
-  -- Positivity preconditions on both mix-w composites: the outer weight
-  -- M = mix-w p q₁ q₂ and its complement 1-M = mix-w p (1-q₁) (1-q₂)
-  -- must be positive for the Bayesian-rebalanced inner weights to be
-  -- defined (FDist-Convex's bayesW requires Pos (mix-w p wA wB)).
+  -- The generalized Bayesian interchange.  It rearranges a
+  -- 4-leaf mix tree whose inner weights are distinct and related
+  -- by Bayes' formula.  The mix-interchange above is the special
+  -- case q₁ ≡ q₂.  This constructor is the extra axiom that full
+  -- Bayesian conditioning needs at the HIT level.  The paper
+  -- takes it as its starting point.
+  -- Both mix-w composites carry a positivity precondition.  The
+  -- outer weight M = mix-w p q₁ q₂ and its complement
+  -- 1-M = mix-w p (1-q₁) (1-q₂) must be positive, or the
+  -- Bayesian-rebalanced inner weights are undefined: the bayesW
+  -- of FDist-Convex requires Pos (mix-w p wA wB).
   mix-bayes-interchange : ∀ p q₁ q₂
     (pM : Pos (mix-w p q₁ q₂))
     (pM' : Pos (mix-w p (1-w q₁) (1-w q₂)))
@@ -274,28 +284,29 @@ data FDist {ℓ} (A : Type ℓ) : Type ℓ where
 -- ============================================================
 -- Section 8: Expectation 𝔼.
 --
--- Defined by HIT recursion. EACH path-constructor case (except
--- mix-bayes-interchange) is a DIRECT application of the
--- corresponding mix-w convex algebra axiom — in stark contrast
--- to the OLD FDist.agda where each case required a derived
--- weight-arithmetic theorem.
+-- Defined by HIT recursion.  Every path-constructor case, apart
+-- from mix-bayes-interchange, applies the matching mix-w convex
+-- algebra axiom directly.  In the old FDist.agda each case
+-- needed a derived weight-arithmetic theorem instead.
 --
--- The mix-bayes-interchange case requires the weight-level
--- Bayesian interchange identity, which is the algebraic
--- counterpart of the new HIT path constructor. Derivable from
--- the ordered-field axioms by distributivity + commutativity +
--- the bayesW definition; the algebraic chain unfolds both sides
--- of the identity into ∑(p·q·e) terms and verifies they agree
--- modulo reordering. Postulated here pending the full derivation
--- (paper's "Limitations" item: the consistency of the augmented
--- HIT rests on the universal-algebra construction of free convex
--- algebras with the Bayesian-decomposition theory).
+-- The mix-bayes-interchange case needs the weight-level Bayesian
+-- interchange identity, the algebraic counterpart of the new HIT
+-- path constructor.  It is derivable from the ordered-field
+-- axioms, using distributivity, commutativity, and the
+-- definition of bayesW.  The algebraic chain unfolds both sides
+-- into ∑(p·q·e) terms and checks that they agree up to
+-- reordering.  It is postulated here, pending the full
+-- derivation.  This is the "Limitations" item in the paper: the
+-- consistency of the augmented HIT rests on the universal-algebra
+-- construction of free convex algebras with the
+-- Bayesian-decomposition theory.
 -- ============================================================
 
--- The weight-level Bayesian interchange identity, derived from the
--- ordered-field axioms. The proof drops to val level via WeightPath
--- and chains through ·r-distR + +r-medial + ·r-assoc + the four
--- bayesW round-trips lifted from Weight level via cong val.
+-- The weight-level Bayesian interchange identity, derived from
+-- the ordered-field axioms.  The proof drops to the val level
+-- through WeightPath.  It then chains ·r-distR, +r-medial,
+-- ·r-assoc, and the four bayesW round-trips, each lifted from
+-- the Weight level by cong val.
 mix-w-bayes-interchange-eq : ∀ p q₁ q₂
   (pM : Pos (mix-w p q₁ q₂))
   (pM' : Pos (mix-w p (1-w q₁) (1-w q₂)))
@@ -317,14 +328,16 @@ mix-w-bayes-interchange-eq p q₁ q₂ pM pM' ea eb ec ed = WeightPath chain
     bw1v = val (bayesW p q₁ q₂ pM)
     bw2v = val (bayesW p (1-w q₁) (1-w q₂) pM')
 
-    -- 1-r Mv ≡ val (mix-w p (1-w q₁) (1-w q₂)) (from 1-w-mix-w lifted to val).
+    -- 1-r Mv ≡ val (mix-w p (1-w q₁) (1-w q₂)), from 1-w-mix-w
+    -- lifted to val.
     1-Mv-eq : (1-r Mv) ≡ val (mix-w p (1-w q₁) (1-w q₂))
     1-Mv-eq = cong val (1-w-mix-w p q₁ q₂)
 
-    -- The four bayesW round-trip bridges, at val level.
-    -- Each is obtained by lifting the corresponding Weight-level
-    -- bayesW-*w-Z / bayesW-complement via cong val, then ·r-comm.
-    -- Bridges 3, 4 additionally bridge val (mix-w p (1-q₁) (1-q₂)) ≡ 1-r Mv.
+    -- The four bayesW round-trip bridges, at the val level.
+    -- Each one lifts the matching Weight-level bayesW-*w-Z or
+    -- bayesW-complement by cong val, then applies ·r-comm.
+    -- Bridges 3 and 4 also cross
+    -- val (mix-w p (1-q₁) (1-q₂)) ≡ 1-r Mv.
     bridge1 : pv ·r q₁v ≡ Mv ·r bw1v
     bridge1 = sym (cong val (bayesW-*w-Z p q₁ q₂ pM)) ∙ ·r-comm bw1v Mv
 
@@ -355,7 +368,8 @@ mix-w-bayes-interchange-eq p q₁ q₂ pM pM' ea eb ec ed = WeightPath chain
                   (pv ·r ((1-r q₁v) ·r ecv))
                   ((1-r pv) ·r (q₂v ·r ebv))
                   ((1-r pv) ·r ((1-r q₂v) ·r edv))
-      -- Step 3: ·r-assoc to canonicalize each monomial as (scalar)·(variable)
+      -- Step 3: ·r-assoc, to put each monomial in the form
+      -- (scalar)·(variable)
       ∙ cong₂ _+r_
           (cong₂ _+r_
             (·r-assoc pv q₁v eav)
@@ -410,7 +424,8 @@ open import Cubical.Data.Nat using (ℕ; zero; suc)
 open import Cubical.Data.Empty as E using ()
 open import Cubical.Relation.Nullary using (Dec; yes; no)
 
--- δ : indicator function. δ a₀ a = w1 if a ≡ a₀, else w0.
+-- δ : the indicator function.  δ a₀ a = w1 when a ≡ a₀, and w0
+-- otherwise.
 δ : ∀ {n} → Fin n → Fin n → Weight
 δ a₀ a with discreteFin a a₀
 ... | yes _ = w1
@@ -428,15 +443,16 @@ open import Cubical.Relation.Nullary using (Dec; yes; no)
 ... | yes p = E.rec (¬p p)
 ... | no _  = refl
 
--- mass: probability mass function via expectation of indicator.
+-- mass: the probability mass function, as the expectation of an
+-- indicator.
 mass : ∀ {n} → FDist (Fin n) → Fin n → Weight
 mass d a = 𝔼 d (δ a)
 
--- mass commutes with mix constructor (definitional via 𝔼).
--- KEY OBSERVATION: in the OLD framing, mass-mix was a complex
--- statement involving _+w_ and _*w_. In the NEW framing, it
--- collapses to a SINGLE mix-w application — and is REFL because
--- 𝔼's mix case is exactly this convex combination.
+-- mass commutes with the mix constructor.  The equation holds
+-- definitionally, through 𝔼.
+-- In the old framing mass-mix was stated with _+w_ and _*w_.
+-- Here it is one mix-w application, and the proof is refl,
+-- because the mix case of 𝔼 is that same convex combination.
 mass-mix : ∀ {n} (p : Weight) (d₁ d₂ : FDist (Fin n)) (a : Fin n)
   → mass (mix p d₁ d₂) a ≡ mix-w p (mass d₁ a) (mass d₂ a)
 mass-mix p d₁ d₂ a = refl
@@ -448,31 +464,33 @@ mass-pure a₀ a = refl
 -- ============================================================
 -- Section 10: Total mass is w1.
 --
--- For any distribution d : FDist (Fin n), the sum of masses
--- equals w1. In the OLD framing, this was Σ-Fin (mass d) ≡ w1,
--- proved by induction on the HIT and using +w properties. In
--- the NEW framing, we compute the total mass via 𝔼:
+-- For any distribution d : FDist (Fin n), the masses sum to w1.
+-- In the old framing this was Σ-Fin (mass d) ≡ w1, proved by
+-- induction on the HIT with the +w properties.  Here we compute
+-- the total mass with 𝔼:
 --
 --    total-mass d = 𝔼 d (λ _ → w1)
 --
--- and this equals w1 by 𝔼's mix-w-idem case (mix-w p w1 w1 ≡ w1).
+-- and this equals w1 by the mix-w-idem case of 𝔼, since
+-- mix-w p w1 w1 ≡ w1.
 -- ============================================================
 
 total-mass : ∀ {ℓ} {A : Type ℓ} → FDist A → Weight
 total-mass d = 𝔼 d (λ _ → w1)
 
--- The total mass is identically w1.
--- We prove this via well-founded recursion on Acc-FDist (below).
--- The direct structural recursion fails because mix-assoc-pos's
--- right-hand side is a syntactically-larger mix expression.
+-- The total mass is w1 for every distribution.
+-- We prove this by well-founded recursion on Acc-FDist, below.
+-- Direct structural recursion fails, because the right-hand side
+-- of mix-assoc-pos is a syntactically larger mix expression.
 
 -- ============================================================
 -- Section 7.1: Acc-FDist (well-founded recursion).
 --
--- Acc-FDist is a propositional accessibility predicate that
--- enables structural recursion on FDist while bypassing the
--- termination issues introduced by path constructors whose
--- endpoints are syntactically larger (e.g., mix-assoc-pos).
+-- Acc-FDist is a propositional accessibility predicate.  It
+-- allows structural recursion on FDist.  Some path constructors
+-- have an endpoint that is syntactically larger, mix-assoc-pos
+-- among them, and the predicate avoids the termination problem
+-- they cause.
 -- ============================================================
 
 data Acc-FDist {ℓ} {A : Type ℓ} : FDist A → Type ℓ where
@@ -540,7 +558,7 @@ acc (trunc d₁ d₂ p q i j) =
     refl refl i j
 
 -- ============================================================
--- total-mass-≡-w1: now derived via well-founded recursion.
+-- total-mass-≡-w1, derived by well-founded recursion.
 -- ============================================================
 
 -- First, a helper that recurses on Acc-FDist.
@@ -588,11 +606,11 @@ mapF f d = d >>= (λ a → pure (f a))
 --
 -- 𝔼 (d >>= k) f ≡ 𝔼 d (λ a → 𝔼 (k a) f)
 --
--- This is a fundamental Fubini-style theorem. In the OLD framing,
--- the path-constructor cases each required a derived weight-
--- arithmetic identity. In the NEW framing, the proof is a clean
--- well-founded recursion on Acc-FDist, with each path-constructor
--- case discharged propositionally via isSetWeight.
+-- This is a Fubini-style theorem.  In the old framing each
+-- path-constructor case needed a derived weight-arithmetic
+-- identity.  Here the proof is a well-founded recursion on
+-- Acc-FDist, and each path-constructor case is discharged
+-- propositionally by isSetWeight.
 -- ============================================================
 
 𝔼-bind-WF : ∀ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'}
@@ -613,8 +631,8 @@ mapF f d = d >>= (λ a → pure (f a))
 𝔼-bind d k f = 𝔼-bind-WF d (acc d) k f
 
 -- 𝔼-mapF: expectation under mapF reduces to pre-composition.
--- One-line corollary of 𝔼-bind (since mapF f d = d >>= pure ∘ f
--- and 𝔼 (pure (f a)) g = g (f a) by definition).
+-- It is a corollary of 𝔼-bind, since mapF f d = d >>= pure ∘ f
+-- and 𝔼 (pure (f a)) g = g (f a) by definition.
 𝔼-mapF : ∀ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'}
        → (d : FDist A) (f : A → B) (g : B → Weight)
        → 𝔼 (mapF f d) g ≡ 𝔼 d (λ a → g (f a))
@@ -626,9 +644,10 @@ total-mass-mapF : ∀ {ℓ ℓ'} {A : Type ℓ} {B : Type ℓ'}
                 → total-mass (mapF f d) ≡ total-mass d
 total-mass-mapF d f = 𝔼-mapF d f (λ _ → w1)
 
--- mass under a Fin-valued mapF: relates to indicator pre-image.
--- mass (mapF f d) b = 𝔼 d (λ a → δ b (f a)).
--- (Useful for mass-mapF-fsuc-fzero etc. in Representation.agda.)
+-- mass under a Fin-valued mapF, in terms of the indicator on the
+-- pre-image: mass (mapF f d) b = 𝔼 d (λ a → δ b (f a)).
+-- Used by mass-mapF-fsuc-fzero and similar lemmas in
+-- Representation.agda.
 mass-mapF : ∀ {n m} (d : FDist (Fin n)) (f : Fin n → Fin m) (b : Fin m)
           → mass (mapF f d) b ≡ 𝔼 d (λ a → δ b (f a))
 mass-mapF d f b = 𝔼-mapF d f (δ b)
@@ -654,7 +673,8 @@ mass-mapF d f b = 𝔼-mapF d f (δ b)
        → 𝔼 d f ≤w 𝔼 d g
 𝔼-mono d f g f≤g = 𝔼-mono-WF d (acc d) f g f≤g
 
--- 𝔼 of a constant function is the constant. Generalizes total-mass-≡-w1.
+-- 𝔼 of a constant function is that constant.  This generalizes
+-- total-mass-≡-w1.
 𝔼-const-WF : ∀ {ℓ} {A : Type ℓ} (d : FDist A) → Acc-FDist d
            → (c : Weight) → 𝔼 d (λ _ → c) ≡ c
 𝔼-const-WF .(pure a) (acc-pure a) c = refl
@@ -674,9 +694,9 @@ mass-mapF d f b = 𝔼-mapF d f (δ b)
 --
 -- 𝔼 d (λ a → 1-w (f a)) ≡ 1-w (𝔼 d f)
 --
--- This is the convex-algebra version of "expectation distributes
--- over complement". The proof is by HIT recursion using Acc-FDist
--- and the 1-w-mix-w axiom.
+-- This is the convex-algebra form of "expectation distributes
+-- over complement".  The proof is HIT recursion with Acc-FDist,
+-- using the 1-w-mix-w axiom.
 -- ============================================================
 
 𝔼-1-w-WF : ∀ {ℓ} {A : Type ℓ} (d : FDist A) → Acc-FDist d
@@ -698,10 +718,10 @@ mass-mapF d f b = 𝔼-mapF d f (δ b)
 -- ============================================================
 -- Section 11: Tail mass.
 --
--- For a distribution d on Fin (suc n), the "head probability" is
--- mass d fzero, and the "tail probability" is its complement.
--- This complementary structure is fundamental to representation
--- theorems on Fin (suc n).
+-- For a distribution d on Fin (suc n), the head probability is
+-- mass d fzero, and the tail probability is its complement.  The
+-- representation theorems on Fin (suc n) are stated in terms of
+-- this split.
 -- ============================================================
 
 head-mass : ∀ {n} → FDist (Fin (suc n)) → Weight
@@ -718,21 +738,21 @@ tail-mass d = 1-w head-mass d
 --
 --    renorm-tail d k = mass d (fsuc k) / tail-mass d
 --
--- Defined via the constrained `normalize` primitive. The
--- precondition mass d (fsuc k) ≤w tail-mass d is sound:
--- the mass at any position is bounded by the total tail mass
--- (which is the sum of all tail masses, including this one).
+-- It is defined with the constrained `normalize` primitive.  The
+-- precondition mass d (fsuc k) ≤w tail-mass d holds because the
+-- mass at one position is at most the total tail mass, which is
+-- the sum of all tail masses, this one included.
 --
--- The precondition is established by a structural property of
--- 𝔼: for any indicator-like function g (where g a ∈ [0,1]),
--- 𝔼 d g ≤ 𝔼 d (λ _ → w1) = w1, and the mass at one point is
--- bounded by the cumulative mass of any superset.
+-- The precondition follows from a structural property of 𝔼.  For
+-- an indicator-like function g, with g a ∈ [0,1], we have
+-- 𝔼 d g ≤ 𝔼 d (λ _ → w1) = w1.  The mass at one point is at most
+-- the cumulative mass of any set containing it.
 -- ============================================================
 
--- mass-fsuc-≤-tail: the tail mass dominates any individual mass at fsuc k.
--- Derived via 𝔼-mono and 𝔼-1-w.
+-- mass-fsuc-≤-tail: the tail mass is at least the individual
+-- mass at fsuc k.  Derived from 𝔼-mono and 𝔼-1-w.
 --
--- Strategy:
+-- Outline:
 --   tail-mass d = 1-w mass d fzero = 1-w 𝔼 d (δ fzero)
 --               = 𝔼 d (λ a → 1-w (δ fzero a))    [by sym 𝔼-1-w]
 --   mass d (fsuc k) = 𝔼 d (δ (fsuc k))
@@ -741,8 +761,8 @@ tail-mass d = 1-w head-mass d
 --     - a = fsuc m: δ (fsuc k) (fsuc m) ∈ {w0, w1}; 1-w (δ fzero (fsuc m)) = w1.
 --   Apply 𝔼-mono.
 
--- Helper: standard Fin property — fzero ≢ fsuc k.
--- Derived from nat-znots applied to toℕ.
+-- Helper: the standard Fin property fzero ≢ fsuc k.  Derived
+-- from nat-znots applied to toℕ.
 fzero≢fsuc : ∀ {n} {k : Fin n} → ¬ (fzero ≡ fsuc k)
 fzero≢fsuc {n} {k} p = nat-znots (cong toℕ p)
   where
@@ -775,7 +795,8 @@ mass-fsuc-≤-tail d k =
         (𝔼-mono d (δ (fsuc k)) (λ a → 1-w (δ fzero a))
                 (δ-fsuc-≤-1-w-δ-fzero k))
 
--- renorm-tail: the normalized tail kernel, requires Pos tail-mass.
+-- renorm-tail: the normalized tail kernel.  It requires
+-- Pos tail-mass.
 renorm-tail : ∀ {n} → (d : FDist (Fin (suc n)))
             → Pos (tail-mass d) → Fin n → Weight
 renorm-tail d pt k = normalize (mass d (fsuc k)) (tail-mass d) pt
@@ -784,79 +805,55 @@ renorm-tail d pt k = normalize (mass d (fsuc k)) (tail-mass d) pt
 -- ============================================================
 -- Section 13a: Bayesian-projection axioms.
 --
--- These three axioms package the "renormalized tail FDist exists"
--- and "mass is injective on FDist (Fin n)" properties of the
--- convex algebra. They are part of the FDist interface presented
--- here; in any concrete model where Weight is realized as a
--- subset of [0,1] (with a renormalization-respecting model of
--- normalize), all three follow from standard arithmetic.
+-- These three axioms record two properties of the convex
+-- algebra.  The renormalized tail FDist exists, and mass is
+-- injective on FDist (Fin n).  Injectivity comes from the round
+-- trip, which says that build is the inverse of toPMF.  The
+-- three axioms belong to the FDist interface presented here.  Take any concrete model where Weight is a
+-- subset of [0,1], with a model of normalize that respects
+-- renormalization.  In such a model all three follow from
+-- standard arithmetic.
 --
 -- Specifically:
 --
 -- * renorm-tail-FDist constructs the FDist of the renormalized
---   tail. In a [0,1] model, this is built by iterated mix
---   (head + recursively-renormalized tail) using the Bayesian
---   formula at each level. The formal Cubical Agda construction
---   requires either sized types or explicit accessibility on
---   (n, depth) pairs.
+--   tail.  In a [0,1] model it is built by iterated mix, a head
+--   together with a recursively renormalized tail, using the
+--   Bayesian formula at each level.  The formal Cubical Agda
+--   construction needs either sized types or explicit
+--   accessibility on (n, depth) pairs.
 --
--- * renorm-tail-FDist-mass-eq characterizes the masses of the
---   renormalized tail. In a [0,1] model, this is just the
---   definition of the iterative construction.
+-- * renorm-tail-FDist-mass-eq describes the masses of the
+--   renormalized tail.  In a [0,1] model it is the definition of
+--   the iterative construction.
 --
--- * mass-injective is the central representation theorem: distinct
---   FDists have distinct mass functions. In a [0,1] model with a
---   well-defined normalize, this follows from the round-trip
---   d ≡ build (toPMF d), whose Cubical Agda derivation requires
---   roughly 1500 lines of HIT recursion (see the OLD framework's
---   Representation.agda for the full proof).
+-- * mass-injective is the representation theorem.  Distinct
+--   FDists have distinct mass functions.  In a [0,1] model with
+--   a well-defined normalize it follows from the round trip
+--   d ≡ build (toPMF d).  The Cubical Agda derivation of that
+--   round trip takes about 1500 lines of HIT recursion; see
+--   Representation.agda in the old framework for the full proof.
 --
--- These axioms are dischargeable in any concrete WeightQ-Convex
--- model layer.
+-- Representation-Convex.agda now derives mass-injective as a
+-- theorem.  It uses a fourth axiom, build-toPMF-≡-id, declared
+-- there, which is the round trip d ≡ build (toPMF d).
+-- build-toPMF-≡-id is stated in Representation-Convex.agda
+-- because build and toPMF are both defined there.
+--
+-- Any concrete WeightQ-Convex model layer discharges these
+-- axioms.
 -- ============================================================
 
--- ============================================================
--- Section 13a: Bayesian-projection axioms.
---
--- These three axioms package the "renormalized tail FDist exists"
--- and "build is the inverse of toPMF" properties of the convex
--- algebra. They are part of the FDist interface presented here;
--- in any concrete model where Weight is realized as a subset of
--- [0,1] (with a renormalization-respecting model of normalize),
--- all three follow from standard arithmetic.
---
--- Specifically:
---
--- * renorm-tail-FDist constructs the FDist of the renormalized
---   tail. In a [0,1] model, this is built by iterated mix
---   (head + recursively-renormalized tail) using the Bayesian
---   formula at each level. The formal Cubical Agda construction
---   requires either sized types or explicit accessibility on
---   (n, depth) pairs.
---
--- * renorm-tail-FDist-mass-eq characterizes the masses of the
---   renormalized tail. In a [0,1] model, this is just the
---   definition of the iterative construction.
---
--- The third Bayesian-projection contract — that mass is injective
--- on FDist (Fin n) — is now derived in Representation-Convex.agda
--- as a theorem from a fourth axiom build-toPMF-≡-id (the round-trip
--- d ≡ build (toPMF d)) declared there. We state build-toPMF-≡-id
--- in Representation-Convex.agda because both build and toPMF are
--- defined there.
---
--- These axioms are dischargeable in any concrete WeightQ-Convex
--- model layer.
--- ============================================================
 
 -- ============================================================
 -- The Bayesian-projection (head-tail) construction.
 --
--- Earlier drafts assumed a single Σ-type axiom here (a renormalized
--- tail FDist for any distribution with positive tail-mass).  It was
--- discharged --- derived from a head-tail decomposition and
--- mass-injectivity --- and the results this artifact uses do not
--- depend on it.  No postulate is assumed in this module.
+-- Earlier drafts assumed one Σ-type axiom here: a renormalized
+-- tail FDist for any distribution with positive tail-mass.  It
+-- has since been discharged, by deriving it from a head-tail
+-- decomposition together with mass-injectivity.  The results
+-- this artifact uses do not depend on it.  This module assumes
+-- no postulate.
 -- ============================================================
 
 
@@ -880,7 +877,7 @@ marginal₂ d = mapF snd d
 -- ============================================================
 -- Section 16: Validation example: a complete Bayes computation.
 --
--- Show that bayesW interacts cleanly with the convex framing.
+-- The example shows how bayesW fits the convex framing.
 --
 -- bayesW p wA wB pZ = (p · wA) / (p · wA + (1-p) · wB)
 --                  = normalize (p · wA) (mix-w p wA wB) pZ (...)
@@ -893,14 +890,15 @@ marginal₂ d = mapF snd d
 --   bayesW p wA wB · gA + (1 - bayesW p wA wB) · gB
 --     ≡ ((p · wA · gA) + ((1-p) · wB · gB)) / (p · wA + (1-p) · wB)
 --
--- In the OLD framing, this was bayesPf-pos, derived in ~80 lines.
--- In the NEW framing, the LHS is mix-w (bayesW p wA wB pZ) gA gB
--- and the RHS is normalize-of-something. They are equal by a
--- cleaner derivation using the mix-w/normalize interaction.
+-- In the old framing this was bayesPf-pos, derived in about 80
+-- lines.  Here the left side is mix-w (bayesW p wA wB pZ) gA gB
+-- and the right side is a normalize.  They are equal by a
+-- shorter derivation, which uses the interaction between mix-w
+-- and normalize.
 -- ============================================================
 
--- Bayes' rule, NEW framing.
--- Statement: convex combination of gA and gB at the bayesW weight
+-- Bayes' rule, in the new framing.
+-- The convex combination of gA and gB at the bayesW weight
 -- equals the renormalized weighted sum.
 --
 -- LHS = mix-w (bayesW p wA wB pZ) gA gB
@@ -908,32 +906,34 @@ marginal₂ d = mapF snd d
 --
 -- RHS = normalize ((p · wA · gA) + ((1-p) · wB · gB)) (mix-w p wA wB) pZ ?
 --
--- The numerator on the RHS itself is a convex combination scaled by Z:
+-- The numerator on the right side is itself a convex combination
+-- scaled by Z:
 --   (p · wA · gA) + ((1-p) · wB · gB)
---     = mix-w p (wA · gA) (wB · gB)  [conceptually]
--- Wait, that's not right either. Let me think.
+--     = mix-w p (wA · gA) (wB · gB)
+-- This holds because mix-w p X Y = p · X + (1-p) · Y, taking
+-- X = wA·gA and Y = wB·gB.
 --
--- Actually: (p · wA · gA) + ((1-p) · wB · gB) = mix-w p (wA · gA) (wB · gB)
---   YES, because mix-w p X Y = p · X + (1-p) · Y, with X = wA·gA, Y = wB·gB.
---
--- So bayesPf-pos statement becomes:
+-- So the bayesPf-pos statement becomes:
 --   mix-w (bayesW p wA wB pZ) gA gB ≡
 --     normalize (mix-w p (wA *w gA) (wB *w gB)) (mix-w p wA wB) pZ ?
 --
--- This is cleaner than the OLD form. We'd need a precondition
---   (mix-w p (wA · gA) (wB · gB)) ≤w (mix-w p wA wB)
--- which holds when gA, gB ∈ [0,1]: wA · gA ≤ wA and wB · gB ≤ wB,
--- so the convex combination on the left is ≤ that on the right.
+-- This form is shorter than the old one.  It needs a
+-- precondition,
+--   (mix-w p (wA · gA) (wB · gB)) ≤w (mix-w p wA wB),
+-- which holds for gA, gB ∈ [0,1]: then wA · gA ≤ wA and
+-- wB · gB ≤ wB, so the left convex combination is ≤ the right
+-- one.
 
--- We don't fully prove this here in Phase 2; it's a Phase 3 task.
--- The PHASE 2 OBSERVATION is: the statement of bayesPf becomes
--- substantially simpler in the NEW framing (one normalize +
--- two mix-w on each side, vs the OLD nested _+w_/_*w_/_/w_).
+-- Phase 2 does not prove this.  It is a Phase 3 task.  Phase 2
+-- records only that the statement of bayesPf gets shorter in the
+-- new framing.  Each side has one normalize and two mix-w, in
+-- place of the old nested _+w_ / _*w_ / _/w_.
 
 -- ============================================================
 -- Section 17: Renormalization decomposition validation.
 --
--- The central Bayesian decomposition lemma in OLD Representation.agda:
+-- The central Bayesian decomposition lemma in the old
+-- Representation.agda:
 --
 --   renorm-tail-decomp : ∀ {n} (p : Weight) (d₁ d₂ : FDist (Fin (suc n)))
 --     → (pos₁ : Pos (1-w mass d₁ fzero))
@@ -945,11 +945,11 @@ marginal₂ d = mapF snd d
 --       +w (1-w bayesW p (1-w mass d₁ fzero) (1-w mass d₂ fzero))
 --         *w (mass d₂ (fsuc k) /w (1-w mass d₂ fzero))
 --
--- This statement involves _/w_ four times, _*w_ four times, _+w_
--- once, and 1-w four times. The proof in OLD Representation.agda
--- is ~80 lines (lines 1591-1690).
+-- The statement uses _/w_ four times, _*w_ four times, _+w_
+-- once, and 1-w four times.  The proof in the old
+-- Representation.agda is about 80 lines, at lines 1591-1690.
 --
--- In the NEW framing, this becomes:
+-- In the new framing it becomes:
 --
 --   renorm-tail-decomp-convex : ∀ {n} (p : Weight) (d₁ d₂ : FDist (Fin (suc n)))
 --     → (pos₁ : Pos (tail-mass d₁))
@@ -962,18 +962,19 @@ marginal₂ d = mapF snd d
 --             (renorm-tail d₁ pos₁ k)
 --             (renorm-tail d₂ pos₂ k)
 --
--- The structure: a single mix-w on the RHS, with renormalize
--- arguments on each side. No _+w_ at all.
+-- The right side is one mix-w, with a renormalize argument on
+-- each side.  No _+w_ occurs.
 --
--- The proof requires one new identity: tail-mass commutes with mix:
+-- The proof needs one new identity, that tail-mass commutes with
+-- mix:
 --   tail-mass (mix p d₁ d₂) ≡ mix-w p (tail-mass d₁) (tail-mass d₂)
 --
 -- which itself reduces to the fundamental "1-w-mix-w" identity:
 --   1-w (mix-w p a b) ≡ mix-w p (1-w a) (1-w b)
 -- ============================================================
 
--- 1-w-mix-w is now in the main postulate block (Section 1).
--- See documentation there for the soundness rationale.
+-- 1-w-mix-w is in the main postulate block, Section 1.  The
+-- soundness argument is documented there.
 
 -- tail-mass-mix: tail-mass commutes with mix.
 tail-mass-mix : ∀ {n} (p : Weight) (d₁ d₂ : FDist (Fin (suc n)))
@@ -983,8 +984,8 @@ tail-mass-mix p d₁ d₂ = cong 1-w_ (mass-mix p d₁ d₂ fzero) ∙ 1-w-mix-w
 -- ============================================================
 -- Section 17: Renormalization decomposition (the central lemma).
 --
--- The proof uses *w-cancel-l: show LHS *w Z ≡ RHS *w Z, where
--- Z = tail-mass (mix p d₁ d₂). The key sub-lemmas:
+-- The proof uses *w-cancel-l.  We show LHS *w Z ≡ RHS *w Z,
+-- where Z = tail-mass (mix p d₁ d₂).  The sub-lemmas:
 --
 --   1. LHS *w Z ≡ mass (mix p d₁ d₂) (fsuc k) = mix-w p mass₁ mass₂.
 --      [normalize-*w-back + mass-mix.]
@@ -992,23 +993,24 @@ tail-mass-mix p d₁ d₂ = cong 1-w_ (mass-mix p d₁ d₂ fzero) ∙ 1-w-mix-w
 --   2. RHS *w Z = mix-w bp (Z*r₁) (Z*r₂)  [*w-comm + *w-distrib-mix-w].
 --      Then we need mix-w bp (Z*r₁) (Z*r₂) ≡ mix-w p mass₁ mass₂.
 --
--- Step 2 requires the "change-of-basis" lemma renorm-rebase below,
--- which is the central convex-algebraic identity for the Bayesian
--- decomposition. It is sound for [0,1] and is essentially the
+-- Step 2 uses the change-of-basis lemma renorm-rebase below.
+-- That lemma is the convex-algebraic identity the Bayesian
+-- decomposition rests on.  It holds for [0,1], and it states the
 -- defining property of the bayesW operation.
 -- ============================================================
 
--- The key change-of-basis lemma (renorm-rebase):
--- mix-w bp X Y *w Z ≡ mix-w p (t₁·X) (t₂·Y)
+-- The change-of-basis lemma renorm-rebase:
+-- mix-w bp X Y *w Z ≡ mix-w p (t₁·X) (t₂·Y),
 -- where bp = bayesW p t₁ t₂ pTM and Z = mix-w p t₁ t₂.
 --
--- This is now DERIVED as a theorem from the abstract version
--- renorm-rebase-abstract (in WeightQ-Convex.agda), instantiating
--- b := bayesW p t₁ t₂ pTM and supplying the two hypotheses
+-- It is derived as a theorem from the abstract version
+-- renorm-rebase-abstract, in WeightQ-Convex.agda.  Instantiate
+-- b := bayesW p t₁ t₂ pTM, and supply the two hypotheses
 -- bayesW-*w-Z and bayesW-complement.
 
--- bayesW-*w-Z and bayesW-complement are defined earlier (Section 6, just
--- after bayesW), since mix-w-bayes-interchange-eq references them.
+-- bayesW-*w-Z and bayesW-complement are defined earlier, in
+-- Section 6 just after bayesW, because
+-- mix-w-bayes-interchange-eq refers to them.
 
 -- renorm-rebase derived from renorm-rebase-abstract.
 renorm-rebase : ∀ p t₁ t₂ (pTM : Pos (mix-w p t₁ t₂)) X Y
@@ -1023,8 +1025,8 @@ renorm-rebase p t₁ t₂ pTM X Y =
 -- Now derive renorm-tail-decomp-convex using these lemmas.
 -- ============================================================
 
--- We need to relate Pos (tail-mass (mix p d₁ d₂)) and Pos (mix-w p t₁ t₂).
--- These are equal by tail-mass-mix.
+-- Pos (tail-mass (mix p d₁ d₂)) and Pos (mix-w p t₁ t₂) are the
+-- same proposition, by tail-mass-mix.
 pos-tail-mass-mix : ∀ {n} p (d₁ d₂ : FDist (Fin (suc n)))
                   → Pos (tail-mass (mix p d₁ d₂))
                   → Pos (mix-w p (tail-mass d₁) (tail-mass d₂))
@@ -1067,9 +1069,9 @@ renorm-tail-decomp-convex-derived {n} p d₁ d₂ pos₁ pos₂ pZ k =
            ∙ normalize-*w-back (mass (mix p d₁ d₂) (fsuc k)) Z pZ
                                 (mass-fsuc-≤-tail (mix p d₁ d₂) k)
 
-    -- RHS *w Z' = mix-w p (t₁ · r₁) (t₂ · r₂)  by renorm-rebase.
-    -- And r_i · t_i = mass_i  by normalize-*w-back; we need t_i · r_i,
-    -- so apply *w-comm.
+    -- RHS *w Z' = mix-w p (t₁ · r₁) (t₂ · r₂), by renorm-rebase.
+    -- normalize-*w-back gives r_i · t_i = mass_i.  We need
+    -- t_i · r_i, so we apply *w-comm.
     rhs-*w-Z' : (mix-w bp r₁ r₂) *w Z' ≡ mix-w p mass₁ mass₂
     rhs-*w-Z' =
       renorm-rebase p t₁ t₂ pTM r₁ r₂
@@ -1077,9 +1079,11 @@ renorm-tail-decomp-convex-derived {n} p d₁ d₂ pos₁ pos₂ pZ k =
               (*w-comm t₁ r₁ ∙ normalize-*w-back mass₁ t₁ pos₁ (mass-fsuc-≤-tail d₁ k))
               (*w-comm t₂ r₂ ∙ normalize-*w-back mass₂ t₂ pos₂ (mass-fsuc-≤-tail d₂ k))
 
-    -- Combine: LHS *w Z ≡ RHS *w Z (after substituting Z ≡ Z').
-    -- LHS *w Z ≡ mass (mix p d₁ d₂) (fsuc k) ≡ mix-w p mass₁ mass₂ (mass-mix is refl)
-    -- RHS *w Z = RHS *w Z' (after subst Z-eq-Z') ≡ mix-w p mass₁ mass₂.
+    -- Combine, after substituting Z ≡ Z':
+    -- LHS *w Z ≡ mass (mix p d₁ d₂) (fsuc k)
+    --          ≡ mix-w p mass₁ mass₂, since mass-mix is refl.
+    -- RHS *w Z = RHS *w Z', by subst Z-eq-Z',
+    --          ≡ mix-w p mass₁ mass₂.
     proof-after-*w :
       Z *w renorm-tail (mix p d₁ d₂) pZ k ≡ Z *w mix-w bp r₁ r₂
     proof-after-*w =
@@ -1091,12 +1095,14 @@ renorm-tail-decomp-convex-derived {n} p d₁ d₂ pos₁ pos₂ pZ k =
 -- ============================================================
 -- Note on the ordered field.
 --
--- The Weight algebra used above (w0, w1, mix-w, _*w_, 1-w, and the
--- order and positivity laws) is not postulated here.  It is the
--- ordered field re-exported from WeightQ, discharged concretely as
--- the cubical-library rationals inside WeightQ-Field's opaque block.
--- This module contains no postulates and no holes and typechecks
--- under --safe.  The HIT path constructors of FDist align with
--- mix-w, so the convex structure is carried by the type rather than
--- by an axiom set.
+-- The Weight algebra used above covers w0, w1, mix-w, _*w_,
+-- 1-w, and the order and positivity laws.  None of it is
+-- postulated here.  It is the ordered field re-exported from
+-- WeightQ.  That field is discharged concretely as the
+-- cubical-library rationals, inside the opaque block of
+-- WeightQ-Field.  This module contains no postulates and no
+-- holes, and it typechecks under --safe.  The HIT path
+-- constructors of FDist match mix-w one for one, so FDist
+-- already has the convex structure and needs no separate axiom
+-- set.
 -- ============================================================

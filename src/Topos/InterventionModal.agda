@@ -5,23 +5,24 @@
 -- value an intervention forces is j-CLOSED under every Lawvere–
 -- Tierney topology.
 --
--- Stage 1 (Topos.DoClassifier) showed do(X := x₀) is classified
--- by a characteristic map χ : X ⇒ Ω, and that the forced value
--- pt c is sent to the maximal sieve ⊤ (do-classified).  Stage 2
--- (Topos.LawvereTierney) introduced topologies j : Ω → Ω and
--- their j-closed sieves.
+-- Stage 1 (Topos.DoClassifier) showed that do(X := x₀) is
+-- classified by a characteristic map χ : X ⇒ Ω, and that the
+-- forced value pt c goes to the maximal sieve ⊤ (do-classified).
+-- Stage 2 (Topos.LawvereTierney) introduced topologies j : Ω → Ω
+-- and their j-closed sieves.
 --
--- Here we connect them: for ANY topology J, the sieve classifying
--- the intervened value is j-closed —
+-- This module connects them.  For ANY topology J, the sieve that
+-- classifies the intervened value is j-closed:
 --
 --     is-j-closed J c (χ_c (x₀ c)).
 --
--- Causally: an intervention is INVARIANT under every modality ◯
--- (sheafification / localization).  do(X := x₀) is "j-stable
--- discovery" in the sense of outline.md:85 — the do-fact survives
--- passage to any sub-topos of j-sheaves.  This is the j-do-
--- calculus thesis (j = lex modality) made internal and machine-
--- checked for the intervention classifier, not just asserted.
+-- Causal reading.  An intervention is invariant under every
+-- modality ◯, that is, under sheafification or localization.
+-- do(X := x₀) is "j-stable discovery" in the sense of
+-- outline.md:85, since the do-fact survives passage to any
+-- sub-topos of j-sheaves.  The j-do-calculus thesis (j = lex
+-- modality) is here made internal and machine-checked for the
+-- intervention classifier.
 -- ============================================================
 
 module Topos.InterventionModal where
@@ -43,9 +44,9 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
   do-sieve : (c : Ob) → Sieve {C = C} c
   do-sieve c = χ-sieve X x₀ c (pt X x₀ c)
 
-  -- HEADLINE: the intervention classifier is j-closed for every
-  -- Lawvere–Tierney topology J.  Proof: do-classified collapses
-  -- it to ⊤, and ⊤ is j-closed (truth-preservation).
+  -- The intervention classifier is j-closed for every Lawvere–
+  -- Tierney topology J.  Proof: do-classified sends it to ⊤, and
+  -- ⊤ is j-closed by truth-preservation.
   do-j-stable : (J : LawvereTierney {C = C}) (c : Ob)
               → is-j-closed J c (do-sieve c)
   do-j-stable J c =
