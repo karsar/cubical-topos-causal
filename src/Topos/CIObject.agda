@@ -21,14 +21,19 @@
 -- This is weaker than the statement "conditioning preserves
 -- conditional independence", which is where the content and a
 -- real obstruction lie.  For a COLLIDER, conditioning on the
--- collider vertex OPENS the path, so CI is NOT preserved under
+-- collider vertex opens the path, so CI is not preserved under
 -- that refinement (Berkson's paradox).  So `ci-Ω` is a sieve only
 -- when refinement is restricted to conditioning that preserves
--- CI.  The collider is a counterexample to restriction-stability
--- without that restriction.  A precise treatment needs Bayesian
--- conditioning on the convex-HIT and the general d-separation
--- soundness theorem.  Both are future work; see
--- Topos.ContingentCI and the companion d-separation layer.
+-- CI.
+--
+-- Topos.ColliderObstruction now proves this, at the level of
+-- supports: on a base whose one proper arrow is conditioning on
+-- a common effect, independence is not closed under restriction,
+-- so it defines no sieve.  The possibilistic form suffices,
+-- since a counterexample there is one for any finer notion.
+-- The probabilistic form, with Bayesian conditioning on the
+-- distribution carrier, is still open; see Topos.ContingentCI
+-- and the companion d-separation layer.
 -- ============================================================
 
 module Topos.CIObject where
