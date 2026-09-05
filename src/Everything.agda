@@ -15,6 +15,7 @@ open import Topos.Classicality
 open import Topos.Classifier
 open import Topos.CoarseClassicality
 open import Topos.CoarseSite
+open import Topos.ColliderObstruction
 open import Topos.Cohomology
 open import Topos.Contextuality
 open import Topos.ContingentCI
