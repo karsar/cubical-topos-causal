@@ -25,6 +25,7 @@ open import Topos.Example
 open import Topos.Forcing
 open import Topos.MechanismGeometric
 open import Topos.MechanismSeparation
+open import Topos.MechanismSite
 open import Topos.MechanismObject
 open import Topos.Exponential
 open import Topos.Gluing
