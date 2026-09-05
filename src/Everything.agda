@@ -51,6 +51,8 @@ open import Topos.Rule1
 open import Topos.Rule2
 open import Topos.Rule3
 open import Topos.SCM
+open import Topos.MediatorObstruction
+open import Topos.ReversedSite
 open import Topos.SiteSelfObstruction
 open import Topos.SCMNat
 open import Topos.ThreeSiteObstruction

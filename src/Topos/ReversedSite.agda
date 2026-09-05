@@ -1,0 +1,188 @@
+{-# OPTIONS --safe --cubical --guardedness #-}
+
+-- ============================================================
+-- Topos.ReversedSite — the other horn of the site choice.
+--
+-- Topos.SiteSelfObstruction proves that on the intervention site
+-- of Topos.InterventionSite, where an intervention REFINES the
+-- observational context, no truth value holds observationally
+-- and fails under an intervention.  The header of that module
+-- says reversing the arrows would express the missing claim and
+-- would cost the covering story instead.  That was a comment.
+-- This module proves it.
+--
+-- The reversed site keeps the three contexts and turns the two
+-- proper arrows around:
+--     do0 <-r0- obs -r1-> do1
+-- reading observation as a refinement of each intervention.
+--
+-- WHAT IS GAINED.  Sieves are closed under precomposition, so on
+-- this site a sieve on do0 may contain the arrow from obs and
+-- miss the identity.  Such a sieve holds observationally and
+-- fails under the intervention, which is the shape of the claim
+-- Topos.SiteSelfObstruction shows to be unavailable.
+--
+-- WHAT IS PAID.  The only arrow into obs is its identity.  So a
+-- sieve on obs is fixed by its value there, and obs carries no
+-- covering family of interventions.  On the original site this
+-- is false: Topos.InterventionModality's ci-both agrees with the
+-- empty sieve at the identity and differs from it at e0, and
+-- that difference is the discriminating truth value the modal
+-- layer runs on.
+--
+-- Results:
+--   no-e0, no-e1     nothing maps into obs but obs.
+--   obs-sieve-rigid  a sieve on obs is fixed by its value at the
+--                    identity, so Omega(obs) sees no refinement.
+--   see-not-do       a sieve on do0 that holds observationally
+--                    and fails under the intervention.
+--   iv-not-rigid     the original site fails obs-sieve-rigid.
+--
+-- The two together are a trade-off, not a defect.  A site can
+-- carry the intervention coverage, or it can express
+-- non-invariance under intervention.  This pair of results says
+-- it cannot do both, and which one is kept is the modeller's
+-- choice.
+-- ============================================================
+
+module Topos.ReversedSite where
+
+open import Cubical.Core.Primitives
+open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.HLevels
+open import Cubical.Data.Unit using (Unit*; tt*; isPropUnit*)
+open import Cubical.Data.Sigma using (Σ-syntax; _×_; _,_; fst; snd)
+open import Cubical.Relation.Nullary using (¬_)
+open import Cubical.Data.Empty as E using (⊥; isProp⊥)
+
+open import Topos.Cat
+open import Topos.Omega
+open import Topos.InterventionSite using (Iv; IObj; obs; do0; do1; IHom; idₒ; id₀; id₁; e0; e1)
+open import Topos.InterventionModality using (ci-both; ⊤hp; ⊥hp)
+
+-- ------------------------------------------------------------
+-- The reversed poset.  Observation now refines each
+-- intervention.
+-- ------------------------------------------------------------
+data RHom : IObj → IObj → Type where
+  idr  : RHom obs obs
+  idr0 : RHom do0 do0
+  idr1 : RHom do1 do1
+  r0   : RHom obs do0
+  r1   : RHom obs do1
+
+isPropRHom : (x y : IObj) → isProp (RHom x y)
+isPropRHom obs obs idr  idr  = refl
+isPropRHom do0 do0 idr0 idr0 = refl
+isPropRHom do1 do1 idr1 idr1 = refl
+isPropRHom obs do0 r0   r0   = refl
+isPropRHom obs do1 r1   r1   = refl
+isPropRHom do0 obs ()
+isPropRHom do1 obs ()
+isPropRHom do0 do1 ()
+isPropRHom do1 do0 ()
+
+idR : ∀ {x} → RHom x x
+idR {obs} = idr
+idR {do0} = idr0
+idR {do1} = idr1
+
+_⋆R_ : ∀ {x y z} → RHom x y → RHom y z → RHom x z
+idr  ⋆R g = g
+idr0 ⋆R g = g
+idr1 ⋆R g = g
+r0   ⋆R idr0 = r0
+r1   ⋆R idr1 = r1
+
+Rv : Precategory ℓ-zero ℓ-zero
+Rv = record
+  { Ob       = IObj
+  ; Hom      = RHom
+  ; idn      = idR
+  ; _⋆_      = _⋆R_
+  ; ⋆-idL    = λ f → isPropRHom _ _ (idR ⋆R f) f
+  ; ⋆-idR    = λ f → isPropRHom _ _ (f ⋆R idR) f
+  ; ⋆-assoc  = λ f g h → isPropRHom _ _ ((f ⋆R g) ⋆R h) (f ⋆R (g ⋆R h))
+  ; isSetHom = λ {x} {y} → isProp→isSet (isPropRHom x y)
+  }
+
+-- ------------------------------------------------------------
+-- Nothing maps into obs but obs.  This is the whole cost, and
+-- everything below is a consequence of it.
+-- ------------------------------------------------------------
+no-e0 : ¬ (RHom do0 obs)
+no-e0 ()
+
+no-e1 : ¬ (RHom do1 obs)
+no-e1 ()
+
+-- ------------------------------------------------------------
+-- THE COST.  A sieve on obs is fixed by its value at the
+-- identity, so obs has no covering family to be modal about.
+-- ------------------------------------------------------------
+obs-sieve-rigid : (S T : Sieve {C = Rv} obs)
+                → fst S obs idr ≡ fst T obs idr
+                → S ≡ T
+obs-sieve-rigid S T p = Sieve≡ {C = Rv} S T (funExt λ d → funExt λ f → lem d f)
+  where
+    lem : (d : IObj) (f : RHom d obs) → fst S d f ≡ fst T d f
+    lem obs idr = p
+    lem do0 ()
+    lem do1 ()
+
+-- ------------------------------------------------------------
+-- THE GAIN.  The sieve on do0 generated by the arrow from obs.
+-- It contains that arrow and misses the identity.
+-- ------------------------------------------------------------
+Sgen : Sieve {C = Rv} do0
+Sgen = mem , clo
+  where
+    mem : (d : IObj) → RHom d do0 → hProp ℓ-zero
+    mem obs r0   = ⊤hp
+    mem do0 idr0 = ⊥hp
+    clo : Closure {C = Rv} do0 mem
+    clo obs obs idr  r0   pf = tt*
+    clo do0 do0 idr0 idr0 pf = pf
+    clo do0 obs r0   idr0 pf = E.rec pf
+
+-- It holds observationally: pulled back along the arrow from
+-- obs, it is the maximal sieve there.
+gen-holds-obs : pull {C = Rv} r0 Sgen ≡ maximal {C = Rv} obs
+gen-holds-obs = Sieve≡ {C = Rv} _ _ (funExt λ d → funExt λ f → lem d f)
+  where
+    lem : (d : IObj) (f : RHom d obs) → fst Sgen d (f ⋆R r0) ≡ ⊤hp
+    lem obs idr = refl
+    lem do0 ()
+    lem do1 ()
+
+-- And it fails under the intervention: it misses the identity.
+gen-fails-do0 : ¬ (fst (fst Sgen do0 idr0))
+gen-fails-do0 x = E.rec x
+
+-- ------------------------------------------------------------
+-- Put together: the claim Topos.SiteSelfObstruction rules out on
+-- the original site exists here.
+-- ------------------------------------------------------------
+see-not-do
+  : Σ[ S ∈ Sieve {C = Rv} do0 ]
+      ( (pull {C = Rv} r0 S ≡ maximal {C = Rv} obs)
+      × (¬ (fst (fst S do0 idr0))) )
+see-not-do = Sgen , gen-holds-obs , gen-fails-do0
+
+-- ------------------------------------------------------------
+-- And the original site does NOT satisfy obs-sieve-rigid: the
+-- covering sieve {e0, e1} agrees with the empty sieve at the
+-- identity and differs at e0.  That difference is what the
+-- reversal destroys.
+-- ------------------------------------------------------------
+emptyIv : Sieve {C = Iv} obs
+emptyIv = (λ _ _ → ⊥hp) , (λ d e k f pf → pf)
+
+agree-at-id : fst ci-both obs idₒ ≡ fst emptyIv obs idₒ
+agree-at-id = refl
+
+iv-not-rigid : ¬ (ci-both ≡ emptyIv)
+iv-not-rigid q = E.rec (transport (λ i → fst (fst (q i) do0 e0)) tt*)
+
+-- So obs-sieve-rigid is not a general fact about three-context
+-- sites.  It is what the reversal costs.
