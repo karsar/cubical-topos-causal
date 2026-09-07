@@ -4,8 +4,13 @@ Cubical Agda artifact accompanying the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
 The artifact implements the 1-topos core of Mahadevan's topos causal
-models. It has forty-three modules in `src/Topos/` and eight in
-`src/Transport/`, over an eight-module probability layer:
+models. It has fifty-eight modules in `src/Topos/` and eight in
+`src/Transport/`, over an eight-module probability layer. Not all of
+them back the paper named above; see
+[Which modules back which paper](#which-modules-back-which-paper).
+The paper's own development is the fifty-four `src/Topos/` modules of
+rows 1 and 3 of that table, together with the eight in
+`src/Transport/`:
 
 - the subobject classifier of sieves, with the value-fixing subobject
   `{x₀} ↪ X` as its characteristic map χ, and the classification
@@ -40,6 +45,25 @@ models. It has forty-three modules in `src/Topos/` and eight in
 - counterfactual transport (`src/Transport/`): the invariance of a
   counterfactual along an environment arrow, reusing the forcing and
   modal layers.
+
+## Which modules back which paper
+
+This repository has grown past the paper it was built for. Everything
+below typechecks under `--safe` in the same build, but the modules
+answer to different documents.
+
+| Modules | Count | Backs |
+|---|---|---|
+| Core topos layer: classifier, `do` vs `see`, gluing, forcing, the modal layer, the intervention coverage, base change, the contextuality obstruction | 52 in `src/Topos/` | the paper named above |
+| `Transport*` | 8 in `src/Transport/` | the paper named above, Section on counterfactual transport |
+| `IdentProbe`, `IdentificationSieve` | 2 | the paper named above, section on the identification sieve |
+| `AdjustmentSets`, `CyclicIdentification` | 2 | a follow-up on identification as a type. In preparation; nothing is published yet |
+| `VersionFactoring`, `VersionSite` | 2 | not yet written up. They formalise VanderWeele and Hernan's treatment variation irrelevance as an internal truth value |
+
+The last two rows are not cited by the paper and are not counted in
+its module total. They are kept here because they build directly on
+the same classifier and site infrastructure, and splitting them into
+a separate repository would duplicate that base.
 
 ## Typechecking
 
