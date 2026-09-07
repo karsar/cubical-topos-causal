@@ -27,6 +27,11 @@ open import Topos.Forcing
 open import Topos.MechanismGeometric
 open import Topos.MechanismSeparation
 open import Topos.MechanismSite
+open import Topos.VersionFactoring
+open import Topos.VersionSite
+open import Topos.IdentProbe
+open import Topos.IdentificationSieve
+open import Topos.TopologyComparison
 open import Topos.MechanismObject
 open import Topos.Exponential
 open import Topos.Gluing
