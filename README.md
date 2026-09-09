@@ -4,12 +4,12 @@ Cubical Agda artifact accompanying the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
 The artifact implements the 1-topos core of Mahadevan's topos causal
-models. It has fifty-eight modules in `src/Topos/` and eight in
+models. It has fifty-seven modules in `src/Topos/` and eight in
 `src/Transport/`, over an eight-module probability layer. Not all of
 them back the paper named above; see
 [Which modules back which paper](#which-modules-back-which-paper).
-The paper's own development is the fifty-four `src/Topos/` modules of
-rows 1 and 3 of that table, together with the eight in
+The paper's own development is the fifty-five `src/Topos/` modules of
+rows 1, 3 and 4 of that table, together with the eight in
 `src/Transport/`:
 
 - the subobject classifier of sieves, with the value-fixing subobject
@@ -57,13 +57,15 @@ answer to different documents.
 | Core topos layer: classifier, `do` vs `see`, gluing, forcing, the modal layer, the intervention coverage, base change, the contextuality obstruction | 52 in `src/Topos/` | the paper named above |
 | `Transport*` | 8 in `src/Transport/` | the paper named above, Section on counterfactual transport |
 | `IdentProbe`, `IdentificationSieve` | 2 | the paper named above, section on the identification sieve |
-| `AdjustmentSets`, `CyclicIdentification` | 2 | a follow-up on identification as a type. In preparation; nothing is published yet |
+| `TopologyComparison` | 1 | the paper named above, section on the intervention coverage (density of the coverage, and the double-negation verdicts) |
 | `VersionFactoring`, `VersionSite` | 2 | not yet written up. They formalise VanderWeele and Hernan's treatment variation irrelevance as an internal truth value |
 
-The last two rows are not cited by the paper and are not counted in
-its module total. They are kept here because they build directly on
-the same classifier and site infrastructure, and splitting them into
-a separate repository would duplicate that base.
+The last row is not cited by the paper and is not counted in
+its module total. Its two modules are kept here because they build
+directly on the same classifier and site infrastructure, and
+splitting them into a separate repository would duplicate that base.
+A follow-up on identification as a type is in preparation and is not
+part of the tagged tree.
 
 ## Typechecking
 
