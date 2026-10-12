@@ -1,14 +1,16 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.BaseChange — base change along a functor of regime
+-- Topos.BaseChange: base change along a functor of regime
 -- categories, and its comparison map on truth values.
 --
 -- A BaseFunctor F : C → D is an abstraction of contexts.  It
 -- induces two operations:
---   basePull : PSh D → PSh C, precomposition with F;
+--   basePull : PSh D → PSh C, precomposition with F.
 --   φB       : Sieve (App₀ c) → Sieve c, the preimage of a
 --              coarse sieve.
+-- A sieve on c is a set of arrows into c, closed under
+-- precomposition.
 -- φB is natural in c (φB-nat).  So it is the component form of
 -- a map of presheaves basePull Ω_D ⇒ Ω_C (φNat).  This is the
 -- canonical comparison map of the base change.

@@ -17,23 +17,24 @@
 --
 -- The version here tolerates noise. Three sites each measure two of
 -- three binary attributes and report a count table. The tables agree
--- on every shared margin, so every pairwise consistency check a
--- practitioner would run passes. No global dataset has those pairwise
--- tables. The reason is a counting identity, not a parity argument,
--- so the conclusion still holds away from the extreme: the tables
--- here disagree 18 times in 20, and not 20 in 20.
+-- on every shared margin, so every pairwise consistency check that a
+-- practitioner runs passes. No global dataset has those pairwise
+-- tables. The reason is a counting identity, and not a parity
+-- argument. So the conclusion still holds away from the extreme. The
+-- tables here disagree 18 times in 20, and not 20 in 20.
 --
 -- THE ARGUMENT
 -- ============
--- In any global table over three binary attributes, each of the eight
--- cells has 0 or 2 disagreeing pairs, and never 1 or 3, because an
--- odd cycle of disequalities is unsatisfiable. Summing over cells,
+-- Take any global table over three binary attributes. Each of the
+-- eight cells has 0 or 2 disagreeing pairs, and never 1 or 3. The
+-- reason is that an odd cycle of disequalities is unsatisfiable. The
+-- sum over cells gives this equality:
 --
 --     dis(A,B) + dis(B,C) + dis(C,A) + 2 * (both-agree cells)
 --       = 2 * total
 --
--- exactly. The observed tables give 18 + 18 + 18 = 54 with total 20,
--- and 54 + 2k = 40 has no solution in the naturals.
+-- The observed tables give 18 + 18 + 18 = 54 with total 20. But
+-- 54 + 2k = 40 has no solution in the naturals.
 --
 -- WHERE THIS BELONGS
 -- ==================
@@ -58,7 +59,7 @@
 --
 -- Both halves are checked, in Sections 4 to 9. Sections 1 to 3
 -- constrain a global table by four numbers and refute it. On their
--- own they leave the load-bearing half asserted, because the
+-- own they leave the essential half asserted, because the
 -- refutation matters only if compatible site tables carry those
 -- numbers. Section 6 checks the compatibility, and Section 8 reaches
 -- the contradiction from the tables rather than from the four
@@ -66,7 +67,7 @@
 --
 -- Section 10 is the control. A refutation looks the same whether the
 -- notion is unsatisfiable at these numbers or was mis-stated so that
--- nothing could inhabit it. So a realisable family is exhibited
+-- nothing can inhabit it. So Section 10 exhibits a realisable family
 -- against a witness.
 --
 -- The module is not a method. Deciding global consistency in general
@@ -237,8 +238,8 @@ totalCA-20 = refl
 -- Two sites overlap in one attribute. They agree when their margins
 -- on it match. AB and BC share B, which is AB's second attribute and
 -- BC's first. BC and CA share C. CA and AB share A. Every margin is
--- ten against ten, so every pairwise consistency check a practitioner
--- would run passes. Each equation below is machine-checked.
+-- ten against ten, so every pairwise consistency check that a
+-- practitioner runs passes. Each equation below is machine-checked.
 -- ============================================================
 
 -- AB and BC agree on B
@@ -347,7 +348,7 @@ pairwise-consistent-and-globally-impossible =
 --
 -- `no-global-table` refutes `Marginalises`. A refutation looks the
 -- same whether the notion is unsatisfiable at these numbers or was
--- mis-stated so that nothing could inhabit it. This section rules out
+-- mis-stated so that nothing can inhabit it. This section rules out
 -- the second case: a family that is realisable and satisfies the same
 -- record against a witness.
 --

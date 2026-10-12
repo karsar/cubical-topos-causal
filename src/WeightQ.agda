@@ -1,11 +1,11 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- WeightQ: a concrete instantiation of FDist.agda's Weight
+-- WeightQ: a concrete instantiation of FDist's Weight
 -- module signature.
 --
--- This module discharges the algebraic postulates that
--- FDist.agda assumes about the abstract type Weight.  It gives a
+-- This module discharges the algebraic postulates that the
+-- old FDist.agda assumed about the abstract type Weight.  It gives a
 -- concrete construction of Weight: the closed unit interval over
 -- a totally ordered field with decidable order.  The canonical
 -- instance is the rationals:
@@ -17,7 +17,7 @@
 --    /w     ↦ rational division, with division by zero
 --             returning 0.  The operation is total.  Its value
 --             matters only on positive divisors, and only that
---             case arises in FDist.agda's bayesW.
+--             case arises in FDist's bayesW.
 --    Pos    ↦ "the underlying value is strictly greater than 0"
 --
 -- Strategy: we abstract away from the specific representation
@@ -41,14 +41,16 @@
 --   * The division-related identities bayesPf, bayesW algebra,
 --     and the bayesW-cond identities.
 --
--- Out of scope (left as a path postulate on FDist):
+-- Out of scope (left as a path constructor of FDist):
 --   * mix-bayes-interchange itself, which is a path on FDist
---     between distinct expressions.  To discharge it one would
---     have to parameterize FDist over the Weight module
---     signature, or prove that the generalized interchange path
---     follows from the existing FDist axioms plus the rational
---     arithmetic identity.  That is a non-trivial question
---     about HIT-presented free convex algebras.
+--     between distinct expressions.  It is a constructor of the
+--     FDist higher inductive type in FDist-Convex.agda.  To
+--     derive it, you must parameterize FDist over the Weight
+--     module signature.  The alternative is to prove that the
+--     generalized interchange path follows from the other FDist
+--     axioms plus the rational arithmetic identity.  That is a
+--     non-trivial question about HIT-presented free convex
+--     algebras.
 -- ============================================================
 
 module WeightQ where
@@ -80,8 +82,9 @@ open import Cubical.Relation.Nullary using (¬_)
 --
 -- This was once a `postulate` block declaring an abstract
 -- ordered field ℝ with its ring, order, and division axioms.
--- We now import the concrete ℚ model from WeightQ-Discharge.
--- That module proves each of those axioms about the
+-- We now import the concrete ℚ model through the opaque block
+-- of WeightQ-Field, which re-exports WeightQ-Discharge.  That
+-- module proves each of those axioms about the
 -- cubical-library rationals, and postulates nothing itself.
 -- The names are re-exported `public`, so every downstream module
 -- that opens WeightQ sees the same names, now constructive.  The
@@ -167,7 +170,7 @@ w1 = mkW z1 z0≤z1 (≤r-refl z1)
 
 ·r-bound : ∀ {a b : ℝ} → z0 ≤r a → z0 ≤r b → a ≤r z1 → b ≤r z1 → (a ·r b) ≤r z1
 ·r-bound {a} {b} la lb' ua ub' =
-  -- (a·b) ≤ (a·z1) by ≤r-·-mono; (a·z1) = a by ·r-IdR; a ≤ z1 by ua.
+  -- (a·b) ≤ (a·z1) by ≤r-·-mono.  (a·z1) = a by ·r-IdR.  a ≤ z1 by ua.
   ≤r-trans
     (subst ((a ·r b) ≤r_) (·r-IdR a)
        (≤r-·-mono la lb' (≤r-refl a) ub'))
@@ -218,8 +221,8 @@ a +wPf b ⟨ ub ⟩ = a +w b ⟨ ub ⟩
            (≤r-+-mono x≤1 (≤r-refl (-r x))))
 
 -- 1-r-bound-u: from 0 ≤ x, derive 1-x ≤ 1.
--- From 0 ≤ x we get (-x) ≤ z0, by +-monotonicity with -x on the
--- left, using -x + 0 = -x and -x + x = 0.  Then
+-- From 0 ≤ x we get (-x) ≤ z0 by +-monotonicity with -x on the
+-- left.  This step uses -x + 0 = -x and -x + x = 0.  Then
 -- z1 + (-x) ≤ z1 + z0 = z1.
 1-r-bound-u : ∀ {x : ℝ} → z0 ≤r x → (1-r x) ≤r z1
 1-r-bound-u {x} 0≤x =
@@ -432,8 +435,8 @@ weighted-idem-bound p x =
   subst (_≤r z1) (sym (weighted-idem-ℝ (val p) (val x))) (ub x)
 
 -- mix-bound: the convex combination (p · a) + ((1-p) · b) is
--- bounded by 1.  Bound it by p · 1 + (1-p) · 1 = p + (1-p) = 1,
--- using ≤r-+-mono and ≤r-·-mono.  It is defined here, ahead of
+-- bounded by 1.  Bound it by p · 1 + (1-p) · 1 = p + (1-p) = 1
+-- with ≤r-+-mono and ≤r-·-mono.  It is defined here, ahead of
 -- its narrative position.  `weighted-idem` and the HIT
 -- path-coherence in 𝔼 both take it as their canonical bound, and
 -- both come later.
@@ -543,7 +546,8 @@ weighted-idem p x = WeightPath (weighted-idem-ℝ (val p) (val x))
       (p ·r ((1-r q) ·r c))
       ((1-r p) ·r (q ·r b))
       ((1-r p) ·r ((1-r q) ·r d))
-  -- Step 3: rearrange triple products: p·(q·a) = q·(p·a), etc.
+  -- Step 3: rearrange triple products: p·(q·a) = q·(p·a), and
+  -- the same for the other three.
   -- We do these via cong applications using ·r-assoc and ·r-comm.
   -- p ·r (q ·r a) = (p ·r q) ·r a = (q ·r p) ·r a = q ·r (p ·r a)
   ∙ cong (λ w → (w +r ((1-r p) ·r (q ·r b))) +r ((p ·r ((1-r q) ·r c)) +r ((1-r p) ·r ((1-r q) ·r d))))
@@ -673,8 +677,8 @@ s-of p q = p +w ((1-w p) *w q) ⟨ s-of-bound p q ⟩
 
 -- (r-of and bayesW are dead in this module.  The active
 -- framework defines its own r-of via normalize in
--- WeightQ-Convex.agda.  They have been deleted, together with
--- the dependent assocProof / s·r≡p-lem / s·1-r-eq-lem /
+-- WeightQ-Convex.agda.  We deleted them, together with the
+-- dependent assocProof / s·r≡p-lem / s·1-r-eq-lem /
 -- 1-w-s-eq-lem helpers, which are also unused.)
 
 -- ============================================================
@@ -826,17 +830,18 @@ weight-trichotomy p with ≡z1-or-<z1 (val p) (lb p) (ub p)
 -- ============================================================
 
 -- ============================================================
--- assocProof derivation.
+-- assocProof derivation (removed).
 --
--- The skew-associativity polynomial identity at the Weight
--- level.  It is derived from:
+-- assocProof derived the skew-associativity polynomial identity
+-- at the Weight level.  The derivation used:
 --   - s·r≡p             (requires Pos (s-of p q))
 --   - s·1-r-eq          (requires Pos (s-of p q))
 --   - 1-w-s-eq          (unconditional)
 --   - weight-trichotomy-zero, +w-eq-w0-{l,r}
--- In the Pos case both sides expand by *w-distrib-+w and
--- *w-assoc, and the three identities are substituted.  In the
--- s ≡ w0 case p ≡ q ≡ w0, so both sides reduce to wc.
+-- In the Pos case both sides expanded by *w-distrib-+w and
+-- *w-assoc, and the three identities were substituted.  In the
+-- s ≡ w0 case p ≡ q ≡ w0, so both sides reduced to wc.  Only
+-- the two helpers below remain in this module.
 -- ============================================================
 
 -- Helper: weight-trichotomy-zero.
@@ -855,7 +860,7 @@ weight-trichotomy-zero p with weight-trichotomy (1-w p)
     ub-ba : (val b +r val a) ≤r z1
     ub-ba = subst (_≤r z1) (+r-comm (val a) (val b)) ub
 
--- Lemma s·r≡p: when Pos (s-of p q), s-of p q · r-of p q ≡ p.
+-- Lemma s·r≡p (removed): when Pos (s-of p q), s-of p q · r-of p q ≡ p.
 
 -- ============================================================
 -- s·r≡p-lem, s·1-r-eq-lem, 1-w-s-eq-lem, and assocProof were
@@ -863,5 +868,5 @@ weight-trichotomy-zero p with weight-trichotomy (1-w p)
 -- depended on the deleted r-of and on *w-/w-pos / /w-*w-pos.
 -- The active convex framework derives mix-associativity directly
 -- via mix-w-assoc-pos in FDist-Convex.agda, so these helpers are
--- not needed.  They have been removed.
+-- not needed.  We removed them.
 -- ============================================================

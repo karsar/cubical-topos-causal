@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.CoarseSite — the coarse intervention poset.
+-- Topos.CoarseSite: the coarse intervention poset.
 --
 -- The site has two objects:  cDo → cObs.
 -- cObs is the observational context.  cDo is a single merged

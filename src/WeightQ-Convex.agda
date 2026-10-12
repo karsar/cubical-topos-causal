@@ -15,7 +15,7 @@
 -- Specifically:
 --   * mix-w p a b := (p *w a) +w ((1-w p) *w b)        (derived)
 --   * x ≤w y      := val x ≤r val y                    (derived)
---   * normalize num den _ _ := num /w den              (derived)
+--   * normalize num den _ _ := num /wPf den            (derived)
 --
 -- Each axiom is lifted from an ℝ-level ring identity through
 -- WeightPath.
@@ -80,17 +80,16 @@ isProp-≤w = isProp-≤r
 -- preconditions explicit.  It is the migration target for safe
 -- Bayesian-style division.
 --
--- A caveat recorded with this operator.  normalize uses the same
--- trivial _/r_ stub internally as _/w_.  Its value-level
--- correctness therefore rests on the same postulates, ·r-/r-pos
--- and /r-·r-pos in WeightQ-Discharge.  It has the same deeper
--- problem that SOUNDNESS.md records.  Those postulates are
--- structurally inconsistent with a trivial _/r_ stub.
+-- normalize divides through _/wPf_, whose value is computed by
+-- _/r_.  It does not use the total _/w_, which returns w0 for
+-- every input.  _/r_ is honest/r of WeightQ-Discharge-Division,
+-- a total ℚ division that returns z0 at a zero divisor.  The
+-- value-level correctness of normalize rests on ·r-/r-pos and
+-- /r-·r-pos.  WeightQ-Discharge derives both as theorems, so no
+-- postulate is involved.
 --
--- The signature helps even so.  The preconditions are explicit,
--- so a call site cannot violate the obligations silently.  Full
--- soundness needs a real ℚ division, which is the next planned
--- step.
+-- The preconditions are explicit, so a call site cannot violate
+-- the obligations silently.
 normalize : (num den : Weight) → Pos den → num ≤w den → Weight
 normalize num den pd le = num /wPf den ⟨ pd , le ⟩
   where open import WeightQ using (_/wPf_⟨_,_⟩)
@@ -348,7 +347,7 @@ normalize-*w-back num den pd le = /wPf-*w-pos den pd num le
 --          ≡ mix-w (s-of p q) (mix-w (r-of p q ps) a b) c
 -- where:
 --   s-of p q = mix-w p w1 q             (the "weight sum")
---   r-of p q ps = p /w (s-of p q)       (the renormalized inner weight)
+--   r-of p q ps = p /wPf (s-of p q)     (the renormalized inner weight)
 --   ps : Pos (s-of p q)
 --
 -- Proof at the ℝ level.  Set s = val(s-of p q),
@@ -381,7 +380,7 @@ val-s-of p q = cong (_+r ((1-r (val p)) ·r val q)) (·r-IdR (val p))
 
 -- Helper: val (r-of p q ps) ≡ val p /r val (s-of p q).
 val-r-of : ∀ p q (ps : Pos (s-of p q)) → val (r-of p q ps) ≡ val p /r val (s-of p q)
-val-r-of p q ps = refl  -- by definition of normalize and /w
+val-r-of p q ps = refl  -- by definition of normalize and /wPf
 
 -- Lemma A: val(s-of p q) · val(r-of p q ps) ≡ val p.
 sof-rof : ∀ p q (ps : Pos (s-of p q))
@@ -630,13 +629,13 @@ bayesW-complement-abstract b p t₁ t₂ b·Z≡p·t₁ = WeightPath
 -- Proof at the Weight level.  On the right-hand side
 -- Z = mix-w p t₁ t₂, but the proof uses only b·Z ≡ p·t₁ and
 -- (1-b)·Z ≡ (1-p)·t₂.
--- mix-w b X Y *w Z = ((b·X) +w ((1-b)·Y)) *w Z              [defn of mix-w; refl]
+-- mix-w b X Y *w Z = ((b·X) +w ((1-b)·Y)) *w Z              [defn of mix-w, refl]
 --                 = (Z·(b·X)) +w (Z·((1-b)·Y))              [via *w-comm, *w-distrib-+w, *w-comm again]
 --                 = ((Z·b)·X) +w ((Z·(1-b))·Y)              [*w-assoc]
 --                 = ((b·Z)·X) +w (((1-b)·Z)·Y)              [*w-comm]
 --                 = ((p·t₁)·X) +w (((1-p)·t₂)·Y)            [substitute hypotheses]
 --                 = (p·(t₁·X)) +w ((1-p)·(t₂·Y))            [*w-assoc]
---                 = mix-w p (t₁·X) (t₂·Y)                    [defn of mix-w; refl]
+--                 = mix-w p (t₁·X) (t₂·Y)                    [defn of mix-w, refl]
 -- Lifted to the ℝ level through WeightPath.  The val-chain, with
 -- Z = mix-w p t₁ t₂:
 --   val (mix-w b X Y *w Z)

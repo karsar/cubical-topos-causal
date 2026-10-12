@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ModalCI — Stage 3 of the modal-layer repair: j-stability
+-- Topos.ModalCI: Stage 3 of the modal-layer repair: j-stability
 -- of the contingent CI, applied to a truth value that is not ⊤.
 --
 -- Topos.ContingentCI built `ci-Ω`.  It is a causal claim whose
@@ -11,7 +11,7 @@
 -- contingent truth value is j-stable.  For the double-negation
 -- topology (Topos.DoubleNegation, the one non-degenerate topology
 -- available here) it is, at BOTH regimes:
---   • at `false`, ci-Ω = ⊤, and ⊤ is ¬¬-closed;
+--   • at `false`, ci-Ω = ⊤, and ⊤ is ¬¬-closed.
 --   • at `true`,  ci-Ω = ⊥ (the CI fails), and ⊥ is ¬¬-closed.
 -- The true-regime instance applies to a sieve that is not
 -- maximal, so it avoids the "always ⊤" collapse of
@@ -80,8 +80,8 @@ private
 -- ------------------------------------------------------------
 -- STAGE 3 DELIVERABLE: the contingent CI is ¬¬-stable at every
 -- regime.  The true-regime instance applies to a sieve that is
--- NOT maximal, so it says more than the "j ⊤ = ⊤" step used by
--- the modal-rule theorems.
+-- NOT maximal.  So it says more than the "j ⊤ = ⊤" step that the
+-- modal-rule theorems use.
 -- ------------------------------------------------------------
 ci-Ω-¬¬-closed : (c : Bool) → is-j-closed (¬¬LT {C = C}) c (ci-Ω c)
 ci-Ω-¬¬-closed false = false-closed

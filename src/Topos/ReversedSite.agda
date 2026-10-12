@@ -1,34 +1,37 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ReversedSite — the other horn of the site choice.
+-- Topos.ReversedSite: the other horn of the site choice.
 --
--- Topos.SiteSelfObstruction proves that on the intervention site
--- of Topos.InterventionSite, where an intervention REFINES the
--- observational context, no truth value holds observationally
--- and fails under an intervention.  The header of that module
--- says reversing the arrows would express the missing claim and
--- would cost the covering story instead.  That was a comment.
--- This module proves it.
+-- Topos.SiteSelfObstruction studies the intervention site of
+-- Topos.InterventionSite, where an intervention REFINES the
+-- observational context.  It proves that on this site no truth
+-- value holds observationally and fails under an intervention.  This module proves what
+-- reversing the arrows adds and what it removes.
+--
+-- The pattern at issue is a stagewise truth pattern.  The
+-- do-versus-see inequality itself is a different proposition,
+-- and Topos.SiteSelfObstruction gives it an internal truth value
+-- on the original site.
 --
 -- The reversed site keeps the three contexts and turns the two
 -- proper arrows around:
 --     do0 <-r0- obs -r1-> do1
--- reading observation as a refinement of each intervention.
+-- This reads observation as a refinement of each intervention.
 --
 -- WHAT IS GAINED.  Sieves are closed under precomposition, so on
--- this site a sieve on do0 may contain the arrow from obs and
+-- this site a sieve on do0 can contain the arrow from obs and
 -- miss the identity.  Such a sieve holds observationally and
 -- fails under the intervention, which is the shape of the claim
 -- Topos.SiteSelfObstruction shows to be unavailable.
 --
--- WHAT IS PAID.  The only arrow into obs is its identity.  So a
+-- WHAT IS LOST.  The only arrow into obs is its identity.  So a
 -- sieve on obs is fixed by its value there, and obs carries no
 -- covering family of interventions.  On the original site this
--- is false: Topos.InterventionModality's ci-both agrees with the
--- empty sieve at the identity and differs from it at e0, and
--- that difference is the discriminating truth value the modal
--- layer runs on.
+-- is false.  Topos.InterventionModality's ci-both agrees with
+-- the empty sieve at the identity and differs from it at e0.
+-- The modal layer uses that difference as its discriminating
+-- truth value.
 --
 -- Results:
 --   no-e0, no-e1     nothing maps into obs but obs.
@@ -38,11 +41,11 @@
 --                    and fails under the intervention.
 --   iv-not-rigid     the original site fails obs-sieve-rigid.
 --
--- The two together are a trade-off, not a defect.  A site can
--- carry the intervention coverage, or it can express
--- non-invariance under intervention.  This pair of results says
--- it cannot do both, and which one is kept is the modeller's
--- choice.
+-- The two together form a trade-off.  A site can carry the
+-- intervention coverage, or it can express a truth value that
+-- holds observationally and fails under an intervention.  Of
+-- the two sites here, each does one and neither does both.  The
+-- modeller chooses which one to keep.
 -- ============================================================
 
 module Topos.ReversedSite where
@@ -107,8 +110,8 @@ Rv = record
   }
 
 -- ------------------------------------------------------------
--- Nothing maps into obs but obs.  This is the whole cost, and
--- everything below is a consequence of it.
+-- Nothing maps into obs but obs.  The loss below,
+-- obs-sieve-rigid, follows from this fact.
 -- ------------------------------------------------------------
 no-e0 : ¬ (RHom do0 obs)
 no-e0 ()
@@ -117,8 +120,8 @@ no-e1 : ¬ (RHom do1 obs)
 no-e1 ()
 
 -- ------------------------------------------------------------
--- THE COST.  A sieve on obs is fixed by its value at the
--- identity, so obs has no covering family to be modal about.
+-- THE LOSS.  A sieve on obs is fixed by its value at the
+-- identity, so obs has no covering family for a modality to use.
 -- ------------------------------------------------------------
 obs-sieve-rigid : (S T : Sieve {C = Rv} obs)
                 → fst S obs idr ≡ fst T obs idr
@@ -172,8 +175,8 @@ see-not-do = Sgen , gen-holds-obs , gen-fails-do0
 -- ------------------------------------------------------------
 -- And the original site does NOT satisfy obs-sieve-rigid: the
 -- covering sieve {e0, e1} agrees with the empty sieve at the
--- identity and differs at e0.  That difference is what the
--- reversal destroys.
+-- identity and differs at e0.  The reversal removes that
+-- difference.
 -- ------------------------------------------------------------
 emptyIv : Sieve {C = Iv} obs
 emptyIv = (λ _ _ → ⊥hp) , (λ d e k f pf → pf)
@@ -185,4 +188,4 @@ iv-not-rigid : ¬ (ci-both ≡ emptyIv)
 iv-not-rigid q = E.rec (transport (λ i → fst (fst (q i) do0 e0)) tt*)
 
 -- So obs-sieve-rigid is not a general fact about three-context
--- sites.  It is what the reversal costs.
+-- sites.  It is a consequence of the reversal.

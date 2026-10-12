@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.MediatorObstruction — dependence is not a sieve either.
+-- Topos.MediatorObstruction: dependence is not a sieve either.
 --
 -- Topos.ColliderObstruction proves that conditional
 -- INDEPENDENCE is not closed under restriction: conditioning on
@@ -11,7 +11,8 @@
 -- under restriction either.
 --
 -- The base is the one Topos.ColliderObstruction builds, and the
--- supports are the same.  Only the restriction changes:
+-- supports are the same.  A support is the set of outcome pairs
+-- with non-zero probability.  Only the restriction changes:
 --     cond --r--> marg
 -- where marg is the marginal regime and cond is the regime that
 -- conditions on the middle variable of a chain X -> M -> Y.
@@ -21,22 +22,25 @@
 -- Together the two modules give a two-sided no-go.  A truth
 -- value in the internal logic is a sieve, and a sieve is closed
 -- under precomposition.  Independence fails that closure at a
--- collider and dependence fails it at a mediator, so NEITHER
--- side of the causal question is a truth value once refinement
--- may condition.  The internal logic carries persistence, and a
--- causal claim of either polarity is not persistent.
+-- collider and dependence fails it at a mediator.  So if
+-- refinement can condition, we cannot assume that either
+-- predicate persists.  Each result concerns the stated predicate on these
+-- supports.  A causal predicate that does persist is classified
+-- in the usual way.
 --
 -- Results:
 --   chain-dependent   the marginal support is not a product.
 --   fibre-product     its restriction to the mediator fibre is.
 --   dep-not-closed    so dependence is NOT closed under
 --                     restriction on this base.
---   dep-no-sieve      hence it defines no sieve, at any context.
+--   dep-no-sieve      hence it is not a restriction-stable
+--                     predicate, and defines no sieve.
 --
--- The practical reading matches Topos.ColliderObstruction: if
--- the refinement relation between regimes may condition on an
+-- The practical reading matches Topos.ColliderObstruction.  If
+-- the refinement relation between regimes can condition on an
 -- intermediate variable, a dependence claim has no internal
--- truth value, and the sieve machinery is silent about it.  The
+-- truth value.  The sieve construction then says nothing about
+-- it.  The
 -- condition is checkable from the study design.
 -- ============================================================
 
@@ -56,7 +60,7 @@ open import Topos.PSh
 open import Topos.Omega
 
 -- The base, the supports and the notion of a product support are
--- exactly the collider module's.  Reusing them is the point: one
+-- the same as in the collider module.  The reuse is deliberate: one
 -- site, two restrictions, two failures.
 open import Topos.ColliderObstruction
   using ( _&&_; notB; &&-l; &&-r
@@ -121,8 +125,8 @@ diag-tf = refl
 diag-ff : diagS false false ≡ true
 diag-ff = refl
 
--- The agreeing cells force both factors true; the mixed cell is
--- then forced true, and it is false.
+-- The agreeing cells force both factors true.  Then the mixed
+-- cell is forced true, and it is false.
 chain-not-product : ¬ (IsProduct diagS)
 chain-not-product (f , g , eq) = true≢false (sym step)
   where
@@ -138,7 +142,7 @@ chain-dependent h = PT.rec isProp⊥ chain-not-product h
 
 -- ------------------------------------------------------------
 -- Its restriction is the mediator fibre, and that IS a product.
--- Conditioning has closed the path.
+-- Conditioning closes the path.
 -- ------------------------------------------------------------
 fibre : Supp
 fibre = restrM r diagS

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ContingentCI — Stage 1 of the modal-layer repair.
+-- Topos.ContingentCI: Stage 1 of the modal-layer repair.
 --
 -- A modal statement is vacuous when the modality is applied to ⊤.
 -- The modal layer of Topos.ModalRule1 and Topos.ModalRules has
@@ -9,8 +9,8 @@
 -- CONCLUSIONS of theorems.  Each is a proved equality of
 -- distributions, so each has internal truth value ⊤.  The
 -- topology axiom `j ⊤ = ⊤` then gives the modal statement.  The
--- modality never receives a causal claim, so `modal-ruleᵢ` would
--- typecheck verbatim with the causal content deleted.
+-- modality never receives a causal claim.  So `modal-ruleᵢ` still
+-- typechecks verbatim after deletion of the causal content.
 --
 -- Mahadevan intends `j` to range over CONTINGENT causal claims.
 -- The truth value of such a claim is a sieve that is not maximal.

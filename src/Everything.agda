@@ -3,9 +3,10 @@
 module Everything where
 
 
--- Section 9: transportability / counterfactual transport
+-- Imports every module of the development, so one typecheck checks all of them.
 
 open import Topos.AbstractionTiers
+open import Topos.AbstractionReflection
 open import Topos.BaseChange
 open import Topos.BaseChangeClassifier
 open import Topos.CIObject
@@ -14,6 +15,7 @@ open import Topos.CechCohomology
 open import Topos.Classicality
 open import Topos.Classifier
 open import Topos.CoarseClassicality
+open import Topos.GroupoidClassicality
 open import Topos.CoarseSite
 open import Topos.ColliderObstruction
 open import Topos.Cohomology
@@ -30,6 +32,8 @@ open import Topos.MechanismSite
 open import Topos.VersionFactoring
 open import Topos.VersionSite
 open import Topos.IdentProbe
+open import Topos.Identification
+open import Topos.IdentificationModels
 open import Topos.IdentificationSieve
 open import Topos.TopologyComparison
 open import Topos.MechanismObject
@@ -66,6 +70,7 @@ open import Transport.CounterfactualForcing
 open import Transport.CounterfactualProbe
 open import Transport.CounterfactualWeld
 open import Transport.TransportGeneral
+open import Transport.TransportDescent
 open import Transport.TransportModal
 open import Transport.TransportProbabilistic
 open import Transport.TransportSoundness

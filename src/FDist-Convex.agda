@@ -268,7 +268,7 @@ data FDist {ℓ} (A : Type ℓ) : Type ℓ where
   -- Both mix-w composites carry a positivity precondition.  The
   -- outer weight M = mix-w p q₁ q₂ and its complement
   -- 1-M = mix-w p (1-q₁) (1-q₂) must be positive, or the
-  -- Bayesian-rebalanced inner weights are undefined: the bayesW
+  -- Bayesian-rebalanced inner weights are undefined.  The bayesW
   -- of FDist-Convex requires Pos (mix-w p wA wB).
   mix-bayes-interchange : ∀ p q₁ q₂
     (pM : Pos (mix-w p q₁ q₂))
@@ -291,12 +291,12 @@ data FDist {ℓ} (A : Type ℓ) : Type ℓ where
 --
 -- The mix-bayes-interchange case needs the weight-level Bayesian
 -- interchange identity, the algebraic counterpart of the new HIT
--- path constructor.  It is derivable from the ordered-field
--- axioms, using distributivity, commutativity, and the
--- definition of bayesW.  The algebraic chain unfolds both sides
+-- path constructor.  It follows from the ordered-field axioms by
+-- distributivity, commutativity, and the definition of bayesW.  The algebraic chain unfolds both sides
 -- into ∑(p·q·e) terms and checks that they agree up to
--- reordering.  It is postulated here, pending the full
--- derivation.  This is the "Limitations" item in the paper: the
+-- reordering.  The identity is derived below, as
+-- mix-w-bayes-interchange-eq, with no postulate.  One caveat
+-- remains, and it is the "Limitations" item in the paper.  The
 -- consistency of the augmented HIT rests on the universal-algebra
 -- construction of free convex algebras with the
 -- Bayesian-decomposition theory.
@@ -740,8 +740,8 @@ tail-mass d = 1-w head-mass d
 --
 -- It is defined with the constrained `normalize` primitive.  The
 -- precondition mass d (fsuc k) ≤w tail-mass d holds because the
--- mass at one position is at most the total tail mass, which is
--- the sum of all tail masses, this one included.
+-- mass at one position is at most the total tail mass.  The total
+-- tail mass is the sum of all tail masses, this one included.
 --
 -- The precondition follows from a structural property of 𝔼.  For
 -- an indicator-like function g, with g a ∈ [0,1], we have
@@ -757,8 +757,8 @@ tail-mass d = 1-w head-mass d
 --               = 𝔼 d (λ a → 1-w (δ fzero a))    [by sym 𝔼-1-w]
 --   mass d (fsuc k) = 𝔼 d (δ (fsuc k))
 --   Pointwise: δ (fsuc k) a ≤w 1-w (δ fzero a):
---     - a = fzero: δ (fsuc k) fzero = w0; 1-w (δ fzero fzero) = 1-w w1 = w0.
---     - a = fsuc m: δ (fsuc k) (fsuc m) ∈ {w0, w1}; 1-w (δ fzero (fsuc m)) = w1.
+--     - a = fzero: δ (fsuc k) fzero = w0, and 1-w (δ fzero fzero) = 1-w w1 = w0.
+--     - a = fsuc m: δ (fsuc k) (fsuc m) ∈ {w0, w1}, and 1-w (δ fzero (fsuc m)) = w1.
 --   Apply 𝔼-mono.
 
 -- Helper: the standard Fin property fzero ≢ fsuc k.  Derived
@@ -777,14 +777,14 @@ fzero≢fsuc {n} {k} p = nat-znots (cong toℕ p)
 δ-fsuc-≤-1-w-δ-fzero {n} k a | yes a≡0 | yes a≡fsuc-k =
   E.rec (fzero≢fsuc (sym a≡0 ∙ a≡fsuc-k))
 δ-fsuc-≤-1-w-δ-fzero {n} k a | yes a≡0 | no _ =
-  -- δ (fsuc k) a = w0; 1-w (δ fzero a) = 1-w w1 = w0.
+  -- δ (fsuc k) a = w0, and 1-w (δ fzero a) = 1-w w1 = w0.
   subst (λ x → w0 ≤w x) (sym 1-w-1) (≤w-refl w0)
 δ-fsuc-≤-1-w-δ-fzero {n} k a | no a≢0 with discreteFin a (fsuc k)
 δ-fsuc-≤-1-w-δ-fzero {n} k a | no a≢0 | yes _ =
-  -- δ (fsuc k) a = w1; 1-w (δ fzero a) = 1-w w0 = w1.
+  -- δ (fsuc k) a = w1, and 1-w (δ fzero a) = 1-w w0 = w1.
   subst (λ x → w1 ≤w x) (sym 1-w-0) (≤w-refl w1)
 δ-fsuc-≤-1-w-δ-fzero {n} k a | no a≢0 | no _ =
-  -- δ (fsuc k) a = w0; 1-w (δ fzero a) = 1-w w0 = w1.
+  -- δ (fsuc k) a = w0, and 1-w (δ fzero a) = 1-w w0 = w1.
   subst (λ x → w0 ≤w x) (sym 1-w-0) (w0≤w-all w1)
 
 -- Now derive mass-fsuc-≤-tail.
@@ -805,21 +805,23 @@ renorm-tail d pt k = normalize (mass d (fsuc k)) (tail-mass d) pt
 -- ============================================================
 -- Section 13a: Bayesian-projection axioms.
 --
--- These three axioms record two properties of the convex
--- algebra.  The renormalized tail FDist exists, and mass is
--- injective on FDist (Fin n).  Injectivity comes from the round
--- trip, which says that build is the inverse of toPMF.  The
--- three axioms belong to the FDist interface presented here.  Take any concrete model where Weight is a
--- subset of [0,1], with a model of normalize that respects
--- renormalization.  In such a model all three follow from
--- standard arithmetic.
+-- This module declares none of the three axioms below, and no
+-- result here depends on them.  The notes record what they say.
+--
+-- The three axioms record two properties of the convex algebra.
+-- The renormalized tail FDist exists, and mass is injective on
+-- FDist (Fin n).  Injectivity comes from the round trip, which
+-- says that build is the inverse of toPMF.  Take any concrete
+-- model where Weight is a subset of [0,1], with a model of
+-- normalize that respects renormalization.  In such a model all
+-- three follow from standard arithmetic.
 --
 -- Specifically:
 --
 -- * renorm-tail-FDist constructs the FDist of the renormalized
 --   tail.  In a [0,1] model it is built by iterated mix, a head
---   together with a recursively renormalized tail, using the
---   Bayesian formula at each level.  The formal Cubical Agda
+--   together with a recursively renormalized tail.  Each level
+--   uses the Bayesian formula.  The formal Cubical Agda
 --   construction needs either sized types or explicit
 --   accessibility on (n, depth) pairs.
 --
@@ -831,12 +833,13 @@ renorm-tail d pt k = normalize (mass d (fsuc k)) (tail-mass d) pt
 --   FDists have distinct mass functions.  In a [0,1] model with
 --   a well-defined normalize it follows from the round trip
 --   d ≡ build (toPMF d).  The Cubical Agda derivation of that
---   round trip takes about 1500 lines of HIT recursion; see
+--   round trip takes about 1500 lines of HIT recursion.  See
 --   Representation.agda in the old framework for the full proof.
 --
--- Representation-Convex.agda now derives mass-injective as a
--- theorem.  It uses a fourth axiom, build-toPMF-≡-id, declared
--- there, which is the round trip d ≡ build (toPMF d).
+-- Representation-Convex.agda derives mass-injective as a
+-- theorem.  That file is not part of this repository.  When this
+-- note was written, it used a fourth axiom, build-toPMF-≡-id,
+-- declared there, which is the round trip d ≡ build (toPMF d).
 -- build-toPMF-≡-id is stated in Representation-Convex.agda
 -- because build and toPMF are both defined there.
 --
@@ -849,8 +852,8 @@ renorm-tail d pt k = normalize (mass d (fsuc k)) (tail-mass d) pt
 -- The Bayesian-projection (head-tail) construction.
 --
 -- Earlier drafts assumed one Σ-type axiom here: a renormalized
--- tail FDist for any distribution with positive tail-mass.  It
--- has since been discharged, by deriving it from a head-tail
+-- tail FDist for any distribution with positive tail-mass.  A
+-- later version discharged it, by deriving it from a head-tail
 -- decomposition together with mass-injectivity.  The results
 -- this artifact uses do not depend on it.  This module assumes
 -- no postulate.
@@ -924,9 +927,9 @@ marginal₂ d = mapF snd d
 -- wB · gB ≤ wB, so the left convex combination is ≤ the right
 -- one.
 
--- Phase 2 does not prove this.  It is a Phase 3 task.  Phase 2
--- records only that the statement of bayesPf gets shorter in the
--- new framing.  Each side has one normalize and two mix-w, in
+-- This file does not prove this identity.  It is left to a later
+-- phase.  This section records only that the statement of bayesPf
+-- gets shorter in the new framing.  Each side has one normalize and two mix-w, in
 -- place of the old nested _+w_ / _*w_ / _/w_.
 
 -- ============================================================
@@ -973,8 +976,8 @@ marginal₂ d = mapF snd d
 --   1-w (mix-w p a b) ≡ mix-w p (1-w a) (1-w b)
 -- ============================================================
 
--- 1-w-mix-w is in the main postulate block, Section 1.  The
--- soundness argument is documented there.
+-- 1-w-mix-w is imported in Section 1 from WeightQ-Convex, where
+-- it is a theorem of the WeightQ model layer.
 
 -- tail-mass-mix: tail-mass commutes with mix.
 tail-mass-mix : ∀ {n} (p : Weight) (d₁ d₂ : FDist (Fin (suc n)))

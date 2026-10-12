@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Classifier — Ω is the subobject classifier.
+-- Topos.Classifier: Ω is the subobject classifier.
 --
 -- Topos.Omega builds Ω, the presheaf of sieves.
 -- Topos.DoClassifier classifies one subobject, the value-fixing

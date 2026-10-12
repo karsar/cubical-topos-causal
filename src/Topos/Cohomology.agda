@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Cohomology — the cohomological refinement of the
+-- Topos.Cohomology: the cohomological refinement of the
 -- contextuality obstruction.
 --
 -- Topos.Contextuality showed that Specker's empirical model has

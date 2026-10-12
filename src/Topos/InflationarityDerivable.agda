@@ -5,7 +5,7 @@
 --
 -- The inflationarity law  S ≤ j S  follows from naturality (jnat)
 -- together with truth-preservation (j-⊤).  So `LawvereTierney`
--- needs no `j-infl` field.  A Lawvere–Tierney topology is a
+-- needs no `j-infl` field.  A Lawvere-Tierney topology is a
 -- natural morphism j : Ω ⇒ Ω, and every such morphism is
 -- inflationary.
 --

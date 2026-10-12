@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.TiersConverse — the converse directions of the tier
+-- Topos.TiersConverse: the converse directions of the tier
 -- characterization.  With Topos.AbstractionTiers this closes
 -- the iff, constructively:
 --
@@ -14,16 +14,16 @@
 --                    because φB reflects ⊤ through App-id.
 --   inj⇒back∥      : D thin and antisymmetric.  Injectivity
 --                    identifies the principal sieve at h with
---                    its image-generated part; evaluating at h
---                    yields a mere lift.
+--                    its image-generated part.  Evaluation at
+--                    h yields a mere lift.
 --   surj⇒reflect   : C and D thin.  Surjectivity onto the
 --                    principal fine sieve at gy turns a coarse
 --                    arrow into a fine one.
 --
--- The lift in inj⇒back∥ is merely-existent, and that is the
--- constructive content: the converse holds with no choice and
--- no excluded middle, and BackCond∥ is exactly what Tier 1
--- consumes.
+-- The lift in inj⇒back∥ exists merely, that is, inside a
+-- propositional truncation.  That is the constructive content.
+-- The converse holds with no choice and no excluded middle.
+-- BackCond∥ is exactly what Tier 1 consumes.
 -- ============================================================
 
 module Topos.TiersConverse where

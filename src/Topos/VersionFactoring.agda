@@ -1,14 +1,14 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.VersionFactoring — well-definedness of a causal effect
+-- Topos.VersionFactoring: well-definedness of a causal effect
 -- as an internal truth value.
 --
 -- Hernán and Taubman object that an observational study of body
 -- mass index does not name the intervention: different means of
--- reaching the same BMI may give different mortality outcomes.
+-- reaching the same BMI can give different mortality outcomes.
 -- Pearl replies that do(X := x) is manipulation-neutral by
--- construction, and that indexing it by the means would be a
+-- construction, and that an operator indexed by the means is a
 -- different operator.  The assumption that closes the gap is
 -- VanderWeele and Hernán's TREATMENT VARIATION IRRELEVANCE: the
 -- outcome under treatment value x is the same whichever version
@@ -35,11 +35,12 @@
 --                    from Topos.Classifier.
 --   Here             the STAGEWISE reading: well-definedness at
 --                    this regime only.  Factors→Here always.
---   Factors↔AllHere  Factors is exactly the hereditary closure of
+--   Factors→AllHere, AllHere→Factors
+--                    Factors is exactly the hereditary closure of
 --                    Here: "well defined here and in every
 --                    refinement".  This is the Kripke-Joyal
---                    reading of the internal ∀, and it is why
---                    Factors, unlike Here, is a truth value.
+--                    reading of the internal ∀.  It is the reason
+--                    that Factors, unlike Here, is a truth value.
 --   Here→Factors     the converse of Factors→Here needs a
 --                    condition on the site: LiftPairs, that every
 --                    same-value pair at a refinement is the
@@ -47,23 +48,23 @@
 --                    That is "refinement adds no versions".
 --   Here-closed      under LiftPairs the stagewise predicate is
 --                    itself closed under restriction.  This is
---                    the exact form of the conjecture that
+--                    the precise form of the conjecture that
 --                    factoring is down-closed when refinement
---                    narrows the available versions: it is TRUE
---                    of the stagewise reading, and VACUOUS for
+--                    narrows the available versions.  It is TRUE
+--                    of the stagewise reading.  It is VACUOUS for
 --                    the hereditary one, which is down-closed
 --                    with no condition at all.
 --   ungraded         under LiftPairs the sieve is maximal exactly
---                    when the stagewise reading holds.  NOTE this
---                    does NOT make the truth value Boolean: the
+--                    when the stagewise reading holds.  NOTE: this
+--                    does NOT make the truth value Boolean.  The
 --                    sieve can still be proper, because the
 --                    stagewise property can vary from regime to
 --                    regime.  LiftPairs removes one source of
---                    grading (the hereditary/stagewise gap), not
---                    the other (genuine regime-dependence).
+--                    grading, the hereditary/stagewise gap.  It
+--                    leaves the other, regime-dependence.
 --
 -- The reading: well-definedness of a causal effect is a truth
--- value in Ω, not a Boolean.  Topos.VersionSite exhibits a site
+-- value in Ω, and it need not be Boolean.  Topos.VersionSite exhibits a site
 -- on which it is a proper sieve.
 -- ============================================================
 
@@ -96,7 +97,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
 
   -- ----------------------------------------------------------
   -- The mechanism object of the FINE world.  Its input is the
-  -- version, not the value; that is the whole of Hernán's point.
+  -- version, not the value.  That is Hernán's point.
   -- ----------------------------------------------------------
   MechV : PSh C ℓ
   MechV = Exp {C = C} Ver (Dist_E {C = C} Out)
@@ -111,7 +112,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   isPropSameVal d a b = isSetF₀ Val d _ _
 
   -- Having the same value is closed under restriction.  This is
-  -- the one place naturality of the coarsening is used: it makes
+  -- the only place that uses naturality of the coarsening.  It makes
   -- the relation a subpresheaf of Ver ×ᴾ Ver.
   SameVal-closed : (d e : Ob) (k : Hom e d) (a b : F₀ Ver d)
                  → SameVal d a b → SameVal e (F₁ Ver k a) (F₁ Ver k b)
@@ -122,7 +123,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- TREATMENT VARIATION IRRELEVANCE, hereditary form.  The
   -- mechanism factors through p at c and at every stage below c.
   -- The quantifier over arrows into c is the Kripke-Joyal reading
-  -- of the internal ∀; it is what makes the predicate a sieve.
+  -- of the internal ∀.  It makes the predicate a sieve.
   -- ----------------------------------------------------------
   Factors : (c : Ob) → F₀ MechV c → hProp ℓ
   Factors c m =
@@ -134,10 +135,10 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- ----------------------------------------------------------
   -- CLOSURE UNDER RESTRICTION, with no condition on the site.
   -- Restricting a mechanism precomposes its index arrow, so a
-  -- witness at d is reused at e by composing.  This is exactly
+  -- witness at d is reused at e by composing.  This is
   -- MechanismObject.Adm-closed, with the two extra version
-  -- arguments carried along unchanged: at the stage d' the
-  -- quantifier ranges over F₀ Ver d' whichever route reached d'.
+  -- arguments carried along unchanged.  At the stage d' the
+  -- quantifier ranges over F₀ Ver d', whichever route reached d'.
   -- ----------------------------------------------------------
   Factors-closed : (d e : Ob) (k : Hom e d) (m : F₀ MechV d)
                  → fst (Factors d m) → fst (Factors e (F₁ MechV k m))
@@ -176,10 +177,10 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- ----------------------------------------------------------
   -- Factors IS the hereditary closure of Here.  Both directions
   -- are unconditional.  So the predicate the classifier sees is
-  -- "well defined at this regime and at every refinement of it",
-  -- which is the Kripke-Joyal semantics of the internal ∀ over
-  -- refinements.  That is the whole reason it is restriction-
-  -- stable, and it is what the stagewise reading lacks.
+  -- "well defined at this regime and at every refinement of it".
+  -- This is the Kripke-Joyal semantics of the internal ∀ over
+  -- refinements.  That is the reason it is restriction-stable,
+  -- and the stagewise reading lacks this property.
   -- ----------------------------------------------------------
   Factors→AllHere : (c : Ob) (m : F₀ MechV c) → fst (Factors c m)
                   → (d : Ob) (g : Hom d c) → Here d (F₁ MechV g m)
@@ -196,9 +197,9 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- THE CONDITION ON THE SITE.  Every same-value pair at a stage
   -- below c is the restriction of a same-value pair at c.  In
   -- words: refinement makes no NEW versions available.  This is
-  -- the author's hypothesis, in its sharp form; note it is a
-  -- lifting condition on the version presheaf, not a mere
-  -- inclusion of version sets.
+  -- the author's hypothesis, in its sharp form.  It is a lifting
+  -- condition on the version presheaf.  It is not an inclusion of
+  -- version sets.
   -- ----------------------------------------------------------
   LiftPairs : (c : Ob) → Type ℓ
   LiftPairs c =
@@ -241,7 +242,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
       (Factors-closed d e k m (Here→Factors d lp m h))
 
   -- Under LiftPairs the two readings agree at c.  This does NOT
-  -- say the sieve is ⊥ or ⊤; see the header.
+  -- say the sieve is ⊥ or ⊤.  See the header.
   ungraded : (c : Ob) → LiftPairs c → (m : F₀ MechV c)
            → ( Here c m → χ-wd-sieve c m ≡ maximal {C = C} c )
            × ( χ-wd-sieve c m ≡ maximal {C = C} c → Here c m )
@@ -255,7 +256,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- An outcome presheaf is FAITHFUL when no refinement loses
   -- outcome information: restriction of outcome distributions is
   -- injective.  Topos.MechanismSite gets its non-maximal sieve by
-  -- breaking exactly this — there the value type collapses to a
+  -- breaking this property.  There the value type collapses to a
   -- point at do0, so anything is admissible there.  With faithful
   -- outcomes that route is closed.
   -- ----------------------------------------------------------
@@ -299,14 +300,14 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
   -- ----------------------------------------------------------
   -- THE DICHOTOMY.  Under faithful outcomes AND LiftPairs the
   -- truth value is two-valued: a sieve that is not maximal is
-  -- empty.  Contrapositively, a PROPER classifying sieve — a
-  -- genuinely graded well-definedness — requires either that
-  -- refinement adds versions, or that refinement loses outcome
+  -- empty.  Contrapositively, a PROPER classifying sieve, that is
+  -- a graded well-definedness, requires one of two things:
+  -- refinement adds versions, or refinement loses outcome
   -- information.
   --
-  -- This inverts the stated risk.  Refinement adding versions is
-  -- not a threat to the construction; with faithful outcomes it
-  -- is the ONLY thing that makes the truth value interesting.
+  -- This inverts the stated risk.  When refinement adds versions,
+  -- the construction is not at risk.  With faithful outcomes it is
+  -- the ONLY source of a proper, graded truth value.
   -- ----------------------------------------------------------
   two-valued : OutFaithful → (c : Ob) → LiftPairs c → (m : F₀ MechV c)
              → ¬ (χ-wd-sieve c m ≡ maximal {C = C} c)
@@ -316,13 +317,13 @@ module _ {ℓ} {C : Precategory ℓ ℓ}
 
 -- ------------------------------------------------------------
 -- Transfer along an abstraction of regimes.  Topos.MechanismGeometric
--- notes that admissibility, being an equation, survives every base
--- functor, while quantified statements are supposed to need a side
+-- shows that admissibility, an equation, survives every base
+-- functor.  Quantified statements are expected to need a side
 -- condition.  Factoring IS a quantified statement, and it survives
--- too.  The reason is that the quantifier over versions ranges over
--- a PULLED-BACK object, so no new elements appear; the side
--- condition of Topos.AbstractionTiers is about ⇒, where the
--- quantifier ranges over refinements the fine site may not see.
+-- too.  The quantifier over versions ranges over a PULLED-BACK
+-- object, so no new elements appear.  The side condition of
+-- Topos.AbstractionTiers is about ⇒.  There the quantifier ranges
+-- over refinements that the fine site can fail to see.
 -- ------------------------------------------------------------
 module _ {ℓ} {C D : Precategory ℓ ℓ} (F : BaseFunctor C D)
          (Ver Val : PSh D ℓ) (p : Nat {C = D} Ver Val) (Out : PSh D ℓ) where

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.TransportProbabilistic — step 2, the probabilistic lift.
+-- Transport.TransportProbabilistic: step 2, the probabilistic lift.
 --
 -- The general theorem (Transport.TransportGeneral) is stated for ANY
 -- presheaf of worlds and ANY prop-valued, restriction-stable
@@ -15,18 +15,18 @@
 -- distributions is then a PROPOSITION, which is what StablePred
 -- requires.  Hence:
 --
---   Wp        — a presheaf of probabilistic worlds (FDist Bool);
---   probPred  — the predicate "the world distribution equals a
+--   Wp          a presheaf of probabilistic worlds (FDist Bool).
+--   probPred    the predicate "the world distribution equals a
 --               target".  It is restriction-stable, so it is a
---               genuine StablePred;
---   χp        — the general theorem then gives a subobject
+--               StablePred.
+--   χp          the general theorem then gives a subobject
 --               χ : Wp ⇒ Ω, so probabilistic counterfactual
---               statements are internal truth values;
---   prob-transport-invariant — transport, that is forcing, of a
+--               statements are internal truth values.
+--   prob-transport-invariant: transport, that is forcing, of a
 --               distributional counterfactual is downward-closed.
---               The proof is the one from the deterministic case;
+--               The proof is the one from the deterministic case.
 --
---   transport→dist — the bridge.  A transported deterministic
+--   transport→dist: the bridge.  A transported deterministic
 --               counterfactual has a determinate DISTRIBUTION in
 --               every regime, the point mass at the queried outcome.
 --               Here cfd c u = pure (cfo c u), and transport gives
@@ -37,11 +37,11 @@
 --
 -- STILL OPEN (step 3 territory).  In this module the per-regime
 -- distributions are point masses, and restriction-stability is the
--- Boolean condition lifted.  The genuinely probabilistic refinement
--- is the next step, built on this instantiation: worlds carrying
--- kernels, abduction as Bayesian conditioning, restriction-stability
--- as invariance under conditioning, and the SOUNDNESS direction,
--- that invariant implies transportable.
+-- Boolean condition lifted.  The fully probabilistic refinement is
+-- the next step, and it builds on this instantiation.  It has four
+-- parts.  Worlds carry kernels.  Abduction is Bayesian conditioning.
+-- Restriction-stability is invariance under conditioning.  The last
+-- part is the SOUNDNESS direction: invariant implies transportable.
 -- ============================================================
 
 module Transport.TransportProbabilistic where
@@ -83,7 +83,7 @@ Wp = record
 -- ----------------------------------------------------------
 -- The probabilistic counterfactual predicate says "the world
 -- distribution equals the target".  It is prop-valued, because FDist
--- is a set, and it is restriction-stable.  It is therefore a genuine
+-- is a set, and it is restriction-stable.  It is therefore a
 -- StablePred, and the general theorem applies.
 -- ----------------------------------------------------------
 probPred : TG.StablePred {C = C} Wp
@@ -96,8 +96,8 @@ probPred = record
 χp = TG.chi probPred
 
 -- Transport, that is forcing, of a distributional counterfactual is
--- downward-closed.  Forced at a regime gives forced at every regime
--- restricting into it.
+-- downward-closed.  If it is forced at a regime, it is forced at
+-- every regime that restricts into it.
 prob-transport-invariant :
     {c : Obj} (w : FDist Bool) → _⊩_ {C = C} c (TG.chiSieve probPred c w)
   → {d : Obj} (f : Hom₀ d c) → _⊩_ {C = C} d (TG.chiSieve probPred d w)

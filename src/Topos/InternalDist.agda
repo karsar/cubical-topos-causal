@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InternalDist — the internal distribution object, reusing
+-- Topos.InternalDist: the internal distribution object, reusing
 -- the core probability monad.
 --
 -- The internal distribution object of the presheaf topos Set^Cᵒᵖ

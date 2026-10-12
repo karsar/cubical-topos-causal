@@ -1,20 +1,19 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Modality — Stage 2 (b): the lex modality ◯ as a
+-- Topos.Modality: Stage 2 (b), the lex modality ◯ as a
 -- reflective modality, at the propositional (subobject) level.
 --
--- A Lawvere–Tierney topology J gives a closure operator
---     ◯ = jop J : Ω → Ω
--- with unit η, which is inflationarity j-infl, and with
--- idempotence, which makes ◯S modal.  It also has the reflector
--- universal property:
+-- A Lawvere-Tierney topology J gives a closure operator
+--     ◯ = jop J : Ω → Ω.
+-- Its unit η is inflationarity, j-infl.  Its idempotence makes
+-- ◯S modal.  It also has the reflector universal property:
 --     T modal  ⟹  ( S ≤ T  ⇔  ◯S ≤ T ).
 -- So the j-closed sieves form a reflective sub-poset of Ω.  ◯ is
 -- the reflector and η is the unit.  This is sheafification
 -- restricted to subobjects, that is, at the (−1)-truncated level.
--- "◯-modal" becomes a property one can state and discharge
--- directly, namely is-j-closed.  That is what (b) asked for.
+-- "◯-modal" is then a property that we can state and prove
+-- directly.  It is is-j-closed.  That is what (b) asked for.
 --
 -- SCOPE: the modality here acts on propositions, that is, on
 -- truth values.  The full type-level reflector is sheafification

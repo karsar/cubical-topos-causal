@@ -1,8 +1,12 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.CoarseClassicality — internal versus stagewise validity
+-- Topos.CoarseClassicality: internal versus stagewise validity
 -- on the coarse site Cv (cDo → cObs).
+--
+-- Internal validity of a sieve S over cObs is forcing: S
+-- contains the identity of cObs.  Stagewise validity means that
+-- S contains the covering arrow ce.
 --
 -- The internal-vs-stagewise gap of Topos.Classicality is also
 -- present on the coarse site, with a different witness.  The
@@ -64,7 +68,7 @@ stagewiseC→⊩j S p = p
 -- The witness has a different shape than in Topos.Classicality.
 -- There, ¬ ci-one held at do1 and contributed to the
 -- disjunction.  Here ¬ ci-c holds nowhere, because restriction
--- along ce always lands in ci-c.  Only the left disjunct
+-- along ce always gives an arrow in ci-c.  Only the left disjunct
 -- contributes.
 -- ------------------------------------------------------------
 em-C : Sieve {C = Cv} cObs
@@ -81,7 +85,7 @@ em-C-stagewise = em-C-at-cDo
 
 -- The disjunction is not forced at cObs.  ci-c omits the
 -- identity.  ¬ ci-c fails at the identity: its restriction
--- along ce lands in ci-c.
+-- along ce is in ci-c.
 em-C-not-forced : ¬ (_⊩_ {C = Cv} cObs em-C)
 em-C-not-forced x = E.rec* (⊔-elim (fst ci-c cObs idc)
                                    (fst (¬S {C = Cv} {c = cObs} ci-c) cObs idc)
@@ -97,7 +101,7 @@ internalC-strictly-stronger
 internalC-strictly-stronger = em-C , em-C-stagewise , em-C-not-forced
 
 -- ------------------------------------------------------------
--- (3b) The closure repairs exactly this gap.
+-- (3b) The closure repairs this gap.
 -- ------------------------------------------------------------
 em-C-covered : jC em-C ≡ maximal {C = Cv} cObs
 em-C-covered = Sieve≡ {C = Cv} (jC em-C) (maximal {C = Cv} cObs)

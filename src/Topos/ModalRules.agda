@@ -1,16 +1,16 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ModalRules — Stage 2 (d): Pearl Rules 2 and 3 made modal.
+-- Topos.ModalRules: Stage 2 (d), Pearl Rules 2 and 3 made modal.
 --
 -- The pattern is the one of Topos.ModalRule1.  Each rule's
 -- conclusion is an equality of FDists.  FDist is a set, so that
 -- equality is a proposition.  We internalise it into Ω with
--- prop→sieve, then show the resulting truth value is j-closed
--- for every Lawvere–Tierney topology.  Rules 2 and 3 therefore
--- hold, as Rule 1 does, in the internal logic of every sheaf
--- subtopos (j-do-calculus), the non-trivial ¬¬ topology
--- included.
+-- prop→sieve.  Then we show that the resulting truth value is
+-- j-closed (j S = S) for every Lawvere-Tierney topology.  So
+-- Rules 2 and 3 hold in the internal logic of every sheaf
+-- subtopos, as Rule 1 does.  This is the j-do-calculus.  It
+-- includes the subtopos of the non-trivial ¬¬ topology.
 --
 -- The scope caveat of Topos.ModalRule1 applies here too.  Each
 -- truth value collapses to ⊤ before j acts, so neither result

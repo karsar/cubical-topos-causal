@@ -1,12 +1,14 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionSite — the intervention poset as a site.
+-- Topos.InterventionSite: the intervention poset as a site.
 --
 -- This is the base for Gate 1 of the topos-directed-homotopy
 -- programme.  Gate 1 recomputes the modality on a coverage that
 -- is not degenerate.  The question is whether the ⊤-collapse is
--- caused by the coverage or by invertibility.
+-- caused by the coverage or by invertibility.  A site is a
+-- category with a coverage.  A coverage picks covering families
+-- of arrows into each object.
 --
 -- Base category (a thin poset):
 --     do0 ─→ obs ←─ do1

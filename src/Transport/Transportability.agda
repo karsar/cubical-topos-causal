@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.Transportability — from witness to theorem.
+-- Transport.Transportability: from witness to theorem.
 --
 -- The weld (Transport.CounterfactualWeld) shows, for two specific
 -- worlds, that forcing the computed counterfactual at the global
@@ -29,14 +29,15 @@
 -- non-transportable world come back as corollaries of the general
 -- theorem.
 --
--- HONEST LIMITS (unchanged from the weld).  The model is
+-- LIMITS (unchanged from the weld).  The model is
 -- deterministic.  The regime category is finite.  Worlds are the
 -- shared exogenous noise.  "Transport" here is the internal notion,
 -- forcing at a context.  It is NOT yet proved equivalent to the
--- Bareinboim-Pearl s-hedge criterion; that equivalence and the
+-- Bareinboim-Pearl s-hedge criterion.  That equivalence and the
 -- probabilistic (FDist-kernel) case are the remaining theory.  What
--- this module adds over the weld: the predicate is a genuine
--- W ⇒ Ω, and transport-invariance holds for a class of models.
+-- this module adds over the weld: the predicate is a natural
+-- transformation W ⇒ Ω, and transport-invariance holds for a class
+-- of models.
 -- ============================================================
 
 module Transport.Transportability where
@@ -85,7 +86,7 @@ record RegPred : Type₁ where
     stable  : (c d : Obj) (k : Hom₀ d c) (u : U) → P c u → P d u
 
 -- ----------------------------------------------------------
--- Every restriction-stable regime predicate gives a genuine internal
+-- Every restriction-stable regime predicate gives an internal
 -- predicate χ : W ⇒ Ω.  Naturality is proved.  It holds because
 -- sieve membership reads only the source regime.
 -- ----------------------------------------------------------
@@ -99,8 +100,8 @@ record RegPred : Type₁ where
     nat x y f u = Sieve≡ {C = C} (α x u) (pull {C = C} f (α y u)) refl
 
 -- The counterfactual TRANSPORTS to regime c at world u exactly when
--- it is forced there, that is, when c ⊩ S for S the sieve component
--- of χ at c and u.
+-- it is forced there.  That is, c ⊩ S, where S is the sieve
+-- component of χ at c and u.
 transports-to : RegPred → Obj → U → Type
 transports-to R c u = _⊩_ {C = C} c (fst (χ R) c u)
 

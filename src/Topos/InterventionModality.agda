@@ -1,13 +1,13 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionModality — Gate 1 payload.
+-- Topos.InterventionModality: the Gate 1 results.
 --
 -- The site is Iv (do0 → obs ← do1) from Topos.InterventionSite,
 -- with the coverage "obs is covered by {do0, do1}".  On it the
 -- closure operator j moves truth values:
---   * a CI that holds under BOTH interventions ({e0,e1}) closes
---     up to the maximal sieve ⊤;
+--   * a CI (conditional independence claim) that holds under
+--     BOTH interventions ({e0,e1}) closes up to the maximal sieve ⊤.
 --   * a CI that holds under only ONE intervention ({e0}) SURVIVES
 --     closure (j {e0} ≠ maximal).
 -- So the ⊤-collapse of the discrete two-regime site comes from

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- WeightQ-Field — the ordered-field interface, made opaque.
+-- WeightQ-Field: the ordered-field interface, made opaque.
 --
 -- WeightQ.agda once used `postulate` for an abstract ordered
 -- field ℝ.  A postulated symbol is rigid.  The typechecker

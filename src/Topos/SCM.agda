@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.SCM — internal structural causal models over the
+-- Topos.SCM: internal structural causal models over the
 -- regime base C.
 --
 -- An internal SCM on presheaves X and Y is, regime by regime,

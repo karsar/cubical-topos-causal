@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Contextuality — a gluing obstruction: local causal
--- data that is pairwise consistent and has no global model.
+-- Topos.Contextuality: a gluing obstruction.  Local causal
+-- data is pairwise consistent and has no global model.
 --
 -- Section 4 (Topos.Gluing) showed that two mechanisms agreeing
 -- on an overlap always glue.  The glued object is a pullback,
@@ -10,7 +10,8 @@
 -- topos.  An obstruction needs three contexts.  Over a cover
 -- with three measurement contexts, local sections can agree
 -- pairwise on every overlap and still have no global section.
--- The sheaf condition then fails.  Abramsky and Brandenburger
+-- The sheaf condition, that every compatible family glues,
+-- then fails.  Abramsky and Brandenburger
 -- define (strong) contextuality by this failure.  The module
 -- checks it for a causal empirical model.
 --

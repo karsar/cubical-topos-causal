@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Omega — the subobject classifier of the presheaf topos,
+-- Topos.Omega: the subobject classifier of the presheaf topos,
 -- and interventions as characteristic maps into it.
 --
 -- A sieve on c is a family of morphisms into c that is closed

@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Rule2 — internal Pearl Rule 2 (action/observation
--- exchange) on the confounded model, lifting RuleDoCalc/Rule2.
+-- Topos.Rule2: internal Pearl Rule 2 (action/observation
+-- exchange) on the confounded model.  It lifts RuleDoCalc/Rule2.
 --
 -- A confounded SCM has a joint prior pXZ on (X,Z) and a kernel
 -- kY that depends on both X and Z.  A structural CI witness is a
@@ -13,16 +13,16 @@
 -- Rule2.rule2-marginal-ZY and rule2-marginal-Y at each regime.
 --
 -- Levels, each stronger than the one before it:
---  * rule2-{ZY,Y}-E: the pointwise form, one regime at a time;
+--  * rule2-{ZY,Y}-E: the pointwise form, one regime at a time.
 --  * rule2-{Y,ZY}-section: an equality of internal morphisms,
---    with naturality assumed;
+--    with naturality assumed.
 --  * SCM-conf-E-nat and margY-conf-nat: the Y-marginal of a
 --    natural confounded SCM is itself natural.  This level proves
---    that; the level above assumes it.  It is the confounded
+--    that.  The level above assumes it.  It is the confounded
 --    analogue of Topos.SCMNat.marg-nat.
 --    The proof goes through the fusion
---    marginal-Y ≡ pXZ >>= (kY ∘ ⟨fst,snd⟩);
---  * do-conf-nat: do-X-conf preserves naturality;
+--    marginal-Y ≡ pXZ >>= (kY ∘ ⟨fst,snd⟩).
+--  * do-conf-nat: do-X-conf preserves naturality.
 --  * rule2-Y-section-derived: internal Rule 2 with no naturality
 --    hypothesis.  Naturality of the left side comes from
 --    margY-conf-nat.  Naturality of the right side is
@@ -95,11 +95,11 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     rule2-Y-E m ind x₀ c = rule2-marginal-Y (m c) (ind c) (x₀ c)
 
     -- ------------------------------------------------------------
-    -- The Section form, at the level of rule1-E-nat.  Assume the
-    -- intervened and the conditioned downstream marginals are
-    -- natural; the witnesses ndo and nm carry that assumption.
-    -- They are the confounded analogue of Topos.SCMNat.marg-nat,
-    -- and are derivable from a natural pXZ, a natural kY and the
+    -- The Section form, at the level of rule1-E-nat.  We assume
+    -- that the intervened and the conditioned downstream marginals
+    -- are natural.  The witnesses ndo and nm carry that assumption.
+    -- They are the confounded analogue of Topos.SCMNat.marg-nat.
+    -- They are derivable from a natural pXZ, a natural kY and the
     -- CI witness.  Under them, Nat≡ turns the pointwise rule2 into
     -- an equality of internal morphisms.
     -- ------------------------------------------------------------

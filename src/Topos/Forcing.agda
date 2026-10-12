@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Forcing — the internal language: Mitchell-Bénabou terms
+-- Topos.Forcing: the internal language: Mitchell-Bénabou terms
 -- and Kripke-Joyal forcing semantics (Mahadevan's pillar 3).
 --
 -- A predicate on a presheaf B is a morphism φ : B ⇒ Ω.  It is a
@@ -15,7 +15,7 @@
 --   * locality, also called monotonicity.  Forcing is stable
 --     under restriction.  This is the defining Kripke property.
 --   * the clauses for ⊤, ⊥, ∧, ⇒, ∨, and the clauses for the
---     quantifiers ∀ and ∃.  These follow Mac Lane–Moerdijk VI.6,
+--     quantifiers ∀ and ∃.  These follow Mac Lane-Moerdijk VI.6,
 --     specialized to a presheaf topos.
 --
 -- Mahadevan's TCM invokes this layer.  It calls it the internal
@@ -59,7 +59,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- Forcing of a truth value at a stage.  c forces S when the
   -- identity at c lies in the sieve S.  The relation is
   -- prop-valued, because sieve membership is prop-valued.
-  -- Equivalently, a ∈ the classified subobject.
+  -- For the truth value χ(a) of an element a, forcing means
+  -- that a lies in the classified subobject.
   -- ----------------------------------------------------------
   _⊩_ : (c : Ob) → Sieve {C = C} c → Type ℓ
   c ⊩ S = fst (fst S c idn)

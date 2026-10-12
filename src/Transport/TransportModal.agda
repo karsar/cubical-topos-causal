@@ -1,47 +1,36 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.TransportModal — transportability is the invariance
--- modality.
+-- Transport.TransportModal: a transported counterfactual is
+-- j-closed for every topology.
 --
--- The modal layer of the paper (Topos.LawvereTierney,
--- InterventionModal, ModalRules) proves that interventions and
--- Pearl's rules are j-CLOSED for EVERY Lawvere-Tierney topology.
--- j-closed means invariant under the localization that the topology
--- defines.  One mechanism does the work there: the truth value of
--- the statement is the maximal sieve ⊤, and ⊤ is j-closed for every
--- topology (⊤-j-closed = j-⊤).
+-- A counterfactual is TRANSPORTABLE to the global context g when
+-- it is forced there.  This module shows that its truth value is
+-- then the maximal sieve ⊤.  The paper's ⊤-j-closed then makes it
+-- j-closed for every Lawvere-Tierney topology.  This is the same
+-- collapse to ⊤ that do-j-stable and the modal rules use.
 --
--- The transportability story (Transport.Transportability) reaches
--- the same point.  A counterfactual is TRANSPORTABLE to the global
--- context when it is forced there.  This module shows that in that
--- case its internal truth value is the maximal sieve ⊤.  By the
--- paper's own ⊤-j-closed it is then j-closed for every topology,
--- that is, invariant under every localization.
+-- The theorem names contain "invariant".  Here that word means
+-- j-closed.  It does not mean that a causal effect takes the same
+-- value in every regime.
 --
---   transportable→⊤-gen        : forced at the global context gives
---                                truth value ⊤, for ANY R : RegPred.
---   transportable→invariant-gen: hence j-closed for EVERY topology J,
---                                by the same ⊤-collapse that the
---                                paper's do-j-stable and modal-rules
---                                use.
---   transportable→⊤, transportable→invariant: the scmPred instances.
+-- This is one direction only.  The converse needs more than
+-- closedness: the closure must also be forced.
+-- Transport.TransportDescent proves that equivalence for every
+-- base and topology.  Transport.TransportSoundness proves the
+-- two-regime instance, with local truth, and shows that local
+-- truth cannot be dropped.
 --
--- Both general forms quantify over the regime predicate.  The base
--- category of regimes is still the fixed two-object one of
--- Transport.CounterfactualForcing.
+-- Results:
+--   transportable→⊤-gen          forced at g gives truth value ⊤,
+--                                for ANY R : RegPred.
+--   transportable→invariant-gen  hence j-closed for EVERY J.
+--   transportable→⊤, transportable→invariant
+--                                the scmPred instances.
 --
--- The reading: transportability, j-stability and invariance coincide
--- here.  The modality the paper studies for interventions is, for
--- counterfactuals, transportability.  A counterfactual that holds
--- only in an environment does not transport.  Its truth value is
--- then below ⊤, so it is not j-closed for the regime topology, and
--- it is not yet invariant.
---
--- STILL OPEN (unchanged): the equivalence with the Bareinboim-Pearl
--- s-hedge criterion, and the probabilistic case.  This module gives
--- the bridge to the paper's modal layer.  It does not give that
--- equivalence.
+-- The base category of regimes is the fixed two-object one of
+-- Transport.CounterfactualForcing.  The equivalence with the
+-- Bareinboim-Pearl s-hedge criterion is not proved here.
 -- ============================================================
 
 module Transport.TransportModal where

@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.DoubleNegation — Stage 2 (a): a NON-TRIVIAL Lawvere–
--- Tierney topology, j = ¬¬.
+-- Topos.DoubleNegation: Stage 2 (a), a NON-TRIVIAL
+-- Lawvere-Tierney topology, j = ¬¬.
 --
 -- The trivial topology, Topos.LawvereTierney.trivialLT, makes the
 -- modal results do-j-stable and modal-rule1 hold.  It makes them
@@ -11,11 +11,13 @@
 -- example.  Its sheaves are the ¬¬-closed objects, which are the
 -- Boolean ones, and its internal logic is Boolean.  Instantiating
 -- do-j-stable and modal-rule1 at ¬¬ says that interventions and
--- Rule 1 survive the Boolean localization.
+-- Rule 1 survive the Boolean localization.  A Lawvere-Tierney
+-- topology is a natural map j : Ω ⇒ Ω that preserves ⊤ and meets
+-- and is idempotent.
 --
 -- The module first builds the Heyting structure on sieves that
 -- this needs: bottom ⊥, implication ⇒, and negation ¬.  It then
--- proves that ¬¬ satisfies the three Lawvere–Tierney axioms.
+-- proves that ¬¬ satisfies the three Lawvere-Tierney axioms.
 -- Everything sits at a single level ℓ.  That keeps the
 -- ∀-quantified implication membership in hProp ℓ, which is the
 -- hom level.
@@ -50,7 +52,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   ⊥S c = (λ d f → ⊥* , isProp⊥*) , (λ d e k f x → x)
 
   -- Heyting implication.  f ∈ (S ⇒ T) when every restriction of f
-  -- that lands in S also lands in T.
+  -- that lies in S also lies in T.
   _⇒S_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Sieve {C = C} c
   _⇒S_ {c} S T =
     (λ d f →
@@ -69,7 +71,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   ¬¬S {c} S = ¬S {c} (¬S {c} S)
 
   -- ----------------------------------------------------------
-  -- ¬¬ satisfies the Lawvere–Tierney axioms.
+  -- ¬¬ satisfies the Lawvere-Tierney axioms.
   -- ----------------------------------------------------------
 
   -- j ⊤ = ⊤, that is ¬¬⊤ = ⊤.  ¬⊤ is empty: apply the witness at
@@ -125,8 +127,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
   -- Meet preservation: ¬¬(S ∩ T) = ¬¬S ∩ ¬¬T.
   -- ----------------------------------------------------------
 
-  -- Meet alias pinned at C.  The bare ∧S leaves its {C} a
-  -- metavariable.
+  -- Meet alias with C fixed.  Without it, Agda cannot solve the
+  -- {C} argument of ∧S.
   _∩_ : {c : Ob} → Sieve {C = C} c → Sieve {C = C} c → Sieve {C = C} c
   _∩_ {c} S T = _∧S_ {C = C} {c = c} S T
 
@@ -199,7 +201,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} where
 
   -- ----------------------------------------------------------
   -- The double-negation topology, assembled.  jnat is inlined so
-  -- that its expected type, the record field, pins C.  ¬¬
+  -- that its expected type, the record field, fixes C.  ¬¬
   -- commutes with pullback by applying ¬-nat twice.
   -- ----------------------------------------------------------
   ¬¬LT : LawvereTierney {C = C}

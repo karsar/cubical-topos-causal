@@ -1,15 +1,16 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.HiddenRefinement — the observational restriction, and
+-- Topos.HiddenRefinement: the observational restriction, and
 -- what hiding a refinement does to the internal logic.
 --
 -- Pt is the one-context site.  obsOnly : Pt → Cv keeps cObs and
 -- discards the interventional refinement cDo.  This is the
 -- abstraction that looks at the observational context alone.
 --
--- obsOnly fails BackCond: the refinement ce has no lift
--- (back-fails).  Both Tier-1 conclusions fail with it:
+-- obsOnly fails BackCond, the condition that every coarse
+-- refinement of an image lifts to a fine one.  The refinement ce
+-- has no lift (back-fails).  Both Tier-1 conclusions fail with it:
 --
 --  (1) NOT INJECTIVE.  ci-c and ⊥ have the same preimage
 --      (hidden-collapse).  The claim "holds under the
@@ -18,9 +19,9 @@
 --
 --  (2) NEGATION BREAKS.  ¬ ci-c holds nowhere on Cv.  But on
 --      the restricted site the preimage of ci-c is empty, so
---      its negation is internally TRUE (neg-broken).  Hiding
---      the refinement that refutes ¬ ci-c manufactures internal
---      certainty of it.
+--      its negation is internally TRUE (neg-broken).  When the
+--      refinement that refutes ¬ ci-c is hidden, ¬ ci-c becomes
+--      internally certain.
 --
 -- Together with Topos.MergeAbstraction (Reflect fails, φ not
 -- surjective) this shows the two conditions of

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.MergeAbstraction — the merge abstraction and its
+-- Topos.MergeAbstraction: the merge abstraction and its
 -- comparison map on truth values.
 --
 -- F : Iv → Cv is the base functor.  F sends obs to cObs and
@@ -18,7 +18,7 @@
 --      a fine gap (merge-transfers-gap).
 --  (2) NOT ISO.  φ is not surjective.  The truth value
 --      ci-one = {e0} is not in its image.  So F* is not
---      logical.
+--      logical (a logical functor preserves the classifier Ω).
 --  (3) CAUSAL READING.  {e0} and {e1} state that a claim
 --      holds under one intervention and fails under the other.
 --      F sends e0 and e1 to the same arrow, so no coarse truth
@@ -146,10 +146,10 @@ mergeF = record { App₀ = F₀m ; App₁ = F₁m ; App-id = F₁m-id ; App-⋆ 
         (subst (λ Q → fst (fst Q do0 e0)) (sym p) tt*)
 
 -- ------------------------------------------------------------
--- (2c) φ sends ci-c to ci-both.  Together with φ-not-surjective
--- this locates the image at the concrete claims: the
--- both-interventions claim is reached, the one-intervention
--- claims are not.
+-- (2c) φ sends ci-c to ci-both.  Together with φ-not-surjective,
+-- this locates the image at the concrete claims.  The image
+-- contains the both-interventions claim.  It does not contain
+-- the one-intervention claims.
 -- ------------------------------------------------------------
 φ-ci-c : φ ci-c ≡ ci-both
 φ-ci-c = Sieve≡ {C = Iv} (φ ci-c) ci-both
@@ -217,7 +217,7 @@ merge-no-reflect r with r {do0} {do1} e0 e1 idd
 ... | ()
 
 -- ------------------------------------------------------------
--- (2e) The mirror of ci-one: {e1}, the claim holding under
+-- (2e) The mirror of ci-one: {e1}, the claim that holds under
 -- do(X:=1) only.  It has no preimage either, by the same
 -- argument with the two interventions exchanged.
 -- ------------------------------------------------------------

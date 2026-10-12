@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionLT — the intervention coverage as a
+-- Topos.InterventionLT: the intervention coverage as a
 -- Lawvere-Tierney topology on Ω.
 --
 -- Topos.InterventionModality computes a closure operator `jS` at
@@ -59,7 +59,7 @@ jopI do1 S = S
 
 -- ------------------------------------------------------------
 -- Naturality.  jopI commutes with restriction, so it is a map of
--- presheaves Ω ⇒ Ω rather than a family of separate operations.
+-- presheaves Ω ⇒ Ω.
 -- ------------------------------------------------------------
 jnatI : IsNat {C = Iv} (Ω {C = Iv}) (Ω {C = Iv}) jopI
 jnatI obs obs idₒ S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ g → goO d g)
@@ -165,9 +165,10 @@ open import Topos.InterventionModality
 -- The two facts above are instances of one characterisation.  It
 -- is the descent condition for the two-chart cover.  A truth
 -- value at obs is j-closed exactly when holding under both
--- interventions forces it to hold observationally.  The converse
--- implication is downward closure of the sieve, so it holds for
--- every sieve, and all the content sits in the stated direction.
+-- interventions forces it to hold observationally.  A j-closed
+-- truth value is one that the closure fixes.  The converse
+-- implication is downward closure of the sieve.  So it holds for
+-- every sieve, and the stated direction carries all the content.
 --
 -- Causal reading.  The modality fixes exactly the claims that
 -- already descend along the cover.  It moves exactly the claims
@@ -224,16 +225,17 @@ ci-both-not-closed p = ci-both-not-descends (closed→descends ci-both p)
 -- On a poset, the subterminals of the presheaf topos are the
 -- down-closed sets of objects.  Take the subterminal that picks
 -- out the interventional contexts: `ci-both` at `obs`, and
--- everything at each intervention, both of these being minimal.
+-- everything at each intervention.  Both interventions are
+-- minimal objects.
 -- The Heyting implication out of it is the closure computed
 -- above.
 --
 -- Two consequences.  The four axioms become instances of the
 -- standard facts about open modalities, so they need not be four
 -- separate computations.  And an open subtopos has a
--- complementary CLOSED one, here supported on the single object
--- `obs`, so the site splits into an interventional part and an
--- observational part.  ¬¬ is dense, so it admits no such
+-- complementary CLOSED one.  Here the closed one is supported on
+-- the single object `obs`.  So the site splits into an
+-- interventional part and an observational part.  ¬¬ is dense, so it admits no such
 -- splitting.
 -- ------------------------------------------------------------
 
@@ -300,9 +302,9 @@ open-is-intervention do1 S = Sieve≡ {C = Iv} _ _ (funExt λ d → funExt λ f 
 --
 -- Openness determines the sheaves as well as the criterion.  The
 -- open subtopos here is carried by the two interventions, and
--- they are discrete.  So a j-closed truth value at `obs` should
--- amount to a pair of truth values, one per intervention.  It
--- does.  The observational membership of a closed sieve is forced
+-- they are discrete.  So we expect a j-closed truth value at
+-- `obs` to amount to a pair of truth values, one per
+-- intervention.  It does.  The observational membership of a closed sieve is forced
 -- to be the conjunction of the two interventional ones, and every
 -- pair arises this way.
 --
@@ -335,7 +337,7 @@ fromPair-closed P Q = descends→closed (fromPair P Q) (λ pq → pq)
 toPair : Sieve {C = Iv} obs → hProp ℓ-zero × hProp ℓ-zero
 toPair S = fst S do0 e0 , fst S do1 e1
 
--- every pair is realised; the proof is refl
+-- every pair is realised.  The proof is refl.
 toPair-fromPair : (P Q : hProp ℓ-zero) → toPair (fromPair P Q) ≡ (P , Q)
 toPair-fromPair P Q = refl
 

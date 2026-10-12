@@ -1,14 +1,14 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.MechanismSeparation — Ω does separate surgery from
--- observation, once it is pointed at mechanisms.
+-- Topos.MechanismSeparation: Ω does separate surgery from
+-- observation, once it is applied to mechanisms.
 --
 -- Topos.MechanismObject builds the classifier χ-do on the
--- mechanism object.  A classifier is only worth having if it
--- discriminates, so this module exhibits the two mechanisms the
--- paper's Section on the do-operator compares, and shows the
--- classifier tells them apart.
+-- mechanism object.  A classifier is useful only if it
+-- discriminates.  So this module exhibits the two mechanisms that
+-- the paper's Section on the do-operator compares.  It shows that
+-- the classifier tells them apart.
 --
 -- The base is a single context, which is the sharpest setting
 -- for the question: no refinement is available, so nothing here
@@ -26,10 +26,11 @@
 --   copy-not-admissible copy-mech is not admissible.
 --   χ-do-separates      the two classifying sieves differ.
 --
--- So the route the paper leaves open closes, and it closes in
--- the affirmative: the obstruction was the choice of object, not
--- the classifier.  The value-fixing subobject cannot separate
--- the two operations; the mechanism object can.
+-- So the route that the paper leaves open closes in the
+-- affirmative.  The obstruction came from the choice of object.
+-- It did not come from the classifier.  The value-fixing
+-- subobject cannot separate the two operations.  The mechanism
+-- object can.
 -- ============================================================
 
 module Topos.MechanismSeparation where

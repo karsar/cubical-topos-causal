@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InflationarityIndependence — a counter-model showing that
--- the three Lawvere-Tierney equations, taken pointwise on an
+-- Topos.InflationarityIndependence: a counter-model.  It shows
+-- that the three Lawvere-Tierney equations, taken pointwise on an
 -- arbitrary Heyting algebra, do not by themselves entail
 -- inflationarity (S ≤ j S).
 --
@@ -10,7 +10,7 @@
 -- morphism j : Ω ⇒ Ω, inflationarity is derivable rather than
 -- assumed.  Naturality together with j ⊤ = ⊤ force it
 -- (Topos.InflationarityDerivable).  Naturality is the hypothesis
--- that does the work, and this module isolates it by dropping it.
+-- that does the work.  This module isolates it by dropping it.
 --
 -- The counter-model is the bare three-element Heyting chain
 -- ⊥ < a < ⊤.  The operator j fixes ⊥ and ⊤ and sends a ↦ ⊥.  The
@@ -95,7 +95,7 @@ sep ⊤₃ = true
 a₃≢⊥₃ : ¬ (a₃ ≡ ⊥₃)
 a₃≢⊥₃ p = true≢false (cong sep p)
 
--- Inflationarity would force a ≤ j a, that is a ≤ ⊥.  That means
+-- Inflationarity forces a ≤ j a, that is a ≤ ⊥.  That means
 -- a ∧ ⊥ ≡ a, hence ⊥ ≡ a, which is false.
 not-inflationary : ¬ ((x : Three) → x ≤₃ j₃ x)
 not-inflationary infl = a₃≢⊥₃ (sym (infl a₃))

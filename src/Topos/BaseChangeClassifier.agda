@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.BaseChangeClassifier — classification commutes with
+-- Topos.BaseChangeClassifier: classification commutes with
 -- base change.
 --
 -- Fix a base functor F : C → D, a coarse value presheaf Y on D,
@@ -9,7 +9,8 @@
 -- along F: the fine world is basePull F Y, and the fine
 -- intervened value is pullSect.  Two classifiers are then in
 -- play.  The coarse classifier χ_D of (Y, y₀) can be pulled
--- back and composed with the comparison map φB.  The fine
+-- back and composed with the comparison map φB.  φB sends a
+-- coarse sieve at App₀ c to a fine sieve at c.  The fine
 -- classifier χ_C of the pulled-back pair can be built directly.
 --
 -- THEOREM (χ-pull, χ-pull-Nat): the two agree, for EVERY base
@@ -24,7 +25,7 @@
 --
 -- Contrast with Topos.MergeAbstraction: Ω itself does NOT
 -- transfer along every F.  The classifier of a named target
--- does.  Targets are stable under abstraction; the full space
+-- does.  Targets are stable under abstraction.  The full space
 -- of truth values is not.
 -- ============================================================
 

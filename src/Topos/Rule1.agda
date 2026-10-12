@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Rule1 — internal Pearl Rule 1, the Stage 1 result.
+-- Topos.Rule1: internal Pearl Rule 1, the Stage 1 result.
 --
 -- A regime is an object of the base category C.  An internal
 -- SCM is a family of SCMs, one for each regime.

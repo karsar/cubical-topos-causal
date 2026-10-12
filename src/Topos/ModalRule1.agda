@@ -1,25 +1,25 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ModalRule1 — Stage 2 (c): a do-calculus rule made modal.
+-- Topos.ModalRule1: Stage 2 (c): a do-calculus rule made modal.
 --
 -- Pearl Rule 1 (Topos.Rule1) says that do(X := x₀) leaves the
 -- internal Y-marginal invariant under structural independence.
 -- Here we internalise that conclusion as a truth value in Ω.  We
 -- then show the value is ◯-modal, that is, j-closed for every
--- Lawvere–Tierney topology j.
+-- Lawvere-Tierney topology j.
 --
 -- This makes the j-do-calculus claim of translation.md:25
 -- concrete, with j the lex modality ◯.  Rule 1 is valid in the
 -- internal logic of every sheaf subtopos, so it survives
 -- sheafification and localization to any modality.  The result
--- do-j-stable concerns the intervention classifier; this one
+-- do-j-stable concerns the intervention classifier.  This one
 -- concerns the conclusion of a do-calculus rule.
 --
 -- Scope caveat: the modality is applied only to ⊤ here.  rule1-E
 -- collapses the truth value to ⊤ before j acts.  So this result
--- carries no causal content on its own, and it would still
--- typecheck with the causal content deleted.  Topos.ContingentCI
+-- carries no causal content on its own.  If the causal content
+-- is deleted, the proof still typechecks.  Topos.ContingentCI
 -- and Topos.ModalCI supply the non-maximal case.
 -- ============================================================
 
@@ -90,7 +90,7 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X Y : PSh C ℓ)
       (rule1-E {C = C} {X = X} {Y = Y} m ind x₀ c)
 
   -- The internalised Rule 1 is ◯-modal, that is, j-closed for
-  -- every Lawvere–Tierney topology.  This is j-do-calculus for
+  -- every Lawvere-Tierney topology.  This is j-do-calculus for
   -- Rule 1.
   modal-rule1 : (J : LawvereTierney {C = C}) (c : Ob)
               → is-j-closed J c (rule1-Ω c)

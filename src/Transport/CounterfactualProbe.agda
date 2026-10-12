@@ -1,18 +1,18 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.CounterfactualProbe — a feasibility probe.
+-- Transport.CounterfactualProbe: a feasibility probe.
 --
--- QUESTION.  Does the sheaf-gluing machinery this development
--- already has host Pearl's structural COUNTERFACTUALS?  That
+-- QUESTION.  Can the existing sheaf-gluing machinery of this
+-- development host Pearl's structural COUNTERFACTUALS?  That
 -- machinery is Topos.Gluing, with the pullback X ×_Z Y and its
 -- universal property, and Topos.Contextuality, with the
 -- no-global-section obstruction.  A twin network is two copies of an
--- SCM that share their exogenous noise U, and that is a pullback
+-- SCM that share their exogenous noise U.  That is a pullback
 -- over U.  Suppose the glued twin network computes Pearl's
 -- abduction-action-prediction value, and suppose a case that fails
 -- to glue is counterfactual non-identifiability.  Then the two topos
--- pillars carry genuine causal content.
+-- pillars carry causal content.
 --
 -- WHAT THIS PROBE ESTABLISHES (machine-checked, --safe):
 --   * twin≡aap          : the glued twin-network counterfactual
@@ -25,22 +25,22 @@
 --   * no-twin           : inconsistent factual evidence admits NO
 --                         twin world.  This is the set-level form of
 --                         the no-global-section result
---                         Contextuality.no-global, and it says the
---                         counterfactual is non-identifiable from
---                         that evidence.
+--                         Contextuality.no-global.  It says that
+--                         the counterfactual is non-identifiable
+--                         from that evidence.
 --
--- WHAT IT DOES NOT DO (the honest caveats, and the actual paper):
+-- WHAT IT DOES NOT DO (the caveats, and the work for the paper):
 --   * It is a single DETERMINISTIC SCM at one context, the
 --     set-level single-context case of Topos.Gluing.Pullback.  The
 --     probabilistic case must use the FDist monad, with mechanisms
---     as kernels, where abduction is Bayesian conditioning.
+--     as kernels.  There abduction is Bayesian conditioning.
 --   * The obstruction here is the DEGENERATE one, inconsistent
 --     evidence.  The research-grade obstruction is
 --     non-identifiability across observationally-equivalent SCMs.
 --   * The counterfactual is not yet INTERNALISED as a Kripke-Joyal
 --     forced proposition (Topos.Forcing).  That internalisation is
---     what would make the result topos-internal rather than a
---     re-description.  These three are the next steps; they are not
+--     the step that makes the result topos-internal and not a
+--     re-description.  These three are the next steps.  They are not
 --     done here.
 -- ============================================================
 
@@ -82,13 +82,13 @@ Yeq (uX , uY) = xorb uX uY
 cfOut : Bool → U → Bool
 cfOut x (uX , uY) = xorb x uY
 
--- Abduction–action–prediction, given factual evidence X=x', Y=y':
--- abduction recovers uY = x' ⊕ y'; prediction returns x ⊕ uY.
+-- Abduction-action-prediction, given factual evidence X=x', Y=y':
+-- abduction recovers uY = x' ⊕ y'.  Prediction returns x ⊕ uY.
 aap : (x x' y' : Bool) → Bool
 aap x x' y' = xorb x (xorb x' y')
 
 -- A factual world consistent with the evidence (x' , y') is a noise
--- value producing it.
+-- value that produces it.
 Factual : Bool → Bool → Type
 Factual x' y' = Σ[ u ∈ U ] ((Xeq u ≡ x') × (Yeq u ≡ y'))
 

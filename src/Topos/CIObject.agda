@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.CIObject — Stage 2 of the modal-layer repair: the
+-- Topos.CIObject: Stage 2 of the modal-layer repair: the
 -- contingent CI as a SUBOBJECT, that is, as a natural
 -- transformation into Ω, with restriction-stability proved.
 --
@@ -13,27 +13,28 @@
 -- value.  The classifier takes the arrow-indexed family "the
 -- claim holds after restriction along f" to the sieve
 -- χ_c(*) = { f : d → c | P holds at d }.  The obligation
--- `P-closed` is Mahadevan's "refinement preserves the claim", and
--- it is discharged for this base.
+-- `P-closed` is Mahadevan's "refinement preserves the claim".
+-- This module discharges it for this base.
 --
 -- SCOPE.  The base here is the discrete category on two regimes.
 -- Its morphisms are equalities, so `P-closed` holds by transport.
 -- This is weaker than the statement "conditioning preserves
--- conditional independence", which is where the content and a
--- real obstruction lie.  For a COLLIDER, conditioning on the
--- collider vertex opens the path, so CI is not preserved under
--- that refinement (Berkson's paradox).  So `ci-Ω` is a sieve only
+-- conditional independence (CI)".  That statement carries the
+-- content and a real obstruction.  A COLLIDER is a common effect
+-- of two variables.  Conditioning on the collider vertex opens
+-- the path, so that refinement does not preserve CI (Berkson's
+-- paradox).  So `ci-Ω` is a sieve only
 -- when refinement is restricted to conditioning that preserves
 -- CI.
 --
--- Topos.ColliderObstruction now proves this, at the level of
--- supports: on a base whose one proper arrow is conditioning on
--- a common effect, independence is not closed under restriction,
--- so it defines no sieve.  The possibilistic form suffices,
--- since a counterexample there is one for any finer notion.
--- The probabilistic form, with Bayesian conditioning on the
--- distribution carrier, is still open; see Topos.ContingentCI
--- and the companion d-separation layer.
+-- Topos.ColliderObstruction proves this at the level of
+-- supports.  Its base has one proper arrow: conditioning on a
+-- common effect.  On that base, independence is not closed under
+-- restriction, so it defines no sieve.  The possibilistic form
+-- suffices, because a counterexample there is a counterexample
+-- for any finer notion.  The probabilistic form, with Bayesian
+-- conditioning on the distribution carrier, is still open.  See
+-- Topos.ContingentCI and the companion d-separation layer.
 -- ============================================================
 
 module Topos.CIObject where
@@ -83,7 +84,7 @@ ci-sieve c = fst ci-Ω-nat c tt
 -- ------------------------------------------------------------
 -- STAGE 2 DELIVERABLE: ci-Ω is a natural transformation, so it is
 -- a subobject, and it is still not maximal at the `true` regime.
--- It is a classified contingent truth value in Ω, rather than ⊤
+-- It is a classified contingent truth value in Ω.  It is not ⊤
 -- at every regime.
 -- ------------------------------------------------------------
 ci-nat-non-maximal : Σ[ c ∈ Ob ] (¬ (ci-sieve c ≡ maximal {C = C} c))

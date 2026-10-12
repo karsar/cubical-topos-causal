@@ -1,25 +1,25 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Gluing — the third Mahadevan pillar: sheaf gluing of
+-- Topos.Gluing: the third Mahadevan pillar: sheaf gluing of
 -- independent mechanisms, as a pullback.
 --
 -- Mahadevan's TCM paper (arXiv:2508.08295, §6) states that
 -- "local functions can be collated together to yield a unique
 -- global function" by sheaf theory.  It states this in prose and
--- proves no theorem, and it does not instantiate the
--- Grothendieck-topology vocabulary it introduces.  In a presheaf
+-- proves no theorem.  It also does not instantiate the
+-- Grothendieck-topology vocabulary that it introduces.  In a presheaf
 -- topos the collation is a limit, computed pointwise.  No
 -- topology and no sheafification are needed.
 --
 -- This module gives that limit.  Take two mechanisms
 -- p : X ⇒ Z and q : Y ⇒ Z.  This is local data on X and on Y
--- that agrees on the shared overlap Z.  Their pullback exists,
--- and it has the universal property: any cone, that is any two
--- mechanisms agreeing on Z, factors through a unique global
--- mechanism into the pullback.  That is the content of gluing,
--- "agree on overlap ⟹ unique glued section", and it holds in
--- the bare presheaf topos.
+-- that agrees on the shared overlap Z.  Their pullback exists
+-- and has the universal property.  A cone is a pair of
+-- mechanisms that agree on Z.  Each cone factors through a unique
+-- global mechanism into the pullback.  That is the content of
+-- gluing, "agree on overlap ⟹ unique glued section".  It holds
+-- in the bare presheaf topos.
 -- ============================================================
 
 module Topos.Gluing where
@@ -47,7 +47,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     PB₀ : Ob → Type (ℓ-max (ℓ-max ℓX ℓY) ℓZ)
     PB₀ c = Σ[ xy ∈ (F₀ X c × F₀ Y c) ] Agree c (fst xy) (snd xy)
 
-    -- restriction preserves agreement, using naturality of p and q
+    -- restriction preserves agreement, by naturality of p and q
     PB₁ : {c' c : Ob} → Hom c' c → PB₀ c → PB₀ c'
     PB₁ f ((x , y) , e) =
       (F₁ X f x , F₁ Y f y) ,

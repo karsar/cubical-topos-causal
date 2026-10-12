@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Rule3 — internal Pearl Rule 3 (insertion/deletion of
--- actions) on the chain model, lifting RuleDoCalc.rule3-* .
+-- Topos.Rule3: internal Pearl Rule 3 (insertion/deletion of
+-- actions) on the chain model.  It lifts RuleDoCalc.rule3-* .
 --
 -- The chain model has a prior pX and two kernels, kY from X and
 -- kZ from Y.  Rule 3 needs no independence hypothesis.  An
@@ -46,8 +46,8 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     do-ZE : ((c : Ob) → F₀ Z c) → SCM₃-E X Y Z → SCM₃-E X Y Z
     do-ZE z₀ m = λ c → do-Z₃ (z₀ c) (m c)
 
-    -- Internal Rule 3 in both forms, one regime at a time, lifting
-    -- the core theorems.
+    -- Internal Rule 3 in both forms, one regime at a time.  It
+    -- lifts the core theorems.
     rule3-X-E : (m : SCM₃-E X Y Z) (z₀ : (c : Ob) → F₀ Z c) (c : Ob)
               → marginal-X (do-Z₃ (z₀ c) (m c)) ≡ marginal-X (m c)
     rule3-X-E m z₀ c = rule3-X-marginal (m c) (z₀ c)

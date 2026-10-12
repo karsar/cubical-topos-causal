@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.CounterfactualForcing — the decisive probe.
+-- Transport.CounterfactualForcing: the decisive probe.
 --
 -- Transport.CounterfactualProbe shows that the GLUING pillar hosts
 -- Pearl counterfactuals: a twin network is a pullback over shared
@@ -21,10 +21,10 @@
 --
 -- RESULT (machine-checked, --safe, using the paper's own _⊩_ and
 -- ⊩-mono):
---   * forced-globally : the invariant counterfactual is forced at g;
+--   * forced-globally : the invariant counterfactual is forced at g.
 --   * forced-locally  : a counterfactual that holds only in the
 --                       environment is forced at e, after
---                       restriction;
+--                       restriction.
 --   * not-forced-globally : that same counterfactual is NOT forced
 --                       at g.  Local truth and global truth differ,
 --                       and the internal logic separates them.
@@ -33,22 +33,22 @@
 --                  the environment cover is Kripke LOCALITY, and it
 --                  needs no separate proof.
 --
--- INTERPRETATION.  This is the surplus over Pearl.  "Y_{X:=x}=y is
+-- INTERPRETATION.  This is what forcing adds to Pearl.  "Y_{X:=x}=y is
 -- forced at the global context" says the counterfactual is INVARIANT
--- across the environments that g covers, and a single-graph twin
+-- across the environments that g covers.  A single-graph twin
 -- network cannot say that.  Forcing at an environment is the
 -- ordinary local counterfactual.  Forcing at the global context is
 -- its invariance.  The gap between the two, recorded in
 -- not-forced-globally, is what the modality and the internal logic
 -- contribute.
 --
--- HONEST LIMIT.  This module has two contexts and a Boolean truth
+-- LIMIT.  This module has two contexts and a Boolean truth
 -- value.  The general result needs a presheaf of worlds over a
--- regime category, with the counterfactual a classified subobject,
--- together with a bridge to the probabilistic (FDist-kernel)
--- counterfactual.  The load-bearing question here is narrower: does
--- forcing add content beyond Pearl?  The answer is yes, and the
--- surplus is invariance, which is global forcing.
+-- regime category, with the counterfactual a classified subobject.
+-- It also needs a bridge to the probabilistic (FDist-kernel)
+-- counterfactual.  The question this module answers is narrower:
+-- does forcing add content beyond Pearl?  The answer is yes.  The
+-- added content is invariance, which is global forcing.
 -- ============================================================
 
 module Transport.CounterfactualForcing where

@@ -1,15 +1,15 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.InterventionModal — the Stage-2 causal payload: the
--- value an intervention forces is j-CLOSED under every Lawvere–
--- Tierney topology.
+-- Topos.InterventionModal: the Stage-2 causal payload.  The
+-- value an intervention forces is j-CLOSED under every
+-- Lawvere-Tierney topology.
 --
 -- Stage 1 (Topos.DoClassifier) showed that do(X := x₀) is
 -- classified by a characteristic map χ : X ⇒ Ω, and that the
 -- forced value pt c goes to the maximal sieve ⊤ (do-classified).
 -- Stage 2 (Topos.LawvereTierney) introduced topologies j : Ω → Ω
--- and their j-closed sieves.
+-- and their j-closed sieves.  A sieve S is j-closed when j S = S.
 --
 -- This module connects them.  For ANY topology J, the sieve that
 -- classifies the intervened value is j-closed:
@@ -20,8 +20,8 @@
 -- modality ◯, that is, under sheafification or localization.
 -- do(X := x₀) is "j-stable discovery" in the sense of
 -- outline.md:85, since the do-fact survives passage to any
--- sub-topos of j-sheaves.  The j-do-calculus thesis (j = lex
--- modality) is here made internal and machine-checked for the
+-- sub-topos of j-sheaves.  This module makes the j-do-calculus
+-- thesis (j = lex modality) internal and machine-checked for the
 -- intervention classifier.
 -- ============================================================
 
@@ -44,8 +44,8 @@ module _ {ℓ} {C : Precategory ℓ ℓ} (X : PSh C ℓ) (x₀ : Section {C = C}
   do-sieve : (c : Ob) → Sieve {C = C} c
   do-sieve c = χ-sieve X x₀ c (pt X x₀ c)
 
-  -- The intervention classifier is j-closed for every Lawvere–
-  -- Tierney topology J.  Proof: do-classified sends it to ⊤, and
+  -- The intervention classifier is j-closed for every
+  -- Lawvere-Tierney topology J.  Proof: do-classified sends it to ⊤, and
   -- ⊤ is j-closed by truth-preservation.
   do-j-stable : (J : LawvereTierney {C = C}) (c : Ob)
               → is-j-closed J c (do-sieve c)

@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.SCMNat — natural internal SCMs, closing the gap left by
--- Topos.Rule1.rule1-E-nat.
+-- Topos.SCMNat: natural internal SCMs.  They close the gap
+-- that Topos.Rule1.rule1-E-nat leaves open.
 --
 -- A natural internal SCM carries the regime-wise data together
 -- with its coherence with restriction:

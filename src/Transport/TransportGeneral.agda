@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.TransportGeneral — the general theorem.
+-- Transport.TransportGeneral: the general theorem.
 --
 -- Transport.Transportability proves the transport result over one
 -- concrete base with two regimes.  This module proves it over an
@@ -10,23 +10,23 @@
 --
 -- The pieces:
 --
---   StablePred W   — a prop-valued predicate on worlds that is
+--   StablePred W   : a prop-valued predicate on worlds that is
 --                    RESTRICTION-STABLE.  Restriction-stable means
 --                    this: if the predicate holds at a world, it
 --                    holds at every restriction of that world.  In
 --                    causal terms, a counterfactual true of a
 --                    situation stays true of every refinement of it.
 --
---   chi            — each StablePred gives a subobject χ : W ⇒ Ω,
+--   chi            : each StablePred gives a subobject χ : W ⇒ Ω,
 --                    a natural transformation.  Naturality is proved
 --                    from F-comp.  The sieve closure condition is
 --                    restriction-stability.
 --
---   forced≡pred    — forcing χ at a regime equals the predicate
+--   forced≡pred    : forcing χ at a regime equals the predicate
 --                    holding at that regime.  The internal truth
 --                    value computes the counterfactual.
 --
---   transport-invariant — if the counterfactual is forced at a
+--   transport-invariant : if the counterfactual is forced at a
 --                    regime c, it is forced at every regime that
 --                    restricts into c.  The proof transports Kripke
 --                    locality (⊩-mono) along naturality, so
@@ -37,12 +37,12 @@
 -- the world presheaf.  Transport is forcing, and invariance is
 -- locality.  The two-regime module is one instance of this.
 --
--- STILL OPEN (the real theorem).  Two items.  First, the equivalence
+-- STILL OPEN (the main theorem).  Two items.  First, the equivalence
 -- of this internal "transport = forcing" with the Bareinboim-Pearl
 -- s-hedge criterion.  Second, the probabilistic (FDist-kernel) case,
 -- where restriction-stability becomes invariance under Bayesian
 -- conditioning.  Those two are the contribution.  This module is the
--- verified scaffold they would stand on.
+-- verified base for both of them.
 -- ============================================================
 
 module Transport.TransportGeneral where

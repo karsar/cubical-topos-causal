@@ -1,16 +1,16 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.NonTrivialModal — Stage 2 (a): the modal results
+-- Topos.NonTrivialModal: Stage 2 (a), the modal results
 -- instantiated at the double-negation topology.
 --
 -- do-j-stable and modal-rule1 (Topos.InterventionModal and
--- Topos.ModalRule1) hold for every Lawvere–Tierney topology.  The
--- only instance proved before this module was trivialLT, the
--- identity, which makes them vacuous.  Here they are instantiated
--- at ¬¬LT (Topos.DoubleNegation).  That topology is not
--- degenerate: its sheaves are the ¬¬-separated objects, which
--- form the Boolean localization.
+-- Topos.ModalRule1) hold for every Lawvere-Tierney topology.
+-- Before this module, the only proved instance was trivialLT, the
+-- identity.  At the identity they are vacuous.  Here they are
+-- instantiated at ¬¬LT (Topos.DoubleNegation).  That topology is
+-- not degenerate: its sheaves are the ¬¬-separated objects.
+-- These form the Boolean localization.
 --
 -- Both the intervention classifier and Pearl Rule 1 are ¬¬-closed.
 -- They survive passage to the double-negation sheaf subtopos.

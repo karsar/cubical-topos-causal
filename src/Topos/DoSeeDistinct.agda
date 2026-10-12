@@ -1,20 +1,22 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.DoSeeDistinct — intervening differs from conditioning.
+-- Topos.DoSeeDistinct: intervening differs from conditioning.
 --
 -- DoClassifier gave χ : X ⇒ Ω, the characteristic map of the
 -- value-fixing subobject {x₀} ↪ X.  At the level of Ω the event
--- {X = x₀} is the same object under intervention, do(X := x₀) by
--- graph surgery, and under observation, conditioning on X = x₀.
+-- {X = x₀} is the same object under intervention and under
+-- observation.  Intervention is do(X := x₀) by graph surgery.
+-- Observation is conditioning on X = x₀.
 -- So χ does not separate the two.  The causal content of the
--- do-operator has to be a theorem about the kernels.  This
+-- do-operator must be a theorem about the kernels, the maps from
+-- parent values to distributions.  This
 -- module proves that theorem, and χ names its subject inside Ω.
 --
 -- The model is a confounder  U → X , U → Y.  Here U is a common
 -- cause and there is no direct X → Y edge.  The do-operator is
--- graph surgery: do(X := x₀) severs U → X and pins X to x₀, and
--- leaves U and the Y-mechanism untouched.  On a perfectly
+-- graph surgery: do(X := x₀) removes U → X and fixes X to x₀.
+-- It leaves U and the Y-mechanism unchanged.  On a perfectly
 -- correlating confounder the module proves:
 --
 --     P(Y = ⊤ ∣ do(X := ⊤))  =  p            (the prior on the common cause)
@@ -58,8 +60,8 @@ module _ {ℓu ℓx ℓy} {U : Type ℓu} {X : Type ℓx} {Y : Type ℓy} where
   obs-joint : Confounded U X Y → FDist (X × Y)
   obs-joint m = pU m >>= λ u → kX m u >>= λ x → mapF (x ,_) (kY m u)
 
-  -- do(X := x₀) severs U → X and fixes X to x₀.  U and kY are
-  -- untouched.
+  -- do(X := x₀) removes U → X and fixes X to x₀.  U and kY are
+  -- unchanged.
   do-joint : X → Confounded U X Y → FDist (X × Y)
   do-joint x₀ m = pU m >>= λ u → mapF (x₀ ,_) (kY m u)
 

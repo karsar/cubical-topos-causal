@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.PSh — presheaves over a regime base C (= objects of
+-- Topos.PSh: presheaves over a regime base C (= objects of
 -- the presheaf topos Set^Cᵒᵖ) and their natural transformations.
 --
 -- A presheaf is contravariant.  A morphism f : Hom x y gives a

@@ -1,23 +1,22 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.MechanismSite — the mechanism classifier on a base with
--- a genuine refinement.
+-- Topos.MechanismSite: the mechanism classifier on a base with
+-- a proper refinement.
 --
 -- Topos.MechanismSeparation works over one context.  That is
--- enough to show the classifier discriminates, but it leaves the
--- reply that the base was discrete.  This module runs the same
--- classifier over the intervention site of
--- Topos.InterventionSite, where obs has two incomparable
--- refinements, and gets a stronger result.
+-- enough to show that the classifier discriminates.  It leaves
+-- open the objection that the base was discrete.  This module
+-- runs the same classifier over the intervention site of
+-- Topos.InterventionSite.  There obs has two incomparable
+-- refinements, and the result is stronger.
 --
 -- The value presheaf is chosen so that the fixed value is
--- forced at do0 and free at do1:
---     Val obs = Bool,  Val do0 = Unit,  Val do1 = Bool,
--- with restriction along e0 collapsing to the point.  So a
--- mechanism is automatically admissible over do0, whatever it
--- does, and admissible over do1 only if it returns the fixed
--- value there.
+-- forced at do0 and unconstrained at do1:
+--     Val obs = Bool,  Val do0 = Unit,  Val do1 = Bool.
+-- Restriction along e0 collapses to the point.  So a mechanism
+-- is automatically admissible over do0, whatever it does.  It is
+-- admissible over do1 only if it returns the fixed value there.
 --
 -- Results:
 --   const-⊤        the do-mechanism is classified ⊤.
@@ -25,12 +24,12 @@
 --   copy-not-e1    it is NOT admissible over do1.
 --   copy-non-max   so its classifying sieve is neither ⊤ nor ⊥.
 --
--- The classifier therefore takes a truth value strictly between
--- the two on this site, and that value is the sieve {e0}: the
--- same discriminating truth value that carries the internal-
--- versus-stagewise gap of Topos.Classicality.  Whether a
--- mechanism is an intervention is, on this base, a graded
--- question rather than a yes or no.
+-- So on this site the classifier takes a truth value strictly
+-- between ⊥ and ⊤.  That value is the sieve {e0}.  The same
+-- truth value carries the internal-versus-stagewise gap of
+-- Topos.Classicality.  On this base, whether a mechanism is an
+-- intervention is a graded question, with answers other than
+-- yes and no.
 -- ============================================================
 
 module Topos.MechanismSite where
@@ -65,7 +64,7 @@ ParI = record
 
 -- ------------------------------------------------------------
 -- Values: two at obs and at do1, one at do0.  Restricting to
--- do0 forgets the value; restricting to do1 keeps it.
+-- do0 forgets the value.  Restricting to do1 keeps it.
 -- ------------------------------------------------------------
 ValI-Ob : IObj → Type
 ValI-Ob obs = Bool

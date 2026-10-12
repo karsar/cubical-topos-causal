@@ -1,8 +1,8 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.MechanismObject — classifying the intervention, not
--- its target.
+-- Topos.MechanismObject: classifying the intervention itself,
+-- instead of its target.
 --
 -- Topos.DoClassifier classifies the value-fixing subobject
 -- "X = x₀" inside the value presheaf.  That subobject is the
@@ -22,11 +22,13 @@
 --   Adm-closed    admissibility is closed under restriction.
 --   χ-do          the characteristic map Mech ⇒ Ω, obtained from
 --                 the universal property of Topos.Classifier.
---   do-true       the do-mechanism is classified true.
+--   χ-do-classifies
+--                 the sieve is maximal exactly on the
+--                 do-mechanisms.
 --   χ-do-unique   χ-do is the only such map.
 --
 -- So Ω does classify the intervention once the classifier is
--- pointed at mechanisms rather than at values.  Separation from
+-- applied to mechanisms instead of to values.  Separation from
 -- observation is Topos.MechanismSeparation.
 -- ============================================================
 

@@ -14,21 +14,21 @@
 --    FDist.agda                  (abstract Weight axioms)
 --      ↑ discharged by
 --    WeightQ.agda               (concrete Weight = [z0, z1] ⊆ ℝ)
---      ↑ ℝ discharged by
+--      ↑ ℝ discharged by, through the opaque WeightQ-Field
 --    WeightQ-Discharge.agda     (this file: ℝ ≔ ℚ from cubical lib)
 --
--- Every "ordered field with bounded division" axiom postulated
--- at the WeightQ level appears here as a concrete theorem about
--- ℚ.  The remaining gap is the bound-preservation laws on
--- division, which WeightQ postulates defensively.  Those need a
--- defensive total division operator on ℚ.  We define one here,
--- by case analysis on Q ≡ 0.
+-- Every "ordered field with bounded division" axiom that the
+-- WeightQ level once postulated appears here as a concrete
+-- theorem about ℚ.  This includes the bound-preservation laws on
+-- division, which WeightQ once postulated defensively.  They use
+-- the total division operator honest/r of
+-- WeightQ-Discharge-Division.  It returns z0 on a zero divisor.
 --
 -- Status: this file demonstrates soundness.  It does not
 -- replace WeightQ.agda.  It exhibits one concrete model.
--- WeightQ.agda is parametric over the abstract interface, so
--- anything proved there holds in every model of the interface.
--- ℚ is the canonical model.
+-- WeightQ.agda reaches this model through the opaque block of
+-- WeightQ-Field.  Downstream proofs cannot unfold the names, so
+-- they use only the interface laws.  ℚ is the canonical model.
 -- ============================================================
 
 module WeightQ-Discharge where
@@ -195,7 +195,7 @@ zHalf<z1 = 0 , refl
 -- ============================================================
 -- Strict positivity of products: 0 < a · b when 0 < a and
 -- 0 < b.  Apply <-·o : 0 < o → m < n → m·o < n·o with m=0, n=a,
--- o=b, and use ·AnnihilL to rewrite 0·b as 0.
+-- o=b.  Then use ·AnnihilL to rewrite 0·b as 0.
 -- ============================================================
 <r-·-pos  : ∀ {a b} → z0 <r a → z0 <r b → z0 <r (a ·r b)
 <r-·-pos {a} {b} z0<a z0<b =
@@ -247,22 +247,18 @@ isProp-x≤z1 {x} = QO.isProp≤ x z1
 -- ============================================================
 -- Division: defensive total operator.
 --
--- In the abstract WeightQ.agda development, _/r_ is used only
+-- In the abstract WeightQ.agda development, _/r_ was used only
 -- through the bayesW formulas.  Only the algebraic identities on
--- _/w_ matter there, and those are postulated separately as
+-- _/w_ mattered there, and those were postulated separately as
 -- bayesW-*.  No theorem in Representation.agda or
--- Intersection.agda uses the concrete value that _/r_ returns in
+-- Intersection.agda used the concrete value that _/r_ returned in
 -- WeightQ-Discharge.
 --
--- So, to remove the last ℝ-interface postulate, we give a
--- trivial implementation that always returns z0.  The discharge
--- is sound.  Every Weight axiom and theorem holds without any
--- appeal to the semantic content of _/r_, because every
--- _/r_-using lemma is postulated separately as a bayesW-*
--- identity.  A semantically correct ℚ division would refine this
--- implementation.  Such a division returns z0 on a zero divisor
--- and the standard quotient otherwise.  The trivial version is
--- enough to discharge the postulate.
+-- So an earlier version of this module gave a trivial
+-- implementation that always returned z0.  That stub was enough
+-- to discharge the last ℝ-interface postulate.  The block below
+-- replaces it with honest division.  Honest division returns z0
+-- on a zero divisor and the standard quotient otherwise.
 -- ============================================================
 -- ============================================================
 -- Honest division on ℚ.
@@ -272,7 +268,7 @@ isProp-x≤z1 {x} = QO.isProp≤ x z1
 -- using SetQuot.elimProp together with inverseUniqueness from the
 -- ℚ-CommRing instance.
 --
--- For non-zero y: x /r y returns the actual quotient.
+-- For non-zero y: x /r y returns the quotient x · y⁻¹.
 -- For y ≡ z0:     returns z0 (defensive default).
 --
 -- This closes the soundness gap.  ·r-/r-pos and /r-·r-pos are
@@ -294,15 +290,16 @@ infixl 7 _/r_
 
 -- Strict ordering is irreflexive.
 -- ℚ has < as a strict order.  The witness (0, refl) for 0 < 1
--- cannot match 0 < 0.  We use QO.isIrrefl< where the library
--- supplies it, and otherwise refute directly from the Σ-type.
--- For ℚ, x < x means there is a k with x ≡ pos (suc k) + x.
+-- cannot match 0 < 0.  We use the library lemma QO.isIrrefl<.
+-- The reason it holds: for ℚ, x < x means there is a k with x ≡ pos (suc k) + x.
 -- That forces pos (suc k) ≡ pos 0, which is false.
 -- ============================================================
 -- Order/positivity axioms, derived.
 --
--- Five of the seven earlier postulates are now theorems.  They
--- are built from the ℚ order infrastructure of cubical-stdlib.
+-- Five of the seven earlier postulates are theorems in this
+-- block.  They are built from the ℚ order infrastructure of
+-- cubical-stdlib.  The other two, the division round trips,
+-- follow below.
 -- ============================================================
 
 -- Item 1: irreflexivity of the strict order.  Direct from the
@@ -360,18 +357,16 @@ infixl 7 _/r_
     step = QO.<-+o x z1 (-r x) x<1
 
 -- ============================================================
--- The remaining two postulates require real ℚ division.  With
--- the trivial `_/r_ _ _ = z0` they are false: (x ·r y) /r y
--- reduces to z0 instead of x.  To discharge them one would
--- define a real division on ℚ, using the field structure on the
--- QuoQ representation, or a SetQuotient-level inverse
--- construction.
+-- The remaining two postulates need real ℚ division.  With the
+-- earlier trivial `_/r_ _ _ = z0` they were false: (x ·r y) /r y
+-- reduced to z0 and not to x.  WeightQ-Discharge-Division now
+-- defines real division on ℚ, by a SetQuotient-level inverse
+-- construction.  So the trivial `_/r_` is gone.
 --
 -- The convex framework above WeightQ.agda does not depend on
 -- these two identities being correct.  They are used only inside
--- Bayesian-style derivations, and the convex framework re-derives
--- those without them.  Removing the defensive `_/r_` is a
--- separate refactoring.
+-- Bayesian-style derivations.  The convex framework re-derives
+-- those without them.
 -- ============================================================
 -- ============================================================
 -- Derived: the round-trip identities for honest division.
@@ -443,7 +438,7 @@ z0-decide x 0≤x with x QO.≟ z0
 --   isProp-z0≤          ✓ (from QO.isProp≤)
 --   isProp-x≤z1         ✓ (from QO.isProp≤)
 --   1-r, 1-r-def        ✓ (concrete definition)
---   _/r_                ✓ (honest ℚ division; see WeightQ-Discharge-Division)
+--   _/r_                ✓ (honest ℚ division, in WeightQ-Discharge-Division)
 --
 -- Total: 28 of 28 WeightQ ℝ-interface postulates discharged.
 -- WeightQ-Discharge.agda contains zero postulates.

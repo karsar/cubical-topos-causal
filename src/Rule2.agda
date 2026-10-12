@@ -9,7 +9,7 @@
 -- monad laws and one structural CI witness.
 --
 -- The model:
---   pXZ : FDist (X × Z)   -- joint prior; X and Z may be correlated
+--   pXZ : FDist (X × Z)   -- joint prior. X and Z can be correlated
 --   kY  : X → Z → FDist Y -- Y depends on (X, Z)
 --
 -- The intervention `do-X-conf x₀` removes the structure that
@@ -29,10 +29,10 @@
 -- The HIT-level conditioning operator below takes its
 -- conditional kernel from the structural CI witness.  Under
 -- independence the pZ-marginal field of the witness is the
--- conditional given X = x₀.  For finite types one could instead
--- build a genuine partial-conditioning operator from the
--- representation theorem of Representation-Convex.agda, and
--- recover the structural form as a corollary.  This module
+-- conditional given X = x₀.  For finite types, a
+-- partial-conditioning operator can also be built from the
+-- representation theorem of Representation-Convex.agda.  The
+-- structural form then follows as a corollary.  This module
 -- proves only the structural form.
 -- ============================================================
 
@@ -57,7 +57,7 @@ da ⊗D db = da >>= λ a → mapF (a ,_) db
 infixl 6 _⊗D_
 
 -- ============================================================
--- Section 1: SCM-conf — the confounded 3-variable SCM.
+-- Section 1: SCM-conf: the confounded 3-variable SCM.
 -- ============================================================
 
 record SCM-conf {ℓX ℓZ ℓY} (X : Type ℓX) (Z : Type ℓZ) (Y : Type ℓY)
@@ -95,7 +95,7 @@ marginal-ZY : ∀ {ℓX ℓZ ℓY} {X : Type ℓX} {Z : Type ℓZ} {Y : Type ℓ
 marginal-ZY m = mapF snd (joint-of-conf m)
 
 -- ============================================================
--- Section 2: do-X-conf — kernel-substitution intervention.
+-- Section 2: do-X-conf: kernel-substitution intervention.
 --
 -- do-X-conf x₀ removes the structure that feeds into X.  It
 -- replaces the joint prior pXZ with one that fixes X = x₀ and
@@ -115,7 +115,7 @@ do-X-conf : ∀ {ℓX ℓZ ℓY} {X : Type ℓX} {Z : Type ℓZ} {Y : Type ℓY}
 do-X-conf x₀ m = record m { pXZ = mapF (x₀ ,_) (pZ-of m) }
 
 -- ============================================================
--- Section 3: Structural CI witness — X ⊥⊥ Z in the prior.
+-- Section 3: Structural CI witness: X ⊥⊥ Z in the prior.
 --
 -- The Rule 2 hypothesis: pXZ factors as a product of marginals
 -- pX ⊗D pZ.  This is the kernel-form analogue of the classical
@@ -141,7 +141,7 @@ record X-indep-Z {ℓX ℓZ ℓY} {X : Type ℓX} {Z : Type ℓZ} {Y : Type ℓY
 open X-indep-Z public
 
 -- ============================================================
--- Section 4: cond-X-conf — HIT-level conditioning on X = x₀.
+-- Section 4: cond-X-conf: HIT-level conditioning on X = x₀.
 --
 -- Given the structural CI witness, the conditional distribution
 -- of Z given X = x₀ is the pZ-marg field of the witness.  Under
@@ -161,8 +161,9 @@ open X-indep-Z public
 -- X-indep-Z witness.  The witness connects intervention
 -- semantics (kernel substitution) with conditioning semantics
 -- (Bayesian update).  On a positive joint where X and Z are
--- correlated, one would obtain the same witness from bayes-cond
--- applied to the syntactic representation of pXZ.  The
+-- correlated, bayes-cond applied to the syntactic representation
+-- of pXZ is expected to give the same witness.  This module does
+-- not prove that.  The
 -- structural form used here avoids the full-support requirement
 -- of bayes-cond and works directly at the HIT level.
 -- ============================================================
@@ -180,7 +181,7 @@ cond-X-conf x₀ m ind =
 -- marginal Z of pXZ equals the pZ-marg field of the witness.
 -- Independence is used at this step.  It gives that the
 -- Z-marginal of pXZ agrees with the Z-marginal of the
--- factorized form, for every X-value one might condition on.
+-- factorized form, for every X-value that conditioning can use.
 -- ============================================================
 
 -- mapF snd of a product (pX ⊗D pZ) is pZ.  This is one

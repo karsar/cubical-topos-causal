@@ -1,12 +1,13 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Classicality — internal validity versus stagewise
+-- Topos.Classicality: internal validity versus stagewise
 -- validity on the intervention site Iv (do0 → obs ← do1).
 --
 -- Forcing at a stage, written c ⊩ S, is INTERNAL validity.  It
 -- says that the identity of c lies in S.  "Stagewise" validity is
--- validity over the covering family.  It says the claim holds
+-- validity over the covering family {e0, e1}, the two arrows
+-- into obs.  It says the claim holds
 -- under do(X:=0) and under do(X:=1), with no demand that it hold
 -- observationally.  A context-by-context argument establishes
 -- stagewise validity.
@@ -21,7 +22,7 @@
 --      for a one-intervention claim, ci-one ∨ ¬ ci-one, is forced
 --      at do0 and at do1 but NOT at obs.  So on this base the
 --      topos reading forces strictly FEWER causal statements than
---      the stagewise reading, and internal validity is the
+--      the stagewise reading.  Internal validity is the
 --      stricter criterion.  We check this base only.  We do not
 --      prove it of every base that carries a non-trivial
 --      refinement.
@@ -30,7 +31,7 @@
 --      definition, internal validity of its covering closure:
 --      `obs ⊩ jS S` and `stagewise S` are the same type.  The
 --      Lawvere-Tierney modality is therefore the transfer from
---      stagewise validity to internal validity, and it repairs
+--      stagewise validity to internal validity.  It repairs
 --      the deficit in (2): jS (ci-one ∨ ¬ ci-one) ≡ ⊤ while
 --      ci-one ∨ ¬ ci-one ≢ ⊤.
 --
@@ -124,7 +125,8 @@ em-stagewise = em-at-do0 , em-at-do1
 
 -- It is NOT forced at obs.  Neither disjunct is available there.
 -- ci-one omits the identity.  And ¬ ci-one cannot hold at the
--- identity, because its restriction along e0 lands in ci-one.
+-- identity, because its restriction along e0 is e0, and e0
+-- lies in ci-one.
 em-not-forced : ¬ (_⊩_ {C = Iv} obs em)
 em-not-forced x = E.rec* (⊔-elim (fst ci-one obs idₒ)
                                  (fst (¬S {C = Iv} {c = obs} ci-one) obs idₒ)
@@ -142,7 +144,7 @@ internal-strictly-stronger = em , em-stagewise , em-not-forced
 
 -- ------------------------------------------------------------
 -- (3b) What the modality supplies.  The covering closure repairs
--- exactly this gap.
+-- this gap.
 -- ------------------------------------------------------------
 em-covered : jS em ≡ maximal {C = Iv} obs
 em-covered = Sieve≡ {C = Iv} (jS em) (maximal {C = Iv} obs)

@@ -1,11 +1,12 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Exponential — the internal hom of presheaves.
+-- Topos.Exponential: the internal hom of presheaves.
 --
 -- A pointwise assignment c ↦ (F₀ A c → F₀ B c) is not a
--- presheaf.  Restriction along f : d → c would need a map
--- F₀ A d → F₀ A c, and a presheaf supplies the other direction.
+-- presheaf.  Restriction along f : d → c needs a map
+-- F₀ A d → F₀ A c, but a presheaf supplies only the other
+-- direction.
 --
 -- The exponential fixes this.  An element of Exp A B at c is a
 -- family indexed by arrows into c:

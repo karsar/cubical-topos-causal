@@ -4,29 +4,29 @@
 -- WeightQ-Discharge-Division.agda
 --
 -- Honest division on ℚ, with positive-denominator semantics.
--- "Honest" means the operation returns the real quotient, not a
--- placeholder value.  It returns z0 when the denominator is z0,
--- and the actual quotient otherwise.
+-- "Honest" means the operation returns the real quotient.  It
+-- returns z0 when the denominator is z0, and the quotient
+-- otherwise.
 --
 -- The module is wired into WeightQ-Discharge.agda.  The
 -- round-trip identities ·r-/r-pos and /r-·r-pos are derived here
--- as theorems, not postulated.  This closes the soundness gap
--- listed as Category D' in SOUNDNESS.md.  It replaces the
+-- as theorems, not postulated.  This closes the last gap in
+-- the division laws of the companion development.  It replaces the
 -- trivial _/r_ stub with a real division operation.  The inverse
 -- construction works directly on the SetQuotient representation
 -- of Cubical.Data.Rationals.
 --
 -- Contents (all proved, zero postulates):
---   - inv-pair, inv-helper           — integer-pair-level inverse
---   - inv·-helper-{pos,negsuc}       — sign-cases of x · x⁻¹ ≡ 1
---   - inv·-helper                    — combined for non-zero x
---   - ℤ×ℕ₊₁-zero?                    — decision procedure
---   - ~-preserves-zero-{l,r}         — "is-zero" respects ~
---   - ℚ-hasInverse                   — every non-zero ℚ has a *-inverse
---   - honest/r                       — total ℚ division (z0 at zero divisor)
---   - ·r-/r-pos-derived,             — round-trip identities for
+--   - inv-pair, inv-helper           : integer-pair-level inverse
+--   - inv·-helper-{pos,negsuc}       : sign-cases of x · x⁻¹ ≡ 1
+--   - inv·-helper                    : combined for non-zero x
+--   - ℤ×ℕ₊₁-zero?                    : decision procedure
+--   - ~-preserves-zero-{l,r}         : "is-zero" respects ~
+--   - ℚ-hasInverse                   : every non-zero ℚ has a *-inverse
+--   - honest/r                       : total ℚ division (z0 at zero divisor)
+--   - ·r-/r-pos-derived,             : round-trip identities for
 --     /r-·r-pos-derived                Pos divisor
---   - honest/r-{lb,ub}               — honest division bounds
+--   - honest/r-{lb,ub}               : honest division bounds
 -- ============================================================
 
 module WeightQ-Discharge-Division where
@@ -51,8 +51,8 @@ open import Cubical.Relation.Nullary using (¬_)
 --   - If a = pos (suc n), the inverse is
 --     [ pos (ℕ₊₁→ℕ b) / 1+ n ].
 --   - If a = negsuc n, the inverse is
---     [ negsuc (ℕ₊₁→ℕ b - 1) / 1+ n ], which is written more
---     simply as [ - pos (ℕ₊₁→ℕ b) / 1+ n ].
+--     [ negsuc (ℕ₊₁→ℕ b - 1) / 1+ n ].  This is the same as
+--     [ - pos (ℕ₊₁→ℕ b) / 1+ n ].
 --   - If a = pos 0, the input is zero, which the hypothesis
 --     excludes.
 -- ============================================================
@@ -189,10 +189,11 @@ inv·-helper (negsuc n , b) ¬p = inv·-helper-negsuc n b
 open import Cubical.Data.Sum using (_⊎_; inl; inr)
 
 -- ============================================================
--- Direct definition of _/r_ as a binary SetQuot.rec2.
+-- Division on ℚ: the specification.
 --
 -- x /r y = if y ≡ 0 then 0 else x · y⁻¹.
--- For non-zero y this is the honest quotient.
+-- For non-zero y this is the honest quotient.  honest/r below
+-- implements it with the decidable equality on ℚ.
 -- ============================================================
 
 -- Decision: is the integer pair zero?
@@ -204,28 +205,26 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
 ℤ×ℕ₊₁-zero? (negsuc n , _) = inr λ p → ℤP.negsucNotpos n 0 p
 
 -- ============================================================
--- The strategy.  SetQuot.elimProp has a dependent function
--- type, which is awkward here.  We define _/r_ by SetQuot.rec2
--- instead, using inv-pair on the second argument together with a
--- defensive fallback for the zero case.
---
--- So we define inv-pair-default, which always returns a pair.
--- The convention is that the pair (pos 0, 1) represents z0 in
--- the zero case:
+-- Representatives.  The definitions from here to /r-rep work on
+-- integer pairs (a, b) : ℤ × ℕ₊₁.  The convention is that the
+-- pair (pos 0, 1) represents z0 in the zero case.  inv-rep and
+-- /r-rep are not lifted to ℚ.  honest/r uses ℚ-hasInverse
+-- instead.
 -- ============================================================
 
 -- ============================================================
--- Strategy: define _/r_ on representatives.  The definition is
--- total.  It returns (pos 0, 1) when the denominator is zero,
--- and the honest quotient otherwise.  The equivalence relation
--- preserves the property "(c, d) has c ≡ 0", so the definition
--- is well defined modulo ~.
+-- Division on representatives.  /r-rep is total.  It returns
+-- (pos 0, 1) when the denominator is zero, and the honest
+-- quotient otherwise.  The equivalence relation preserves the
+-- property "(c, d) has c ≡ 0".
 --
 -- Concretely, /r-rep (a, b) (c, d) returns:
 --   - (pos 0, 1) if c = pos 0
 --   - else: a · inv(c, d) at the integer-pair level
 --
--- It is well defined on each side modulo ~:
+-- A lift to ℚ needs well-definedness on each side modulo ~.
+-- This module proves only the zero part of side 2, as
+-- ~-preserves-zero-{l,r}:
 --   - Side 1: if (a, b) ~ (a', b'), then a · ℕ₊₁→ℤ d = a' · ?...
 --     For multiplication by a fixed (c, d), this is the standard
 --     check in the multiplication construction (·CancelL/R).
@@ -275,20 +274,21 @@ open import Cubical.Data.Sum using (_⊎_; inl; inr)
   ~-preserves-zero-l (c , d) (a , b) (sym eq) c≡0
 
 -- ============================================================
--- Total inverse on ℚ.
+-- Total inverse on representatives.
 --
--- For non-zero q it returns the multiplicative inverse.
--- For q = 0 it returns 0, as a defensive default.
+-- For a non-zero pair it returns the inverse pair.  For a zero
+-- pair it returns (pos 0, 1), as a defensive default.
 --
--- It is well defined for two reasons.  ~ preserves "is-zero", by
--- ~-preserves-zero-{l,r}.  And on non-zero pairs the inverse on
--- representatives respects ~, by inv-pair-resp-~.
+-- A lift to ℚ needs two facts.  ~ preserves "is-zero", by
+-- ~-preserves-zero-{l,r}.  And on non-zero pairs the inverse
+-- must respect ~.  This module does not prove the second fact.
+-- ℚ-hasInverse below gives the inverse on ℚ instead.
 -- ============================================================
 
 -- Inverse on representatives, defensive total version:
---   (pos 0, _) → (pos 0, 1)            — represents 0
---   (pos (suc n), b) → (ℕ₊₁→ℤ b, 1+ n) — honest inverse
---   (negsuc n, b) → (- ℕ₊₁→ℤ b, 1+ n)  — honest inverse
+--   (pos 0, _) → (pos 0, 1)            : represents 0
+--   (pos (suc n), b) → (ℕ₊₁→ℤ b, 1+ n) : honest inverse
+--   (negsuc n, b) → (- ℕ₊₁→ℤ b, 1+ n)  : honest inverse
 inv-rep : ℤ × ℕ₊₁ → ℤ × ℕ₊₁
 inv-rep (pos zero , _) = pos 0 , 1
 inv-rep (pos (suc n) , b) = Q.ℕ₊₁→ℤ b , 1+ n
@@ -380,7 +380,7 @@ zero-rep→ℚ-zero (a , b) a≡0 = SetQuot.eq/ _ _ pf
 --
 -- x /r y = if y ≡ 0 then 0 else x · y⁻¹
 --
--- Use the decidable equality on ℚ via discreteℚ.
+-- honest/r uses discreteℚ, the decidable equality on ℚ.
 -- ============================================================
 
 open import Cubical.Relation.Nullary using (Dec; yes; no; Discrete)

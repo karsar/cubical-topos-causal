@@ -1,12 +1,14 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.AbstractionTiers — sufficient conditions for the two
--- tiers of the comparison map φB, over thin bases.
+-- Topos.AbstractionTiers: sufficient conditions for the two
+-- tiers of the comparison map φB, over thin bases.  A thin
+-- base has at most one arrow between two objects.
 --
 -- Fix a base functor F : C → D.  Two conditions on F:
 --   BackCond∥: every coarse refinement of App₀ e merely lifts
---     to a fine refinement of e.  Causal reading: F hides no
+--     to a fine refinement of e.  "Merely" means inside a
+--     propositional truncation.  Causal reading: F hides no
 --     refinements.  BackCond is the chosen-lift form.
 --   ReflectAt c: every coarse arrow between images of
 --     refinements of c comes from a fine arrow.  Causal
@@ -23,10 +25,11 @@
 -- inverse of φB (φB-surjective, φB-retract).  So φB is a
 -- bijection on truth values.
 --
--- The conditions are equivalent to the conclusions, not only
--- sufficient.  Topos.TiersConverse proves the converses;
--- Topos.MergeAbstraction and Topos.HiddenRefinement are the
--- concrete instances where each condition fails.
+-- The conditions are also necessary, so they are equivalent
+-- to the conclusions.  Topos.TiersConverse proves the
+-- converses.  Topos.MergeAbstraction and
+-- Topos.HiddenRefinement are the concrete instances where
+-- each condition fails.
 -- ============================================================
 
 module Topos.AbstractionTiers where

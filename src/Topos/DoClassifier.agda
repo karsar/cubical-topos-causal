@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.DoClassifier — the gate probe: wiring Ω into the do-
+-- Topos.DoClassifier: the gate probe that wires Ω into the do-
 -- operator.
 --
 -- Stage 1 built Ω (Topos.Omega) and proved do-calculus Rule1/2/3

@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Transport.CounterfactualWeld — welding the two probes.
+-- Transport.CounterfactualWeld: welding the two probes.
 --
 -- CounterfactualProbe: the GLUING pillar computes Pearl's
 --   counterfactual.  A twin network is a pullback over shared noise,
@@ -10,32 +10,32 @@
 --   separates local truth from global truth over a regime category.
 --
 -- THIS MODULE connects them.  The computed counterfactual outcome
--- becomes an Ω-valued predicate, a sieve over the regime category,
--- and its FORCING at the global context is TRANSPORTABILITY.
+-- becomes an Ω-valued predicate, that is, a sieve over the regime
+-- category.  Its FORCING at the global context is TRANSPORTABILITY.
 --
---   * cfoE / cfoG  — the counterfactual outcome for do(X:=true) with
+--   * cfoE / cfoG    the counterfactual outcome for do(X:=true) with
 --                    query Y=true, in the environment regime e and in
 --                    the global regime g.  cfoE equals Pearl's
---                    abduction-action-prediction value; link-E proves
---                    cfoE u ≡ aap ….  So this is the SAME
+--                    abduction-action-prediction value.  The proof
+--                    link-E gives cfoE u ≡ aap ….  So this is the SAME
 --                    counterfactual that CounterfactualProbe computed
 --                    through the twin-network gluing, reused here.
---   * cfSieve u    — that counterfactual as an internal truth value.
+--   * cfSieve u      that counterfactual as an internal truth value.
 --                    Its sieve CLOSURE is the proof pg2pe: a
 --                    globally-true counterfactual is locally true.
 --                    That is the causal restriction-stability
 --                    condition.
---   * transportable     — at world (true,false) the counterfactual is
+--   * transportable       at world (true,false) the counterfactual is
 --                    forced at the GLOBAL context g, so it
 --                    transports.
---   * holds-locally + not-transportable — at world (false,false) it
+--   * holds-locally + not-transportable: at world (false,false) it
 --                    is forced in the environment e and NOT at g.  It
 --                    holds locally and does not transport.  Local
---                    truth and global truth differ, and here that is
---                    a fact about the COMPUTED counterfactual, since
---                    cfSieve is built from cfoG and cfoE rather than
+--                    truth and global truth differ.  Here that is a
+--                    fact about the COMPUTED counterfactual, because
+--                    cfSieve is built from cfoG and cfoE.  It is not
 --                    posited.
---   * invariance   — transport gives forcing at every regime
+--   * invariance     transport gives forcing at every regime
 --                    (⊩-mono).
 --
 -- Reading: "the counterfactual is forced at the global context"
@@ -43,14 +43,14 @@
 -- transports across the regimes that context covers".  A single
 -- causal graph cannot state this.  That is the end-to-end weld.
 --
--- HONEST LIMITS (the actual paper).  The model is deterministic and
+-- HONEST LIMITS (for the paper).  The model is deterministic and
 -- has two regimes.  The predicate is given as one sieve per world
 -- rather than as a single natural transformation W ⇒ Ω.
 -- "Transportability" here is the internal notion, and it is NOT yet
--- proved equivalent to the Bareinboim-Pearl s-hedge criterion.  That
--- equivalence, and the probabilistic case where abduction is
--- Bayesian conditioning in the FDist monad, are the work that would
--- turn this proof of concept into a theorem.
+-- proved equivalent to the Bareinboim-Pearl s-hedge criterion.  Two
+-- pieces of work remain before this proof of concept is a theorem.
+-- The first is that equivalence.  The second is the probabilistic
+-- case, where abduction is Bayesian conditioning in the FDist monad.
 -- ============================================================
 
 module Transport.CounterfactualWeld where

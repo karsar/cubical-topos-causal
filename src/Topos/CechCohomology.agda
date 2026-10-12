@@ -1,17 +1,19 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.CechCohomology — the general degree-1 Čech apparatus.
+-- Topos.CechCohomology: the general degree-1 Čech apparatus.
 --
 -- Topos.Cohomology computed H¹ for the fixed triangle.  Here the
 -- same obstruction is a theorem for an arbitrary cover at the
--- pairwise level, with arbitrary abelian coefficients.  Over any
--- set of observables and any abelian group, a 1-cochain with
--- non-trivial holonomy around a closed walk is not a coboundary,
--- so its class in H¹ is non-zero.
+-- pairwise level, with arbitrary abelian coefficients.  Take any
+-- set of observables, any abelian group, and a 1-cochain with
+-- non-trivial holonomy around a closed walk.  Holonomy is the sum
+-- of the cochain around the walk.  Then the cochain is not a
+-- coboundary, a cochain of the form δ⁰ f.  So its class in H¹ is
+-- non-zero.
 --
 -- Scope: this is the degree-1 fragment of Čech cohomology, the
--- one that carries contextuality, and it covers only sites whose
+-- one that carries contextuality.  It covers only sites whose
 -- contexts are pairs.  The full nerve of an arbitrary cover and
 -- the higher cochain complex are left to future work.
 --
@@ -30,7 +32,7 @@ open import Cubical.Data.Bool using (Bool; true; false; not; true≢false)
 open import Cubical.Relation.Nullary using (¬_)
 import Cubical.Data.Empty as ⊥
 
--- A lightweight abelian group.  It supplies the coefficients for
+-- A minimal abelian-group record.  It supplies the coefficients for
 -- the cochains.
 record AbGrp (ℓ : Level) : Type (ℓ-suc ℓ) where
   field
@@ -113,7 +115,7 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
   realises-on ((i , j) ∷ es) f g = (δ⁰ f i j ≡ g i j) × realises-on es f g
 
   -- g is a coboundary on a given set of edges when some 0-cochain
-  -- f has δ⁰ f ≡ g on exactly those measured contexts.
+  -- f has δ⁰ f ≡ g on each of those measured contexts.
   is-coboundary : List Edge → Cochain1 → Type (ℓ-max ℓv ℓ)
   is-coboundary es g = Σ[ f ∈ Cochain0 ] realises-on es f g
 
@@ -128,7 +130,7 @@ module _ {ℓv ℓ} {V : Type ℓv} (Grp : AbGrp ℓ) where
 
   -- A 1-cochain with non-trivial holonomy around a closed walk is
   -- not a coboundary on that walk's edges, so its class in H¹ is
-  -- non-zero.  By the telescope, any edge-realiser would give the
+  -- non-zero.  By the telescope, any edge-realiser gives the
   -- closed walk holonomy ε.
   holonomy-obstruction :
       (g : Cochain1) (v₀ : V) (vs : List V)
@@ -188,7 +190,7 @@ gTri tC tA = true
 gTri _  _  = false
 
 -- No 0-cochain realises gTri on the triangle's three measured
--- edges tA→tB→tC→tA.  Such a realiser would give the closed walk
+-- edges tA→tB→tC→tA.  Such a realiser gives the closed walk
 -- holonomy ε, and gTri has holonomy 1.
 triangle-contextual :
   ¬ is-coboundary Z₂ (edges-of Z₂ tA (tB ∷ tC ∷ tA ∷ [])) gTri

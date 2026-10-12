@@ -1,7 +1,7 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.ColliderObstruction — conditional independence is not a
+-- Topos.ColliderObstruction: conditional independence is not a
 -- sieve when refinement includes conditioning on a collider.
 --
 -- Topos.CIObject builds a contingent independence as an internal
@@ -14,35 +14,38 @@
 -- A truth value in the internal logic is a sieve, and a sieve is
 -- closed under precomposition: what holds at a stage holds at
 -- every refinement of it.  So a predicate that a refinement can
--- falsify is not a truth value at all, and none of the sieve
--- machinery applies to it.
+-- falsify is not a truth value.  No result about sieves applies
+-- to it.
 --
 -- The base has two contexts and one proper arrow:
 --     cond --r--> marg
--- reading marg as the marginal regime and cond as the regime
--- that conditions on the collider.  The object at each context
--- is the support of the joint over two causes, and restriction
--- along r keeps the outcomes the collider admits.
+-- Here marg is the marginal regime, and cond is the regime that
+-- conditions on the collider.  The object at each context
+-- is the set of Boolean support predicates on the two causes.
+-- Restriction along r intersects a support with the collider
+-- fibre.
 --
 -- Independence is taken at the level of supports: a support is
 -- independent when it is a product of a set of X-values with a
 -- set of Y-values.  This is the possibilistic reading the
--- contextuality development already uses, and it is enough,
--- because a counterexample here is a counterexample for any
--- finer notion that refines it.
+-- contextuality development already uses.  The result is about
+-- supports only.  Product support does not imply probabilistic
+-- independence, so the probabilistic statement stays open.
 --
 -- Results:
 --   full-indep      the marginal support is a product.
 --   xor-not-indep   its restriction to the collider fibre is not.
 --   not-closed      so independence is NOT closed under
 --                   restriction on this base.
---   no-sieve        hence it defines no sieve, at any context.
+--   no-sieve        hence it is not a restriction-stable
+--                   predicate, and defines no sieve.
 --
--- The practical reading: if the refinement relation between your
--- regimes includes conditioning on a common effect, a
--- conditional-independence claim has no internal truth value,
--- and every sieve-based result in this development is silent
--- about it.  The condition is checkable from the study design.
+-- The practical reading follows.  Suppose that the refinement
+-- relation between your regimes includes conditioning on a
+-- common effect.  Then a conditional-independence claim has no
+-- internal truth value.  No sieve-based result in this
+-- development says anything about it.  You can check this
+-- condition from the study design.
 -- ============================================================
 
 module Topos.ColliderObstruction where
@@ -62,8 +65,8 @@ open import Topos.Omega
 
 -- ------------------------------------------------------------
 -- Boolean helpers.  The collider is the exclusive or of its two
--- causes, which is the sharpest case: conditioning on it makes
--- each cause a function of the other.
+-- causes.  This is the sharpest case, because conditioning on it
+-- makes each cause a function of the other.
 -- ------------------------------------------------------------
 _&&_ : Bool → Bool → Bool
 true  && b = b
@@ -164,7 +167,7 @@ full-indep = ∣ (λ _ → true) , (λ _ → true) , (λ x y → refl) ∣₁
 
 -- ------------------------------------------------------------
 -- Its restriction along r is the collider fibre, and that is
--- not a product.  Conditioning has opened the path.
+-- not a product.  Conditioning opens the path.
 -- ------------------------------------------------------------
 diag : Supp
 diag = restr r full
@@ -187,8 +190,8 @@ diag-ft = refl
 &&-r true  b p = p
 &&-r false b p = E.rec (true≢false (sym p))
 
--- The mixed cells force both factors true; the agreeing cell is
--- then forced true, and it is false.
+-- The mixed cells force both factors true.  Then the agreeing
+-- cell is forced true, but it is false.
 xor-not-indep : ¬ (IsProduct diag)
 xor-not-indep (f , g , eq) = true≢false (sym step)
   where
@@ -211,9 +214,9 @@ not-closed
       → fst (Indep d S) → fst (Indep e (restr k S)) )
 not-closed cl = not-indep-cond (cl marg cond r full full-indep)
 
--- And therefore the universal property of Ω does not apply:
--- the hypothesis Topos.Classifier requires is exactly the one
--- refuted above, so there is no characteristic map to build.
+-- Therefore the universal property of Ω does not apply.  The
+-- hypothesis that Topos.Classifier requires is the one that
+-- not-closed refutes.  So there is no characteristic map to build.
 no-sieve
   : ¬ ( (d e : BObj) (k : BHom e d) (S : Supp)
       → fst (Indep d S) → fst (Indep e (restr k S)) )

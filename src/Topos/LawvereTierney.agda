@@ -1,18 +1,18 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.LawvereTierney — Stage 2.  A Lawvere–Tierney topology
+-- Topos.LawvereTierney: Stage 2.  A Lawvere-Tierney topology
 -- j : Ω → Ω on the subobject classifier of the presheaf topos.
 --
 -- j is the internal counterpart of a Grothendieck topology.  It
--- also corresponds to a lex modality ◯ (Rijke–Shulman–Spitters).
--- j picks out the covered sieves, also called the j-dense ones,
--- and the j-closed subobjects form a sub-(∞-)topos.  In the
+-- also corresponds to a lex modality ◯ (Rijke-Shulman-Spitters).
+-- j picks out the covered sieves, also called the j-dense
+-- sieves.  The j-closed subobjects form a sub-(∞-)topos.  In the
 -- causal reading (translation.md:25, outline.md:85), j is the
 -- modality of Mahadevan's j-do-calculus, and "j-stable discovery"
 -- means ◯-modal structure.
 --
--- The three axioms are MacLane–Moerdijk's (Sheaves in Geometry &
+-- The three axioms are MacLane-Moerdijk's (Sheaves in Geometry &
 -- Logic, V.1):
 --     j ∘ true  = true        (j preserves ⊤)
 --     j ∘ j     = j           (idempotent)
@@ -50,7 +50,7 @@ module _ {ℓo ℓh} {C : Precategory ℓo ℓh} where
     (λ d e k f pf → (snd S d e k f (fst pf) , snd T d e k f (snd pf)))
 
   -- ----------------------------------------------------------
-  -- A Lawvere–Tierney topology on Ω.
+  -- A Lawvere-Tierney topology on Ω.
   -- ----------------------------------------------------------
   -- jop is the bare regime-wise operation.  jnat makes it an
   -- internal morphism Ω ⇒ Ω, since it says that jop commutes with

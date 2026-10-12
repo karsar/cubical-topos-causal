@@ -4,7 +4,8 @@
 -- RuleDoCalc.agda
 --
 -- Pearl's do-calculus in kernel form, on small structural
--- causal models.  It is built on FDist-Convex.
+-- causal models (SCMs).  A kernel maps a value to a
+-- distribution.  The file is built on FDist-Convex.
 --
 -- Rules verified:
 --   * Rule 1 (insertion/deletion of observations) on SCM₂ and
@@ -21,7 +22,7 @@
 -- The proofs use the monad laws and constBind.  The monad laws
 -- are derived here from the bind definition in FDist-Convex.
 -- constBind is the structural lemma d >>= λ_ → e ≡ e.  There
--- are no postulates beyond those of FDist-Convex.
+-- are no postulates, here or in FDist-Convex.
 -- ============================================================
 
 module RuleDoCalc where
@@ -466,19 +467,19 @@ marginal-X-fuse : ∀ {ℓ ℓ' ℓ''} {X : Type ℓ} {Y : Type ℓ'} {Z : Type 
   → (m : SCM₃ X Y Z)
   → marginal-X m ≡ pX m
 marginal-X-fuse {X = X} {Y = Y} {Z = Z} m =
-    -- Step 1: peel off the outer mapF fst into the outer bind.
+    -- Step 1: move the outer mapF fst into the outer bind.
     >>=-assoc (pX m)
       (λ x → kY m x >>= λ y → kZ m y >>= λ z → pure (x , (y , z)))
       (λ p → pure (fst p))
     -- ≡ pX m >>= λ x → (kY m x >>= λ y → kZ m y >>= λ z → pure (x,(y,z))) >>= λ p → pure (fst p)
     ∙ cong (pX m >>=_) (funExt λ x →
-        -- Step 2: peel through the kY-bind.
+        -- Step 2: move through the kY-bind.
         >>=-assoc (kY m x)
           (λ y → kZ m y >>= λ z → pure (x , (y , z)))
           (λ p → pure (fst p))
         -- ≡ kY m x >>= λ y → (kZ m y >>= λ z → pure (x,(y,z))) >>= λ p → pure (fst p)
         ∙ cong (kY m x >>=_) (funExt λ y →
-            -- Step 3: peel through the kZ-bind.
+            -- Step 3: move through the kZ-bind.
             >>=-assoc (kZ m y)
               (λ z → pure (x , (y , z)))
               (λ p → pure (fst p))
@@ -553,19 +554,19 @@ rule3-XY-marginal m z₀ =
     ∙ sym (marginal-XY-collapse m)
 
 -- ============================================================
--- Honest framing notes
+-- Scope notes
 --
 -- These theorems are Pearl's do-calculus in kernel form, on
 -- small fixed structural causal models.  They follow the Rule 1
 -- verification in this paper.  They are not the general
--- do-calculus.  The general form would need DAGs as types in
+-- do-calculus.  The general form needs DAGs as types in
 -- cubical Agda, d-separation on graphs, and the
 -- graph-mutilation operations that the classical statements
 -- refer to.  That is a separate development, of much larger
 -- scope.
 --
--- The Rule 3 proofs above use no postulates beyond those of
--- FDist-Convex.  They follow the Rule 1 pattern: derive the
+-- The Rule 3 proofs above use no postulates, and FDist-Convex
+-- has none either.  They follow the Rule 1 pattern: derive the
 -- marginal-fuse lemma, then collapse with constBind.  The
 -- structural fact used is that an intervention on a variable
 -- cannot change a marginal that does not depend on that

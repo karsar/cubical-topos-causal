@@ -1,13 +1,13 @@
 {-# OPTIONS --safe --cubical --guardedness #-}
 
 -- ============================================================
--- Topos.Example — a concrete instance on which internal Rule 1
+-- Topos.Example: a concrete instance on which internal Rule 1
 -- computes.
 --
 -- Base: two regimes, the discrete category on Bool.
 -- Value presheaves X, Y: constant Bool.
--- Internal SCM m: at regime c the prior is the point mass on c,
---   so the two regimes differ.  The mechanism kY _ = pure true
+-- Internal SCM (structural causal model) m: at regime c the
+--   prior is the point mass on c, so the two regimes differ.  The mechanism kY _ = pure true
 --   makes Y deterministically true, so Y ⫫ X.
 --
 -- The intervention do(X := x₀) changes the joint, and in
