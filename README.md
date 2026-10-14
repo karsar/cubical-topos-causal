@@ -3,14 +3,16 @@
 This repository is the Cubical Agda artifact for the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
-The paper describes the state at tag `v1.12-lmcs`. That tag extends the
-earlier tag `v1.11-lmcs` (commit `249b3ef`). It adds the identification,
-descent, local-reflection, groupoid-classicality and topology-comparison
-results listed below.
+The paper describes the state at tag `v1.13-lmcs`. That tag extends the
+earlier tag `v1.12-lmcs` (commit `9dd2a50`). It adds `SubModelArrow`,
+which shows that the source's sub-model arrow cannot single out an
+intervention over finite state spaces.  Tag `v1.12-lmcs` added the
+identification, descent, local-reflection, groupoid-classicality and
+topology-comparison results listed below.
 
-The development has 61 modules in `src/Topos/` and 9 modules in
+The development has 62 modules in `src/Topos/` and 9 modules in
 `src/Transport/`. They sit on a probability layer of 8 modules. The paper
-uses 59 of the Topos modules and all 9 Transport modules. The two other
+uses 60 of the Topos modules and all 9 Transport modules. The two other
 Topos modules, `VersionFactoring` and `VersionSite`, stay in the
 repository, but the paper does not describe them.
 
@@ -20,6 +22,15 @@ The verified results include the following:
   classifier of admissible mechanisms on an exponential object.
 - A comparison of intervention with conditioning at the level of kernels.
   A rational weight strictly between 0 and 1 shows that the two differ.
+- The sub-model arrow. `SubModelArrow` works in the arrow category, where
+  a model is a function from exogenous to endogenous states. Pearl's
+  intervened model keeps the state spaces of its parent. When these are
+  finite, every monic arrow from it into the parent is an isomorphism, by
+  the pigeonhole principle. So the arrow only renames states, and the
+  subobject it gives is the whole parent model. A perfectly confounded
+  example shows the renaming. It also shows that the proper sub-model
+  where X is true fixes Y, as conditioning does, while the intervention
+  leaves Y free.
 - Pullbacks and their universal property, presheaf forcing, and
   Lawvere–Tierney topologies. A pullback is a limit. It does not give the
   sheaf condition over a cover.
@@ -68,7 +79,7 @@ The verified results include the following:
 
 | Modules | Count | Status |
 |---|---|---|
-| Core topos layer, including `AbstractionReflection` and `GroupoidClassicality` | 54 in `src/Topos/` | Paper |
+| Core topos layer, including `AbstractionReflection`, `GroupoidClassicality` and `SubModelArrow` | 55 in `src/Topos/` | Paper |
 | `IdentProbe`, `Identification`, `IdentificationModels`, `IdentificationSieve` | 4 | Paper. `IdentProbe` is an earlier, elementary probe |
 | `TopologyComparison` | 1 | Paper |
 | `Transport*`, including `TransportDescent` | 9 in `src/Transport/` | Paper |

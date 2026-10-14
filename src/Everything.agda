@@ -63,6 +63,7 @@ open import Topos.SCM
 open import Topos.MediatorObstruction
 open import Topos.ReversedSite
 open import Topos.SiteSelfObstruction
+open import Topos.SubModelArrow
 open import Topos.SCMNat
 open import Topos.ThreeSiteObstruction
 open import Topos.TiersConverse
