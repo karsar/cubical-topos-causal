@@ -29,6 +29,7 @@ open import Topos.Forcing
 open import Topos.MechanismGeometric
 open import Topos.MechanismSeparation
 open import Topos.MechanismSite
+open import Topos.Modularity
 open import Topos.VersionFactoring
 open import Topos.VersionSite
 open import Topos.IdentProbe

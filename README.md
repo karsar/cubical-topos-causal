@@ -3,16 +3,19 @@
 This repository is the Cubical Agda artifact for the paper
 *"A cubical formalisation of topos causal models: intervention, forcing, and a contextuality obstruction."*
 
-The paper describes the state at tag `v1.13-lmcs`. That tag extends the
-earlier tag `v1.12-lmcs` (commit `9dd2a50`). It adds `SubModelArrow`,
-which shows that the source's sub-model arrow cannot single out an
-intervention over finite state spaces.  Tag `v1.12-lmcs` added the
+The paper describes the state at tag `v1.14-lmcs`. That tag extends
+`v1.13-lmcs` (commit `e9528dc`). It adds `Modularity`, which states
+modularity as a property of the menu of interventions that a world
+allows. The property can fail, and the module gives worlds where it
+fails. Tag `v1.13-lmcs` added `SubModelArrow`, which shows that the
+source's sub-model arrow cannot single out an intervention over finite
+state spaces. Tag `v1.12-lmcs` (commit `9dd2a50`) added the
 identification, descent, local-reflection, groupoid-classicality and
 topology-comparison results listed below.
 
-The development has 62 modules in `src/Topos/` and 9 modules in
+The development has 63 modules in `src/Topos/` and 9 modules in
 `src/Transport/`. They sit on a probability layer of 8 modules. The paper
-uses 60 of the Topos modules and all 9 Transport modules. The two other
+uses 61 of the Topos modules and all 9 Transport modules. The two other
 Topos modules, `VersionFactoring` and `VersionSite`, stay in the
 repository, but the paper does not describe them.
 
@@ -20,6 +23,12 @@ The verified results include the following:
 
 - The general subobject classifier, the classifier of a fixed value, and a
   classifier of admissible mechanisms on an exponential object.
+- Modularity. `Modularity` takes two mechanism slots. A world gives its
+  menu of allowed interventions. The menu splits when each allowed change
+  can also act on one slot alone. Pearl's menu of hard surgeries splits.
+  Three small worlds show that the properties differ. One menu splits
+  but allows a soft intervention. In a second, the act that sets X also
+  changes Y. In a third, X and Y can only be set together.
 - A comparison of intervention with conditioning at the level of kernels.
   A rational weight strictly between 0 and 1 shows that the two differ.
 - The sub-model arrow. `SubModelArrow` works in the arrow category, where
@@ -79,7 +88,7 @@ The verified results include the following:
 
 | Modules | Count | Status |
 |---|---|---|
-| Core topos layer, including `AbstractionReflection`, `GroupoidClassicality` and `SubModelArrow` | 55 in `src/Topos/` | Paper |
+| Core topos layer, including `AbstractionReflection`, `GroupoidClassicality`, `SubModelArrow` and `Modularity` | 56 in `src/Topos/` | Paper |
 | `IdentProbe`, `Identification`, `IdentificationModels`, `IdentificationSieve` | 4 | Paper. `IdentProbe` is an earlier, elementary probe |
 | `TopologyComparison` | 1 | Paper |
 | `Transport*`, including `TransportDescent` | 9 in `src/Transport/` | Paper |
